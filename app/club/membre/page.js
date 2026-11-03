@@ -138,6 +138,14 @@ export default async function Membre({ searchParams }) {
         </div>
       </section>
 
+      {member.is_admin && (
+        <section className="section">
+          <Link href="/admin" className="btn btn-ghost">
+            Espace administrateur
+          </Link>
+        </section>
+      )}
+
       <section className="section">
         <form action="/deconnexion" method="post">
           <button className="btn btn-ghost">Se déconnecter</button>
