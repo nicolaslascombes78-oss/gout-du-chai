@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import CodeVerify from "@/components/CodeVerify";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -9,18 +10,25 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
 
-  async function onSubmit(e) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const address = email.trim().toLowerCase();
+
+  async function send() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
+      email: address,
       options: {
         shouldCreateUser: false, // seuls les membres existants peuvent se connecter ici
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+    return error;
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const error = await send();
     setLoading(false);
     if (error) {
       setError(
@@ -34,15 +42,7 @@ export default function LoginForm() {
   }
 
   if (sent) {
-    return (
-      <div className="stack" style={{ textAlign: "center" }}>
-        <p className="eyebrow">E-mail envoyé</p>
-        <h2>Vérifiez votre boîte mail</h2>
-        <p className="muted">
-          Ouvrez le lien reçu sur <strong>{email}</strong> depuis ce même appareil.
-        </p>
-      </div>
-    );
+    return <CodeVerify email={address} onResend={async () => !(await send())} />;
   }
 
   return (
@@ -53,7 +53,7 @@ export default function LoginForm() {
       </div>
       {error && <p className="error">{error}</p>}
       <button className="btn" disabled={loading || !email.trim()}>
-        {loading ? "Envoi…" : "Recevoir mon lien"}
+        {loading ? "Envoi…" : "Recevoir mon code"}
       </button>
     </form>
   );

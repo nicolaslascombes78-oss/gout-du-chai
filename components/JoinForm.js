@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import CodeVerify from "@/components/CodeVerify";
 
 export default function JoinForm({ code }) {
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "" });
@@ -13,6 +14,25 @@ export default function JoinForm({ code }) {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const ready = form.first_name.trim() && form.last_name.trim() && form.email.trim() && adult && terms;
+  const address = form.email.trim().toLowerCase();
+
+  async function send() {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email: address,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          invite_code: code,
+          is_adult: true,
+          accepted_terms: true,
+        },
+      },
+    });
+    return error;
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -29,19 +49,7 @@ export default function JoinForm({ code }) {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email: form.email.trim().toLowerCase(),
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: {
-          first_name: form.first_name.trim(),
-          last_name: form.last_name.trim(),
-          invite_code: code,
-          is_adult: true,
-          accepted_terms: true,
-        },
-      },
-    });
+    const error = await send();
     setLoading(false);
     if (error) {
       setError(
@@ -55,16 +63,7 @@ export default function JoinForm({ code }) {
   }
 
   if (sent) {
-    return (
-      <div className="stack" style={{ textAlign: "center" }}>
-        <p className="eyebrow">E-mail envoyé</p>
-        <h2>Vérifiez votre boîte mail</h2>
-        <p className="muted">
-          Nous avons envoyé un lien d&apos;accès à <strong>{form.email}</strong>.
-          Ouvrez-le depuis ce même téléphone pour finaliser votre inscription.
-        </p>
-      </div>
-    );
+    return <CodeVerify email={address} onResend={async () => !(await send())} />;
   }
 
   return (
@@ -94,7 +93,7 @@ export default function JoinForm({ code }) {
       </label>
       {error && <p className="error">{error}</p>}
       <button className="btn" disabled={loading || !ready}>
-        {loading ? "Envoi…" : "Recevoir mon lien d'accès"}
+        {loading ? "Envoi…" : "Recevoir mon code d'accès"}
       </button>
     </form>
   );
