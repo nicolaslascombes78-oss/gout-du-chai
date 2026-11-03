@@ -1,0 +1,152 @@
+/* Thème « nuit et or » : encre, ivoire, or, titres didone */
+:root {
+  --ink: #0e0d0b;
+  --ink-2: #17150f;
+  --line: #2c271c;
+  --ivory: #f2ebdd;
+  --ivory-dim: #b9b1a1;
+  --gold: #c9a45c;
+  --gold-soft: #e3c987;
+  --error: #e08a7a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { background: var(--ink); color: var(--ivory); }
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--gold-soft); text-decoration: none; }
+
+.shell {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-family: var(--font-serif), serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--gold);
+  text-align: center;
+}
+
+.ornament {
+  width: 48px; height: 1px; background: var(--gold);
+  margin: 18px auto; opacity: 0.7;
+}
+
+h1, h2, h3 { font-family: var(--font-serif), serif; font-weight: 500; }
+h1 { font-size: 38px; line-height: 1.1; text-align: center; margin-top: 40px; }
+h2 { font-size: 24px; line-height: 1.2; }
+h3 { font-size: 19px; }
+
+.lead { color: var(--ivory-dim); text-align: center; margin-top: 16px; }
+.muted { color: var(--ivory-dim); font-size: 14px; }
+.eyebrow {
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.stack > * + * { margin-top: 14px; }
+.section { margin-top: 36px; }
+
+label { display: block; font-size: 13px; color: var(--ivory-dim); margin-bottom: 6px; }
+
+input[type="text"], input[type="email"] {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ivory);
+  font: inherit;
+  padding: 14px 14px;
+  outline: none;
+}
+input:focus { border-color: var(--gold); }
+input.code { text-transform: uppercase; letter-spacing: 0.15em; text-align: center; }
+
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--ivory-dim); }
+.check input { margin-top: 4px; accent-color: var(--gold); }
+
+.btn {
+  display: block; width: 100%;
+  border: none; border-radius: 999px;
+  padding: 15px 20px;
+  font: inherit; font-weight: 600; letter-spacing: 0.04em;
+  background: var(--gold); color: var(--ink);
+  cursor: pointer; text-align: center;
+}
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-ghost { background: transparent; color: var(--gold-soft); border: 1px solid var(--line); }
+
+.error { color: var(--error); font-size: 14px; }
+.success { color: var(--gold-soft); font-size: 14px; }
+
+.vitrine { display: grid; gap: 12px; }
+.vitrine .card h3 { margin-top: 4px; }
+
+.member-card {
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  padding: 22px;
+  background: linear-gradient(140deg, #1d1912 0%, #0e0d0b 70%);
+}
+.member-card .num { font-family: var(--font-serif), serif; font-size: 30px; color: var(--gold-soft); }
+
+.gauge { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.gauge > span { display: block; height: 100%; background: var(--gold); }
+
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+
+footer.foot { margin-top: auto; padding-top: 40px; text-align: center; font-size: 12px; color: var(--ivory-dim); }
+
+/* Catalogue */
+.link-btn { background: none; border: none; color: var(--ivory-dim); font: inherit; font-size: 14px; cursor: pointer; }
+.select {
+  width: 100%; background: var(--ink-2); color: var(--ivory); border: 1px solid var(--line);
+  border-radius: 10px; padding: 13px 14px; font: inherit; appearance: none;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 1px solid var(--line); background: transparent; color: var(--ivory-dim);
+  border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.chip.on { border-color: var(--gold); color: var(--ink); background: var(--gold); }
+.domain-card { display: block; color: var(--ivory); }
+.domain-card h3 { margin: 4px 0 2px; }
+.badge {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--ivory-dim);
+}
+.badge-ouvert { border-color: var(--gold); color: var(--gold-soft); }
+.badge-bientot { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.badge-declenche { background: var(--ivory); border-color: var(--ivory); color: var(--ink); }
+.price { font-family: var(--font-serif), serif; color: var(--gold-soft); white-space: nowrap; }
+.cuvee-list { border: 1px solid var(--line); border-radius: 14px; background: var(--ink-2); }
+.cuvee { display: flex; justify-content: space-between; gap: 14px; padding: 14px 16px; }
+.cuvee + .cuvee { border-top: 1px solid var(--line); }
+.cuvee .muted { font-size: 13px; }
+.heart { color: var(--gold); }
+.fav { border-color: var(--gold); }
+.hero-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; margin-top: 20px; }
+.scroller { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
+.scroller .mini { flex: 0 0 72%; scroll-snap-align: start; color: var(--ivory); }
+.btn { text-decoration: none; }

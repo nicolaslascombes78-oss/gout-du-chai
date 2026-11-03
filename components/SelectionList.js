@@ -1,0 +1,90 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import Gauge from "@/components/Gauge";
+import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
+
+const QUICK = [
+  { key: "bientot", label: "Bientôt atteint" },
+  { key: "coeur", label: "Coups de cœur" },
+  { key: "nouveau", label: "Nouveautés" },
+  { key: "a_venir", label: "À venir" },
+];
+
+export default function SelectionList({ domains, initialFilter }) {
+  const [region, setRegion] = useState("");
+  const [color, setColor] = useState("");
+  const [quick, setQuick] = useState(QUICK.some((q) => q.key === initialFilter) ? initialFilter : "");
+
+  const regions = useMemo(() => [...new Set(domains.map((d) => d.region))].sort((a, b) => a.localeCompare(b, "fr")), [domains]);
+
+  const newest = useMemo(() => {
+    const sorted = [...domains].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return new Set(sorted.slice(0, 6).map((d) => d.id));
+  }, [domains]);
+
+  const list = domains
+    .map((d) => ({ ...d, st: displayStatus(d, d.reserved) }))
+    .filter((d) => (quick === "a_venir" ? d.st.key === "a_venir" : d.st.key !== "a_venir"))
+    .filter((d) => !region || d.region === region)
+    .filter((d) => !color || d.colors.includes(color))
+    .filter((d) => quick !== "bientot" || d.st.key === "bientot")
+    .filter((d) => quick !== "coeur" || d.favorite)
+    .filter((d) => quick !== "nouveau" || newest.has(d.id));
+
+  const toggle = (setter, current, value) => setter(current === value ? "" : value);
+
+  return (
+    <div className="stack">
+      <select className="select" value={region} onChange={(e) => setRegion(e.target.value)} aria-label="Région">
+        <option value="">Toutes les régions</option>
+        {regions.map((r) => (
+          <option key={r} value={r}>
+            {r}
+          </option>
+        ))}
+      </select>
+
+      <div className="chips">
+        {COLOR_ORDER.filter((c) => c !== "autre").map((c) => (
+          <button key={c} className={`chip ${color === c ? "on" : ""}`} onClick={() => toggle(setColor, color, c)}>
+            {COLOR_LABELS[c]}
+          </button>
+        ))}
+      </div>
+      <div className="chips">
+        {QUICK.map((q) => (
+          <button key={q.key} className={`chip ${quick === q.key ? "on" : ""}`} onClick={() => toggle(setQuick, quick, q.key)}>
+            {q.label}
+          </button>
+        ))}
+      </div>
+
+      <p className="muted">
+        {list.length} domaine{list.length > 1 ? "s" : ""}
+      </p>
+
+      {list.map((d) => (
+        <Link href={`/club/domaine/${d.slug}`} key={d.id} className="card domain-card">
+          <div className="row">
+            <p className="muted">
+              {d.region}
+              {d.appellation ? ` · ${d.appellation}` : ""}
+            </p>
+            <span className={`badge badge-${d.st.key}`}>{d.st.label}</span>
+          </div>
+          <h3>{d.name}</h3>
+          {d.tagline && <p className="muted">{d.tagline}</p>}
+          <div className="row" style={{ marginTop: 6 }}>
+            <p className="muted">{d.colors.map((c) => COLOR_LABELS[c]).join(" · ")}</p>
+            {d.minPrice != null && <p className="price">dès {euros(d.minPrice)}</p>}
+          </div>
+          {d.st.key !== "a_venir" && <Gauge reserved={d.reserved} threshold={d.threshold} participants={d.participants} />}
+        </Link>
+      ))}
+
+      {list.length === 0 && <p className="muted" style={{ textAlign: "center" }}>Aucun domaine ne correspond à ces filtres.</p>}
+    </div>
+  );
+}
