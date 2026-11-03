@@ -1,14 +1,23 @@
 import { notFound } from "next/navigation";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
+import CuveeStepper from "@/components/CuveeStepper";
+import DomainCartLink from "@/components/DomainCartLink";
 import { requireMember } from "@/lib/data";
 import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
 
+const CLOSED = {
+  a_venir: "Réservations bientôt ouvertes",
+  declenche: "Commande déclenchée",
+  livre: "Commande livrée",
+  expire: "Réservations closes",
+};
+
 export default async function Domaine({ params }) {
   const { slug } = await params;
-  const { supabase } = await requireMember();
+  const { supabase, member } = await requireMember();
 
   const { data: domain } = await supabase
     .from("domains")
@@ -20,16 +29,34 @@ export default async function Domaine({ params }) {
   const [{ data: cuvees }, { data: progress }] = await Promise.all([
     supabase
       .from("cuvees")
-      .select("id, name, vintage, color, member_price, description, is_favorite")
+      .select("id, name, vintage, color, member_price, description, is_favorite, pack_size")
       .eq("domain_id", domain.id)
       .eq("active", true)
       .order("member_price"),
     supabase.from("domain_progress").select("reserved_bottles, participants").eq("domain_id", domain.id).maybeSingle(),
   ]);
 
+  // Ce que ce membre a déjà réservé dans ce domaine.
+  const ids = (cuvees || []).map((c) => c.id);
+  const { data: mine } = ids.length
+    ? await supabase
+        .from("reservations")
+        .select("cuvee_id, quantity")
+        .eq("member_id", member.id)
+        .eq("status", "en_attente")
+        .in("cuvee_id", ids)
+    : { data: [] };
+  const reservedByCuvee = {};
+  (mine || []).forEach((r) => (reservedByCuvee[r.cuvee_id] = (reservedByCuvee[r.cuvee_id] || 0) + r.quantity));
+
   const reserved = progress?.reserved_bottles || 0;
   const participants = progress?.participants || 0;
   const st = displayStatus(domain, reserved);
+  const today = new Date().toISOString().slice(0, 10);
+  const pastDeadline = domain.deadline && domain.deadline < today;
+  const editable = ["ouvert", "bientot_atteint"].includes(domain.status) && !pastDeadline;
+  const closedLabel = pastDeadline ? "Réservations closes" : CLOSED[domain.status] || "Réservations closes";
+
   const groups = COLOR_ORDER.map((c) => ({ color: c, items: (cuvees || []).filter((x) => x.color === c) })).filter(
     (g) => g.items.length
   );
@@ -112,7 +139,17 @@ export default async function Domaine({ params }) {
                       {c.description ? ` · ${c.description}` : ""}
                     </p>
                   </div>
-                  <p className="price">{euros(c.member_price)}</p>
+                  <div className="cuvee-side">
+                    <p className="price">{euros(c.member_price)}</p>
+                    <CuveeStepper
+                      cuveeId={c.id}
+                      domainSlug={domain.slug}
+                      step={c.pack_size}
+                      reserved={reservedByCuvee[c.id] || 0}
+                      editable={editable}
+                      label={c.name}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -122,9 +159,7 @@ export default async function Domaine({ params }) {
       </section>
 
       <section className="section">
-        <button className="btn" disabled>
-          Réservation bientôt disponible
-        </button>
+        <DomainCartLink editable={editable && groups.length > 0} closedLabel={groups.length === 0 ? "Cuvées bientôt disponibles" : closedLabel} />
       </section>
 
       <footer className="foot">

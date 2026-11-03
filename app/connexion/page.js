@@ -8,7 +8,7 @@ export default function Connexion() {
         <Link href="/">Le Goût du Chai</Link>
       </p>
       <h1>Bon retour parmi nous</h1>
-      <p className="lead">Recevez votre lien d&apos;accès par e-mail.</p>
+      <p className="lead">Recevez votre code d&apos;accès par e-mail.</p>
       <div className="ornament" />
       <section className="card">
         <LoginForm />

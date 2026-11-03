@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/lib/cart";
 
 const TABS = [
   {
@@ -32,15 +33,34 @@ const TABS = [
 
 export default function BottomNav() {
   const pathname = usePathname() || "";
+  const { count } = useCart();
   return (
     <nav className="bottom-nav" aria-label="Navigation du club">
       {TABS.map((t) => {
         const on = t.match(pathname);
+        const badge = t.href === "/club/panier" && count > 0;
         return (
           <Link key={t.href} href={t.href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}>
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              {t.icon}
-            </svg>
+            <span className="nav-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {t.icon}
+              </svg>
+              {badge && (
+                <span className="nav-badge" aria-label={`${count} cuvée(s) à confirmer`}>
+                  {count}
+                </span>
+              )}
+            </span>
             <span>{t.label}</span>
           </Link>
         );
