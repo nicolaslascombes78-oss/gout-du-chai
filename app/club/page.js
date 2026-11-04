@@ -12,7 +12,11 @@ export const dynamic = "force-dynamic";
 const OPEN = ["ouvert", "bientot_atteint"];
 
 function hello() {
-  const h = Number(new Intl.DateTimeFormat("fr-FR", { hour: "numeric", hour12: false, timeZone: "Europe/Paris" }).format(new Date()));
+  // Heure de Paris, en chiffres seuls (« 00 » à « 23 »).
+  const h = parseInt(
+    new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Paris" }).format(new Date()),
+    10
+  );
   return h >= 18 || h < 5 ? "Bonsoir" : "Bonjour";
 }
 
