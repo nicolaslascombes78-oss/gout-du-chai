@@ -139,6 +139,8 @@ export default async function Membre({ searchParams }) {
                   participants={p.participants}
                   deadline={d.deadline}
                   showDeadline
+                  mine={g.bottles}
+                  size={64}
                 />
               ) : null}
               {editable && (
@@ -183,7 +185,7 @@ export default async function Membre({ searchParams }) {
         <NotificationToggle />
       </section>
 
-      <section className="section stack">
+      <section className="section stack" id="invitations">
         <h2>Mes invitations</h2>
         <InviteFriend invitesLeft={member.invites_left} isAdmin={member.is_admin} firstName={member.first_name} />
         {(invites || []).length > 0 && (

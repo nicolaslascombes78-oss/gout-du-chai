@@ -143,6 +143,8 @@ export default function CartView({ memberId }) {
                 participants={p.participants}
                 deadline={g.domain.deadline}
                 showDeadline
+                mine={g.items.reduce((n, c) => n + c.qty, 0)}
+                size={64}
               />
             ) : null}
           </section>

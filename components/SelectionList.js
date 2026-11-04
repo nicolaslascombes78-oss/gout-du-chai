@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import Gauge from "@/components/Gauge";
+import Seal from "@/components/Seal";
 import DomainImage from "@/components/DomainImage";
 import { COLOR_LABELS, COLOR_ORDER, cardBadge, displayStatus, euros } from "@/lib/catalogue";
 
@@ -25,14 +26,25 @@ function DomainCard({ d }) {
         </p>
         {badge && <span className={`badge badge-${badge.key}`}>{badge.label}</span>}
       </div>
-      <h3>{d.name}</h3>
-      {d.tagline && <p className="muted">{d.tagline}</p>}
-      <div className="row" style={{ marginTop: 6 }}>
-        <p className="muted">{d.colors.map((c) => COLOR_LABELS[c]).join(" · ")}</p>
-        {d.minPrice != null && <p className="price">dès {euros(d.minPrice)}</p>}
+      <div className="dc-grid">
+        <div style={{ minWidth: 0 }}>
+          <h3>{d.name}</h3>
+          {d.tagline && <p className="muted">{d.tagline}</p>}
+          <p className="muted" style={{ marginTop: 6 }}>
+            {d.colors.map((c) => COLOR_LABELS[c]).join(" · ")}
+            {d.minPrice != null && (
+              <>
+                {" · "}
+                <span className="price">dès {euros(d.minPrice)}</span>
+              </>
+            )}
+          </p>
+        </div>
+        {d.st.key !== "a_venir" && <Seal reserved={d.reserved} threshold={d.threshold} size={84} />}
       </div>
       {d.st.key !== "a_venir" && (
         <Gauge
+          variant="lines"
           reserved={d.reserved}
           threshold={d.threshold}
           participants={d.participants}

@@ -59,6 +59,7 @@ export default async function Domaine({ params }) {
     : { data: [] };
   const reservedByCuvee = {};
   (mine || []).forEach((r) => (reservedByCuvee[r.cuvee_id] = (reservedByCuvee[r.cuvee_id] || 0) + r.quantity));
+  const myBottles = Object.values(reservedByCuvee).reduce((s, n) => s + n, 0);
 
   const reserved = progress?.reserved_bottles || 0;
   const participants = progress?.participants || 0;
@@ -108,6 +109,8 @@ export default async function Domaine({ params }) {
             participants={participants}
             deadline={domain.deadline}
             showDeadline
+            mine={myBottles}
+            size={104}
           />
         )}
         {groups.length > 0 && (

@@ -185,3 +185,82 @@ input[type="email"] { border-radius: 14px; }
   .btn, .chip, .domain-card { transition: none; }
   .btn:active, .chip:active, .card.domain-card:active { transform: none; }
 }
+
+/* ================= Le sceau ================= */
+.seal { position: relative; display: block; flex: 0 0 auto; }
+.seal svg { display: block; }
+.seal-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.seal-num { font-family: var(--font-serif), serif; line-height: 1; color: var(--gold-soft); }
+.seal-lbl { font-size: 11px; line-height: 1.2; color: var(--ivory-dim); margin-top: 2px; }
+
+.gauge-row { display: flex; align-items: center; gap: 16px; }
+.gauge-lines { min-width: 0; }
+.gauge-lines .gauge-txt { margin-top: 2px; }
+.gauge-txt { font-size: 14px; }
+.gauge-first { color: var(--gold-soft); }
+.dot-mine { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ivory); vertical-align: 1px; margin-right: 2px; }
+.is-urgent { color: var(--error) !important; }
+
+/* Cartes : texte à gauche, sceau à droite */
+.dc-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.dc-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.domain-card .dc-grid { margin-top: 2px; }
+.domain-card .gauge-lines { margin-top: 10px; }
+
+/* Accueil */
+.home-hello { text-align: left; font-size: 32px; margin-top: 24px; }
+.home-sub { color: var(--ivory-dim); margin-top: 8px; }
+.home-h2 { font-family: var(--font-serif), serif; font-style: italic; font-weight: 400; font-size: 22px; }
+.mc-compact {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 16px;
+  border: 1px solid rgba(201, 164, 92, 0.45);
+  border-radius: 14px;
+  background: var(--ink-2);
+  color: var(--ivory);
+}
+.mc-num { font-family: var(--font-serif), serif; font-size: 22px; color: var(--gold-soft); }
+.order-card h3 { margin: 2px 0 6px; }
+.order-actions { display: flex; gap: 10px; margin-top: 14px; }
+.order-btn { width: auto; padding: 11px 16px; font-size: 14px; }
+.order-actions .order-btn:first-child { flex: 1; }
+.order-edit { color: var(--ivory-dim); }
+.howto { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.howto li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: center; }
+.howto strong { display: block; font-weight: 600; }
+.howto .muted { display: block; }
+.howto-icon {
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-soft);
+}
+.une { display: block; color: var(--ivory); }
+.une .dom-img { margin-top: 0; }
+.une-name { font-size: 26px; margin-top: 4px; }
+.une .btn { display: block; }
+.hot-list { padding: 0 16px; }
+.hot-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; color: var(--ivory); }
+.hot-row + .hot-row { border-top: 1px solid var(--line); }
+.hot-txt { display: flex; flex-direction: column; min-width: 0; }
+.hot-name { font-family: var(--font-serif), serif; font-size: 17px; }
+.scroller { scrollbar-width: none; }
+.scroller::-webkit-scrollbar { display: none; }
