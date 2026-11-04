@@ -277,3 +277,13 @@ input[type="number"], input[type="date"] {
   opacity: 0.85;
 }
 .dom-img-thumb.is-empty span { font-size: 36px; }
+
+/* Encadré d'information (formulaire d'invitation) */
+.notice {
+  font-size: 14px;
+  color: var(--ivory-dim);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}

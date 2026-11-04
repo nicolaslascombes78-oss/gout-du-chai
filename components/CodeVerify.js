@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { withTimeout } from "@/lib/withTimeout";
 
 // Connexion par code : le membre reste dans son navigateur habituel
 // (Safari, Chrome…) au lieu d'ouvrir le lien dans l'appli mail.
@@ -19,18 +20,18 @@ export default function CodeVerify({ email, onResend }) {
     setError("");
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: clean,
-      type: "email",
-    });
+    const { error } = await withTimeout(supabase.auth.verifyOtp({ email, token: clean, type: "email" }));
     if (error) {
       setLoading(false);
-      setError("Ce code est incorrect ou a expiré. Vérifiez-le ou demandez-en un nouveau.");
+      setError(
+        error.message === "timeout"
+          ? "Le réseau ne répond pas. Vérifiez votre connexion, puis réessayez."
+          : "Ce code est incorrect ou a expiré. Vérifiez-le ou demandez-en un nouveau."
+      );
       return;
     }
     // Crée la fiche membre à la première connexion (sans effet ensuite).
-    const { error: signupError } = await supabase.rpc("complete_signup");
+    const { error: signupError } = await withTimeout(supabase.rpc("complete_signup"));
     if (signupError) {
       await supabase.auth.signOut();
       setLoading(false);
@@ -43,8 +44,10 @@ export default function CodeVerify({ email, onResend }) {
 
   async function resend() {
     setError("");
+    setResent(false);
     const ok = await onResend();
-    setResent(ok);
+    if (ok) setResent(true);
+    else setError("Le nouveau code n'a pas pu partir. Attendez une minute, puis réessayez.");
   }
 
   return (

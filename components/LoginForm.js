@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { withTimeout, sendError } from "@/lib/withTimeout";
 import CodeVerify from "@/components/CodeVerify";
 
 export default function LoginForm() {
@@ -14,31 +15,40 @@ export default function LoginForm() {
 
   async function send() {
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email: address,
-      options: {
-        shouldCreateUser: false, // seuls les membres existants peuvent se connecter ici
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    const { error } = await withTimeout(
+      supabase.auth.signInWithOtp({
+        email: address,
+        options: {
+          shouldCreateUser: false, // seuls les membres existants peuvent se connecter ici
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+    );
     return error;
   }
 
   async function onSubmit(e) {
     e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
-    const error = await send();
-    setLoading(false);
-    if (error) {
-      setError(
-        error.status === 429
-          ? "Trop de demandes en peu de temps. Merci de réessayer dans quelques minutes."
-          : "Cette adresse ne correspond à aucun membre du club."
-      );
-      return;
+    try {
+      const err = await send();
+      if (err) {
+        const unknown = err.message !== "timeout" && err.status !== 429 && !/rate|seconds/i.test(err.message || "");
+        setError(
+          unknown
+            ? "Cette adresse ne correspond à aucun membre. Si vous avez reçu une invitation, inscrivez-vous depuis l'accueil avec votre code."
+            : sendError(err)
+        );
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Une erreur inattendue est survenue. Réessayez dans un instant.");
+    } finally {
+      setLoading(false);
     }
-    setSent(true);
   }
 
   if (sent) {
@@ -51,7 +61,11 @@ export default function LoginForm() {
         <label htmlFor="email">E-mail</label>
         <input id="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
       <button className="btn" disabled={loading || !email.trim()}>
         {loading ? "Envoi…" : "Recevoir mon code"}
       </button>

@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { withTimeout, sendError } from "@/lib/withTimeout";
 import CodeVerify from "@/components/CodeVerify";
 
 export default function JoinForm({ code }) {
@@ -18,48 +20,54 @@ export default function JoinForm({ code }) {
 
   async function send() {
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email: address,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: {
-          first_name: form.first_name.trim(),
-          last_name: form.last_name.trim(),
-          invite_code: code,
-          is_adult: true,
-          accepted_terms: true,
+    const { error } = await withTimeout(
+      supabase.auth.signInWithOtp({
+        email: address,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            first_name: form.first_name.trim(),
+            last_name: form.last_name.trim(),
+            invite_code: code,
+            is_adult: true,
+            accepted_terms: true,
+          },
         },
-      },
-    });
+      })
+    );
     return error;
   }
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (!ready) return;
+    if (!ready || loading) return;
     setError("");
     setLoading(true);
-    const supabase = createClient();
-
-    // Revérifie le code juste avant l'envoi.
-    const { data: valid } = await supabase.rpc("check_invitation", { p_code: code });
-    if (!valid) {
-      setLoading(false);
-      setError("Ce code d'invitation n'est plus valable.");
-      return;
-    }
-
-    const error = await send();
-    setLoading(false);
-    if (error) {
-      setError(
-        error.status === 429
-          ? "Trop de demandes en peu de temps. Merci de réessayer dans quelques minutes."
-          : "L'envoi de l'e-mail a échoué. Vérifiez l'adresse et réessayez."
+    try {
+      const supabase = createClient();
+      // Revérifie le code juste avant l'envoi.
+      const { data: valid, error: checkError } = await withTimeout(
+        supabase.rpc("check_invitation", { p_code: code })
       );
-      return;
+      if (checkError) {
+        setError(sendError(checkError));
+        return;
+      }
+      if (!valid) {
+        setError("Ce code d'invitation n'est plus valable. Si vous êtes déjà membre, connectez-vous ci-dessous.");
+        return;
+      }
+      const err = await send();
+      if (err) {
+        setError(sendError(err));
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Une erreur inattendue est survenue. Réessayez dans un instant.");
+    } finally {
+      setLoading(false);
     }
-    setSent(true);
   }
 
   if (sent) {
@@ -68,6 +76,9 @@ export default function JoinForm({ code }) {
 
   return (
     <form onSubmit={onSubmit} className="stack">
+      <p className="notice">
+        Déjà membre ? <Link href="/connexion">Connectez-vous avec votre e-mail</Link>, inutile de vous réinscrire.
+      </p>
       <p className="muted">
         Code d&apos;invitation : <strong style={{ color: "var(--gold-soft)" }}>{code}</strong>
       </p>
@@ -91,10 +102,19 @@ export default function JoinForm({ code }) {
         <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
         J&apos;accepte les conditions du club.
       </label>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
       <button className="btn" disabled={loading || !ready}>
         {loading ? "Envoi…" : "Recevoir mon code d'accès"}
       </button>
+      {error && (
+        <p className="muted" style={{ textAlign: "center" }}>
+          <Link href="/connexion">Je suis déjà membre : me connecter</Link>
+        </p>
+      )}
     </form>
   );
 }
