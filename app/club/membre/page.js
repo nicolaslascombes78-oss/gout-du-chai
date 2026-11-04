@@ -3,6 +3,7 @@ import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
 import InviteFriend from "@/components/InviteFriend";
+import NotificationToggle from "@/components/NotificationToggle";
 import { requireMember } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 
@@ -128,6 +129,11 @@ export default async function Membre({ searchParams }) {
             bancaire arrive très prochainement.
           </p>
         )}
+      </section>
+
+      <section className="section stack">
+        <h2>Notifications</h2>
+        <NotificationToggle />
       </section>
 
       <section className="section stack">
