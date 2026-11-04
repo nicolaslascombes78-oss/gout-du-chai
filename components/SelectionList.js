@@ -156,7 +156,7 @@ export default function SelectionList({ domains, initialFilter }) {
                   className="region-toggle"
                   aria-expanded={isOpen}
                   aria-controls={id}
-                  onClick={() => setOpen({ ...open, [g.region]: !isOpen })}
+                  onClick={() => setOpen((cur) => ({ ...cur, [g.region]: !cur[g.region] }))}
                 >
                   <span className="region-name">{g.region}</span>
                   <span className="region-meta">

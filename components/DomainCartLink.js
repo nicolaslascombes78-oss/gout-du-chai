@@ -28,7 +28,8 @@ export default function DomainCartLink({ editable, closedLabel, cuvees = [] }) {
   const amount = cuvees.reduce((s, c) => s + qtyOf(c) * c.price, 0);
   return (
     <>
-      <Link href="/club/panier" className="btn">
+      {/* Un seul bouton doré à l'écran : quand la barre fixe est là, celui-ci devient discret. */}
+      <Link href="/club/panier" className={changed ? "btn btn-ghost" : "btn"}>
         Voir le panier
       </Link>
       {changed && (
