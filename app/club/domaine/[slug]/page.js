@@ -2,11 +2,13 @@ import { notFound } from "next/navigation";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CuveeStepper from "@/components/CuveeStepper";
+import CuveeTabs from "@/components/CuveeTabs";
 import DomainCartLink from "@/components/DomainCartLink";
 import DomainImage from "@/components/DomainImage";
 import FollowButton from "@/components/FollowButton";
+import StoryClamp from "@/components/StoryClamp";
 import { requireMember } from "@/lib/data";
-import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
+import { COLOR_LABELS, COLOR_ORDER, cardBadge, displayStatus, euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +63,7 @@ export default async function Domaine({ params }) {
   const reserved = progress?.reserved_bottles || 0;
   const participants = progress?.participants || 0;
   const st = displayStatus(domain, reserved);
+  const badge = cardBadge(domain, st);
   const today = new Date().toISOString().slice(0, 10);
   const pastDeadline = domain.deadline && domain.deadline < today;
   const editable = ["ouvert", "bientot_atteint"].includes(domain.status) && !pastDeadline;
@@ -69,10 +72,13 @@ export default async function Domaine({ params }) {
   const groups = COLOR_ORDER.map((c) => ({ color: c, items: (cuvees || []).filter((x) => x.color === c) })).filter(
     (g) => g.items.length
   );
+  const tabs = groups.map((g) => ({ color: g.color, label: COLOR_LABELS[g.color], count: g.items.length }));
   const favorites = (cuvees || []).filter((c) => c.is_favorite);
-  const deadline = domain.deadline
-    ? new Date(domain.deadline).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })
-    : null;
+  const forBar = (cuvees || []).map((c) => ({
+    id: c.id,
+    price: Number(c.member_price),
+    reserved: reservedByCuvee[c.id] || 0,
+  }));
 
   return (
     <main className="shell">
@@ -91,21 +97,26 @@ export default async function Domaine({ params }) {
       <section className="card stack">
         <div className="row">
           <p className="eyebrow">Commande groupée</p>
-          <span className={`badge badge-${st.key}`}>{st.label}</span>
+          {badge && <span className={`badge badge-${badge.key}`}>{badge.label}</span>}
         </div>
         {st.key === "a_venir" ? (
           <p className="muted">Les réservations ouvriront prochainement.</p>
         ) : (
-          <Gauge reserved={reserved} threshold={domain.threshold} participants={participants} />
+          <Gauge
+            reserved={reserved}
+            threshold={domain.threshold}
+            participants={participants}
+            deadline={domain.deadline}
+            showDeadline
+          />
         )}
-        {deadline && <p className="muted">Date limite : {deadline}</p>}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
 
       {domain.story && (
         <section className="section stack">
           <h2>Pourquoi on l&apos;aime</h2>
-          <p style={{ whiteSpace: "pre-line" }}>{domain.story}</p>
+          <StoryClamp text={domain.story} />
         </section>
       )}
 
@@ -127,46 +138,52 @@ export default async function Domaine({ params }) {
         </section>
       )}
 
-      <section className="section stack">
+      <section className="section stack" id="cuvees">
         <h2>Les cuvées</h2>
         {groups.length === 0 && <p className="muted">Les cuvées de ce domaine arrivent bientôt.</p>}
-        {groups.map((g) => (
-          <div key={g.color} className="stack">
-            <p className="eyebrow">{COLOR_LABELS[g.color]}</p>
-            <div className="cuvee-list">
-              {g.items.map((c) => (
-                <div className="cuvee" key={c.id}>
-                  <div>
-                    <p>
-                      {c.name}
-                      {c.is_favorite && <span className="heart"> ♥</span>}
-                    </p>
-                    <p className="muted">
-                      {c.vintage || "Sans millésime"}
-                      {c.description ? ` · ${c.description}` : ""}
-                    </p>
+        <CuveeTabs tabs={tabs}>
+          {groups.map((g) => (
+            <div key={g.color} className="stack cuvee-group" data-c={g.color}>
+              <p className="eyebrow">{COLOR_LABELS[g.color]}</p>
+              <div className="cuvee-list">
+                {g.items.map((c) => (
+                  <div className="cuvee" key={c.id}>
+                    <div>
+                      <p>
+                        {c.name}
+                        {c.is_favorite && <span className="heart"> ♥</span>}
+                      </p>
+                      <p className="muted">
+                        {c.vintage || "Sans millésime"}
+                        {c.description ? ` · ${c.description}` : ""}
+                      </p>
+                    </div>
+                    <div className="cuvee-side">
+                      <p className="price">{euros(c.member_price)}</p>
+                      <CuveeStepper
+                        cuveeId={c.id}
+                        domainSlug={domain.slug}
+                        step={c.pack_size}
+                        reserved={reservedByCuvee[c.id] || 0}
+                        editable={editable}
+                        label={c.name}
+                      />
+                    </div>
                   </div>
-                  <div className="cuvee-side">
-                    <p className="price">{euros(c.member_price)}</p>
-                    <CuveeStepper
-                      cuveeId={c.id}
-                      domainSlug={domain.slug}
-                      step={c.pack_size}
-                      reserved={reservedByCuvee[c.id] || 0}
-                      editable={editable}
-                      label={c.name}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </CuveeTabs>
         <p className="muted">Prix adhérents TTC, départ domaine.</p>
       </section>
 
       <section className="section">
-        <DomainCartLink editable={editable && groups.length > 0} closedLabel={groups.length === 0 ? "Cuvées bientôt disponibles" : closedLabel} />
+        <DomainCartLink
+          editable={editable && groups.length > 0}
+          closedLabel={groups.length === 0 ? "Cuvées bientôt disponibles" : closedLabel}
+          cuvees={forBar}
+        />
       </section>
 
       <footer className="foot">

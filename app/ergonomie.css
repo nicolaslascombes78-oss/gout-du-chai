@@ -1,0 +1,111 @@
+/* Ergonomie des écrans (audit UX, novembre 2026) */
+
+/* Badges : « Derniers jours » à 5 jours de la clôture */
+.badge-urgent { border-color: var(--error); color: var(--error); }
+
+/* Jauge : textes sous la barre */
+.gauge-txt { margin-top: 6px; }
+.gauge-txt strong { color: var(--ivory); font-weight: 500; }
+.gauge-txt.is-urgent { color: var(--error); }
+
+/* Sélection : régions repliées */
+.regions { border-top: 1px solid var(--line); }
+.region-group { border-bottom: 1px solid var(--line); }
+.region-toggle {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 2px;
+  min-height: 64px;
+  padding: 14px 0;
+  background: none;
+  border: none;
+  color: var(--ivory);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.region-name { font-family: var(--font-serif), serif; font-size: 20px; color: var(--gold-soft); }
+.region-meta { grid-column: 1; font-size: 13px; color: var(--ivory-dim); }
+.region-meta strong { color: var(--gold-soft); font-weight: 500; }
+.region-chevron { grid-column: 2; grid-row: 1 / 3; color: var(--gold-soft); transition: transform 0.2s ease; }
+.region-group.is-open .region-chevron { transform: rotate(180deg); }
+.region-body { padding-bottom: 18px; }
+.region-body > * + * { margin-top: 14px; }
+.region-toggle:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; border-radius: 8px; }
+
+/* Fiche domaine : « Pourquoi on l'aime » en trois lignes */
+.story-text.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.story-more {
+  color: var(--gold-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  min-height: 44px;
+  padding: 8px 0;
+}
+
+/* Fiche domaine : onglets de couleur */
+.cuvee-tabbar {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 -20px;
+  padding: 0 20px 4px;
+}
+.cuvee-tabbar::-webkit-scrollbar { display: none; }
+.cuvee-tabbar .chip { flex: 0 0 auto; min-height: 40px; }
+.chip-n { margin-left: 6px; font-size: 12px; opacity: 0.7; }
+.cuvee-tabs:not([data-f="tout"]) .cuvee-group { display: none; }
+.cuvee-tabs[data-f="bulles"] .cuvee-group[data-c="bulles"],
+.cuvee-tabs[data-f="blanc"] .cuvee-group[data-c="blanc"],
+.cuvee-tabs[data-f="rose"] .cuvee-group[data-c="rose"],
+.cuvee-tabs[data-f="rouge"] .cuvee-group[data-c="rouge"],
+.cuvee-tabs[data-f="autre"] .cuvee-group[data-c="autre"] { display: block; }
+#cuvees { scroll-margin-top: calc(20px + env(safe-area-inset-top, 0px)); }
+
+/* Fiche domaine : barre fixe au-dessus de la navigation dès qu'une bouteille est choisie */
+.cart-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  max-width: 456px;
+  margin: 0 auto;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 12px 16px;
+  background: rgba(23, 21, 15, 0.96);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  animation: install-in 0.3s ease-out;
+}
+.cart-bar-t { font-size: 15px; color: var(--ivory); font-variant-numeric: tabular-nums; }
+.cart-bar-s { font-size: 12px; color: var(--ivory-dim); }
+.cart-bar-btn { width: auto; flex: 0 0 auto; padding: 11px 18px; font-size: 14px; }
+.club-app:has(.cart-bar) .shell { padding-bottom: 180px; }
+
+/* Panier */
+.sous-btn { text-align: center; font-size: 13px; }
+
+/* Formulaires : champ en erreur et message juste dessous */
+input[aria-invalid="true"],
+input[aria-invalid="true"]:focus { border-color: var(--error); }
+.field-err { margin-top: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-bar { animation: none; }
+  .region-chevron { transition: none; }
+}

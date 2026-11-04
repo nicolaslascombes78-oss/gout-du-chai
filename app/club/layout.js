@@ -1,3 +1,4 @@
+import "@/app/ergonomie.css";
 import BottomNav from "@/components/BottomNav";
 import InstallBanner from "@/components/InstallBanner";
 

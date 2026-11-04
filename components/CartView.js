@@ -69,6 +69,7 @@ export default function CartView({ memberId }) {
 
   const changes = Object.keys(cart).length;
   const total = groups.reduce((s, g) => s + g.subtotal, 0);
+  const bottles = groups.reduce((s, g) => s + g.items.reduce((n, c) => n + c.qty, 0), 0);
 
   async function confirm() {
     setError("");
@@ -99,8 +100,8 @@ export default function CartView({ memberId }) {
       <section className="card stack" style={{ textAlign: "center" }}>
         <h2>Votre panier est vide</h2>
         <p className="muted">
-          Choisissez vos bouteilles sur la fiche d&apos;un domaine. Vos réservations déjà confirmées se trouvent dans
-          votre espace Membre.
+          Choisissez vos bouteilles sur la fiche d&apos;un domaine. Vos réservations déjà enregistrées se trouvent
+          dans votre espace Membre.
         </p>
         <Link href="/club/selection" className="btn">
           Parcourir la Sélection
@@ -140,6 +141,8 @@ export default function CartView({ memberId }) {
                 reserved={Math.max(0, p.reserved_bottles + g.delta)}
                 threshold={g.domain.threshold}
                 participants={p.participants}
+                deadline={g.domain.deadline}
+                showDeadline
               />
             ) : null}
           </section>
@@ -148,19 +151,24 @@ export default function CartView({ memberId }) {
 
       <section className="card stack">
         <div className="row">
-          <p>Total de ces réservations</p>
+          <p>
+            Total · {bottles} bouteille{bottles > 1 ? "s" : ""}
+          </p>
           <p className="price" style={{ fontSize: 22 }}>
             {euros(total)}
           </p>
         </div>
-        <p className="muted">
-          Rien n&apos;est débité maintenant. Votre carte ne sera débitée que si le seuil du domaine est atteint. Vous
-          pouvez modifier ou annuler jusqu&apos;au déclenchement de la commande.
-        </p>
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
         <button className="btn" onClick={confirm} disabled={saving}>
-          {saving ? "Enregistrement…" : "Confirmer mes réservations"}
+          {saving ? "Enregistrement…" : "Réserver mes bouteilles"}
         </button>
+        <p className="muted sous-btn">
+          Vous ne serez débité que si la commande est lancée. Modifiable ou annulable jusque-là.
+        </p>
         <button type="button" className="link-btn" onClick={() => clearLines()}>
           Vider le panier
         </button>

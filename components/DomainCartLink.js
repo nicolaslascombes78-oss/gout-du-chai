@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
+import { euros } from "@/lib/catalogue";
 
-export default function DomainCartLink({ editable, closedLabel }) {
-  const { count } = useCart();
+// Bas de la fiche domaine + barre fixe dès qu'une bouteille de ce domaine est choisie.
+// cuvees = [{ id, price, reserved }] pour calculer bouteilles et montant de ce domaine.
+export default function DomainCartLink({ editable, closedLabel, cuvees = [] }) {
+  const { cart, count } = useCart();
   if (!editable) {
     return (
       <button className="btn" disabled>
@@ -15,13 +18,32 @@ export default function DomainCartLink({ editable, closedLabel }) {
   if (count === 0) {
     return (
       <p className="muted" style={{ textAlign: "center" }}>
-        Choisissez vos bouteilles ci-dessus, puis confirmez depuis votre panier.
+        Choisissez vos bouteilles ci-dessus, puis réservez depuis votre panier.
       </p>
     );
   }
+  const changed = cuvees.some((c) => cart[c.id]);
+  const qtyOf = (c) => (cart[c.id] ? cart[c.id].qty : c.reserved);
+  const bottles = cuvees.reduce((s, c) => s + qtyOf(c), 0);
+  const amount = cuvees.reduce((s, c) => s + qtyOf(c) * c.price, 0);
   return (
-    <Link href="/club/panier" className="btn">
-      Voir mon panier · {count} cuvée{count > 1 ? "s" : ""} à confirmer
-    </Link>
+    <>
+      <Link href="/club/panier" className="btn">
+        Voir le panier
+      </Link>
+      {changed && (
+        <div className="cart-bar" role="status">
+          <div>
+            <p className="cart-bar-t">
+              {bottles} bouteille{bottles > 1 ? "s" : ""} · {euros(amount)}
+            </p>
+            <p className="cart-bar-s">Rien n&apos;est débité aujourd&apos;hui</p>
+          </div>
+          <Link href="/club/panier" className="btn cart-bar-btn">
+            Voir le panier
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
