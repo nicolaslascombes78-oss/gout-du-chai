@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 
 const TABS = [
@@ -34,18 +35,31 @@ const TABS = [
 export default function BottomNav() {
   const pathname = usePathname() || "";
   const { count } = useCart();
+  // L'onglet touché s'allume tout de suite, sans attendre la page.
+  const [pending, setPending] = useState(null);
+  useEffect(() => setPending(null), [pathname]);
+
   return (
     <nav className="bottom-nav" aria-label="Navigation du club">
       {TABS.map((t) => {
-        const on = t.match(pathname);
+        const on = pending ? pending === t.href : t.match(pathname);
         const badge = t.href === "/club/panier" && count > 0;
         return (
-          <Link key={t.href} href={t.href} className={on ? "on" : ""} aria-current={on ? "page" : undefined}>
+          <Link
+            key={t.href}
+            href={t.href}
+            prefetch={true}
+            className={on ? "on" : ""}
+            aria-current={on ? "page" : undefined}
+            onClick={() => {
+              if (!t.match(pathname)) setPending(t.href);
+            }}
+          >
             <span className="nav-icon">
               <svg
                 viewBox="0 0 24 24"
-                width="22"
-                height="22"
+                width="24"
+                height="24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
