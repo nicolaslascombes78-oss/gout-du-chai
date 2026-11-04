@@ -11,6 +11,7 @@ export default async function AdminLayout({ children }) {
         <Link href="/admin">Domaines</Link>
         <Link href="/admin/invitations">Invitations</Link>
         <Link href="/admin/membres">Membres</Link>
+        <Link href="/admin/notifications">Notifications</Link>
         <Link href="/club" className="muted">
           Retour au club
         </Link>
