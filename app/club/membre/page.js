@@ -4,19 +4,11 @@ import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
 import InviteFriend from "@/components/InviteFriend";
 import NotificationToggle from "@/components/NotificationToggle";
+import OrderTimeline from "@/components/OrderTimeline";
 import { requireMember } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
-
-const ETAT = {
-  ouvert: "En attente du seuil",
-  bientot_atteint: "En attente du seuil",
-  declenche: "Commande déclenchée",
-  livre: "Livrée",
-  expire: "Close",
-  a_venir: "À venir",
-};
 
 export default async function Membre({ searchParams }) {
   const { supabase, member } = await requireMember();
@@ -90,12 +82,15 @@ export default async function Membre({ searchParams }) {
           const p = progress[d.id] || { reserved_bottles: 0, participants: 0 };
           const editable =
             ["ouvert", "bientot_atteint"].includes(d.status) && (!d.deadline || d.deadline >= today);
+          const paid = g.lines.every((r) => r.status === "payee");
+          const enAttente = ["ouvert", "bientot_atteint", "a_venir"].includes(d.status);
           return (
             <div className="card stack" key={d.id}>
               <div className="row">
                 <h3>{d.name}</h3>
-                <span className="badge">{ETAT[d.status] || d.status}</span>
+                {d.status === "expire" && <span className="badge">Close</span>}
               </div>
+              {d.status !== "expire" && <OrderTimeline status={d.status} paid={paid} />}
               {g.lines.map((r) => (
                 <div className="row" key={r.id}>
                   <p className="muted">
@@ -111,7 +106,7 @@ export default async function Membre({ searchParams }) {
                 </p>
                 <p className="price">{euros(g.total)}</p>
               </div>
-              {d.threshold ? (
+              {enAttente && d.threshold ? (
                 <Gauge reserved={p.reserved_bottles} threshold={d.threshold} participants={p.participants} />
               ) : null}
               {editable && (

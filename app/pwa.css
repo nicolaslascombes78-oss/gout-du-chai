@@ -63,3 +63,45 @@
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) { .install-banner { animation: none; } }
+
+/* Frise de suivi de commande (espace Membre) */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  list-style: none;
+  margin: 6px 0 4px;
+  padding: 0;
+}
+.timeline-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+}
+.timeline-step::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 50%;
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+}
+.timeline-step:first-child::before { display: none; }
+.timeline-step.is-done::before { background: var(--gold); }
+.timeline-dot {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+}
+.is-done .timeline-dot { background: var(--gold); border-color: var(--gold); }
+.is-current .timeline-dot { border-color: var(--gold-soft); box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.2); }
+.timeline-label { font-size: 11px; line-height: 1.2; color: var(--ivory-dim); }
+.is-done .timeline-label { color: var(--ivory); }
+.is-current .timeline-label { color: var(--gold-soft); }
