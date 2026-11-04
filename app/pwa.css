@@ -1,0 +1,6 @@
+/* Appli installée sur iPhone : la barre d'état (heure, batterie) passe au-dessus de l'appli.
+   On décale le haut des pages de la hauteur de l'encoche.
+   Dans Safari ou sur ordinateur, cette hauteur vaut 0 : rien ne change. */
+.shell {
+  padding-top: calc(28px + env(safe-area-inset-top, 0px));
+}
