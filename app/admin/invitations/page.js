@@ -31,7 +31,7 @@ export default async function AdminInvitations({ searchParams }) {
           <div className="card stack" style={{ textAlign: "center", borderColor: "var(--gold)" }}>
             <p className="muted">Invitation créée</p>
             <p className="num-big">{sp.nouveau}</p>
-            <p className="muted">À transmettre avec l&apos;adresse du club : gout-du-chai.vercel.app</p>
+            <p className="muted">À transmettre avec le lien : www.legoutduchai.fr/rejoindre?code={sp.nouveau}</p>
           </div>
         )}
         {sp?.erreur && <p className="error">{ERREURS[sp.erreur] || ERREURS.enregistrement}</p>}

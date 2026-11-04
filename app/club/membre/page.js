@@ -2,6 +2,7 @@ import Link from "next/link";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
+import InviteFriend from "@/components/InviteFriend";
 import { requireMember } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 
@@ -45,6 +46,8 @@ export default async function Membre({ searchParams }) {
     ? await supabase.from("domain_progress").select("domain_id, reserved_bottles, participants").in("domain_id", ids)
     : { data: [] };
   const progress = Object.fromEntries((prog || []).map((p) => [p.domain_id, p]));
+
+  const { data: invites } = await supabase.rpc("my_invitations");
 
   const numero = String(member.member_number).padStart(3, "0");
   const since = new Date(member.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
@@ -129,13 +132,25 @@ export default async function Membre({ searchParams }) {
 
       <section className="section stack">
         <h2>Mes invitations</h2>
-        <div className="card stack">
-          <p>
-            Il vous reste <strong className="price">{member.invites_left}</strong> invitation
-            {member.invites_left > 1 ? "s" : ""} à offrir.
-          </p>
-          <p className="muted">Bientôt, vous pourrez envoyer une invitation à un ami directement depuis cette page.</p>
-        </div>
+        <InviteFriend invitesLeft={member.invites_left} isAdmin={member.is_admin} firstName={member.first_name} />
+        {(invites || []).length > 0 && (
+          <div className="card stack">
+            {(invites || []).map((i) => {
+              const expired = !i.used && new Date(i.expires_at) < new Date();
+              return (
+                <div className="row" key={i.code}>
+                  <div>
+                    <p>{i.code}</p>
+                    {i.invited_email && <p className="muted">{i.invited_email}</p>}
+                  </div>
+                  <span className={`badge ${i.used ? "badge-ouvert" : ""}`}>
+                    {i.used ? `Inscrit·e : ${i.used_by_name || "oui"}` : expired ? "Expirée" : "En attente"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {member.is_admin && (

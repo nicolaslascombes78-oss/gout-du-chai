@@ -14,8 +14,7 @@ export default async function Rejoindre({ searchParams }) {
       </p>
       <h1>Bienvenue dans le cercle</h1>
       <p className="lead">
-        Votre invitation est valable. Quelques informations, et nous vous envoyons
-        votre lien d&apos;accès par e-mail. Pas de mot de passe à retenir.
+        Quelques informations, et nous vous envoyons votre code d&apos;accès par e-mail. Pas de mot de passe à retenir.
       </p>
       <div className="ornament" />
       <section className="card">
