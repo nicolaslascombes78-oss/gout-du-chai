@@ -110,6 +110,11 @@ export default async function Domaine({ params }) {
             showDeadline
           />
         )}
+        {groups.length > 0 && (
+          <a href="#cuvees" className="link-btn story-more jump-cuvees">
+            Voir les {(cuvees || []).length} cuvées
+          </a>
+        )}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
 

@@ -68,6 +68,8 @@
 .cuvee-tabs[data-f="rose"] .cuvee-group[data-c="rose"],
 .cuvee-tabs[data-f="rouge"] .cuvee-group[data-c="rouge"],
 .cuvee-tabs[data-f="autre"] .cuvee-group[data-c="autre"] { display: block; }
+.jump-cuvees { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 #cuvees { scroll-margin-top: calc(20px + env(safe-area-inset-top, 0px)); }
 
 /* Fiche domaine : barre fixe au-dessus de la navigation dès qu'une bouteille est choisie */
@@ -109,3 +111,7 @@ input[aria-invalid="true"]:focus { border-color: var(--error); }
   .cart-bar { animation: none; }
   .region-chevron { transition: none; }
 }
+
+/* Espace Membre : confirmation après réservation */
+.reserve-ok { border-color: var(--gold); }
+.reserve-ok-t { font-family: var(--font-serif), serif; font-size: 22px; color: var(--gold-soft); }

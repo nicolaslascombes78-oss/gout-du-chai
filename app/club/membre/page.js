@@ -84,7 +84,15 @@ export default async function Membre({ searchParams }) {
 
       <section className="section stack">
         <h2>Mes commandes</h2>
-        {justReserved && <p className="success">Vos réservations sont enregistrées.</p>}
+        {justReserved && (
+          <div className="card stack reserve-ok" role="status">
+            <p className="reserve-ok-t">C&apos;est réservé !</p>
+            <p className="muted">
+              Vous ne serez débité que si la commande est lancée. Vous pouvez modifier ou annuler vos bouteilles
+              jusque-là. Un ami amateur peut aider à compléter la commande : invitez-le plus bas.
+            </p>
+          </div>
+        )}
         {groups.length === 0 && (
           <div className="card stack">
             <p className="muted">
@@ -125,7 +133,13 @@ export default async function Membre({ searchParams }) {
                 <p className="price">{euros(g.total)}</p>
               </div>
               {enAttente && d.threshold ? (
-                <Gauge reserved={p.reserved_bottles} threshold={d.threshold} participants={p.participants} />
+                <Gauge
+                  reserved={p.reserved_bottles}
+                  threshold={d.threshold}
+                  participants={p.participants}
+                  deadline={d.deadline}
+                  showDeadline
+                />
               ) : null}
               {editable && (
                 <div className="row" style={{ alignItems: "center" }}>

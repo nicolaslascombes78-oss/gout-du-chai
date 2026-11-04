@@ -16,7 +16,12 @@ export default function CodeVerify({ email, onResend }) {
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (clean.length < 6) return;
+    if (loading) return;
+    if (clean.length < 6) {
+      setError("Saisissez les 6 chiffres du code reçu par e-mail.");
+      document.getElementById("otp")?.focus();
+      return;
+    }
     setError("");
     setLoading(true);
     const supabase = createClient();
@@ -51,28 +56,44 @@ export default function CodeVerify({ email, onResend }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="stack" style={{ textAlign: "center" }}>
+    <form onSubmit={onSubmit} className="stack" style={{ textAlign: "center" }} noValidate>
       <p className="eyebrow">E-mail envoyé</p>
       <h2>Saisissez votre code</h2>
       <p className="muted">
         Nous avons envoyé un code à <strong>{email}</strong>. Saisissez-le ici,
         ou touchez le bouton de l&apos;e-mail.
       </p>
-      <input
-        className="otp"
-        type="text"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        maxLength={8}
-        placeholder="••••••"
-        aria-label="Code reçu par e-mail"
-        value={code}
-        onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-        autoFocus
-      />
-      {error && <p className="error">{error}</p>}
-      {resent && !error && <p className="success">Un nouveau code vient de partir.</p>}
-      <button className="btn" disabled={loading || clean.length < 6}>
+      <div>
+        <input
+          id="otp"
+          className="otp"
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={8}
+          placeholder="••••••"
+          aria-label="Code reçu par e-mail"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "err-otp" : undefined}
+          value={code}
+          onChange={(e) => {
+            setCode(e.target.value.replace(/\D/g, ""));
+            if (error) setError("");
+          }}
+          autoFocus
+        />
+        {error && (
+          <p className="error field-err" id="err-otp" role="alert">
+            {error}
+          </p>
+        )}
+        {resent && !error && (
+          <p className="success field-err" role="status">
+            Un nouveau code vient de partir.
+          </p>
+        )}
+      </div>
+      <button className="btn" disabled={loading}>
         {loading ? "Vérification…" : "Entrer dans le club"}
       </button>
       <button type="button" className="link-btn" onClick={resend}>

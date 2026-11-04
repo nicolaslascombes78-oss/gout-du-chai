@@ -1,9 +1,12 @@
 "use client";
 
+import "@/app/ergonomie.css";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { withTimeout, sendError } from "@/lib/withTimeout";
 import CodeVerify from "@/components/CodeVerify";
+
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -31,6 +34,16 @@ export default function LoginForm() {
     e.preventDefault();
     if (loading) return;
     setError("");
+    // Vérification avant l'envoi : le message s'affiche sous le champ.
+    if (!EMAIL.test(address)) {
+      setError(
+        address
+          ? "Cette adresse e-mail ne semble pas valide : vérifiez le @ et le domaine."
+          : "Saisissez l'adresse e-mail de votre compte membre."
+      );
+      document.getElementById("email")?.focus();
+      return;
+    }
     setLoading(true);
     try {
       const err = await send();
@@ -56,17 +69,29 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="stack">
+    <form onSubmit={onSubmit} className="stack" noValidate>
       <div>
         <label htmlFor="email">E-mail</label>
-        <input id="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input
+          id="email"
+          type="email"
+          autoComplete="email"
+          inputMode="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError("");
+          }}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "err-email" : undefined}
+        />
+        {error && (
+          <p className="error field-err" id="err-email" role="alert">
+            {error}
+          </p>
+        )}
       </div>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      <button className="btn" disabled={loading || !email.trim()}>
+      <button className="btn" disabled={loading}>
         {loading ? "Envoi…" : "Recevoir mon code"}
       </button>
     </form>
