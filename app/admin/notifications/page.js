@@ -9,6 +9,7 @@ const ERREURS = {
   domaine: "Domaine introuvable.",
   seuil: "Ce domaine n'a pas de seuil, ou l'a déjà atteint.",
   reservataires: "Aucun membre n'a de réservation en cours sur ce domaine.",
+  suiveurs: "Aucun membre ne suit ce domaine pour le moment.",
   type: "Type de message inconnu.",
 };
 
@@ -86,6 +87,22 @@ export default async function Notifications({ searchParams }) {
           </select>
           <Confirmation />
           <button className="btn">Prévenir tous les membres</button>
+        </form>
+      </section>
+
+      <section className="section stack">
+        <h2>Membres qui suivent un domaine</h2>
+        <form action={envoyerNotification} className="card stack">
+          <input type="hidden" name="type" value="suiveurs" />
+          <p className="muted">Uniquement aux membres qui suivent ce domaine : « Nouvelle commande chez [Domaine]. »</p>
+          <select name="domain_id" className="select" required defaultValue="">
+            <option value="" disabled>Choisir un domaine</option>
+            {tous.map((d) => (
+              <option key={d.id} value={d.id}>{d.name}</option>
+            ))}
+          </select>
+          <Confirmation />
+          <button className="btn">Prévenir les abonnés du domaine</button>
         </form>
       </section>
 

@@ -18,6 +18,7 @@ const STATUS_LABELS = {
 
 // Suivi de commande : étape suivante et libellé du bouton
 const SUIVANT = {
+  a_venir: { vers: "ouvert", label: "Ouvrir les réservations" },
   ouvert: { vers: "declenche", label: "Déclencher la commande" },
   bientot_atteint: { vers: "declenche", label: "Déclencher la commande" },
   declenche: { vers: "expedie", label: "Marquer comme expédiée" },
@@ -33,6 +34,7 @@ const ETAPE_ACTUELLE = {
   expire: "Expirée",
 };
 const SUIVI_OK = {
+  ouvert: "Réservations ouvertes",
   declenche: "Commande déclenchée",
   expedie: "Commande marquée comme expédiée",
   livre: "Commande marquée comme livrée",
@@ -50,7 +52,7 @@ export default async function AdminDomaine({ params, searchParams }) {
     .maybeSingle();
   if (!domain) notFound();
 
-  const [{ data: resa }, { data: progress }] = await Promise.all([
+  const [{ data: resa }, { data: progress }, { count: abonnes }] = await Promise.all([
     supabase
       .from("reservations")
       .select(
@@ -60,6 +62,7 @@ export default async function AdminDomaine({ params, searchParams }) {
       .in("status", ACTIVE_RESERVATION)
       .order("created_at"),
     supabase.from("domain_progress").select("reserved_bottles, participants").eq("domain_id", domain.id).maybeSingle(),
+    supabase.from("domain_follows").select("member_id", { count: "exact", head: true }).eq("domain_id", domain.id),
   ]);
 
   const lines = resa || [];
@@ -115,6 +118,7 @@ export default async function AdminDomaine({ params, searchParams }) {
           <p className="price">{euros(total)}</p>
         </div>
         <p className="muted">
+          {abonnes || 0} membre{abonnes > 1 ? "s" : ""} suit{abonnes > 1 ? "vent" : ""} ce domaine ·{" "}
           <Link href={`/club/domaine/${domain.slug}`}>Voir la fiche membre</Link>
         </p>
       </section>
@@ -142,8 +146,10 @@ export default async function AdminDomaine({ params, searchParams }) {
               <input type="hidden" name="slug" value={domain.slug} />
               <input type="hidden" name="vers" value={suivant.vers} />
               <label className="check">
-                <input type="checkbox" name="notifier" value="1" defaultChecked /> Prévenir les réservataires par
-                notification
+                <input type="checkbox" name="notifier" value="1" defaultChecked />{" "}
+                {suivant.vers === "ouvert"
+                  ? `Prévenir les membres qui suivent ce domaine (${abonnes || 0})`
+                  : "Prévenir les réservataires par notification"}
               </label>
               <label className="check">
                 <input type="checkbox" required /> Je confirme

@@ -4,6 +4,7 @@ import Gauge from "@/components/Gauge";
 import CuveeStepper from "@/components/CuveeStepper";
 import DomainCartLink from "@/components/DomainCartLink";
 import DomainImage from "@/components/DomainImage";
+import FollowButton from "@/components/FollowButton";
 import { requireMember } from "@/lib/data";
 import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
 
@@ -12,6 +13,7 @@ export const dynamic = "force-dynamic";
 const CLOSED = {
   a_venir: "Réservations bientôt ouvertes",
   declenche: "Commande déclenchée",
+  expedie: "Commande expédiée",
   livre: "Commande livrée",
   expire: "Réservations closes",
 };
@@ -27,7 +29,7 @@ export default async function Domaine({ params }) {
     .maybeSingle();
   if (!domain) notFound();
 
-  const [{ data: cuvees }, { data: progress }] = await Promise.all([
+  const [{ data: cuvees }, { data: progress }, { data: follow }] = await Promise.all([
     supabase
       .from("cuvees")
       .select("id, name, vintage, color, member_price, description, is_favorite, pack_size")
@@ -35,6 +37,12 @@ export default async function Domaine({ params }) {
       .eq("active", true)
       .order("member_price"),
     supabase.from("domain_progress").select("reserved_bottles, participants").eq("domain_id", domain.id).maybeSingle(),
+    supabase
+      .from("domain_follows")
+      .select("domain_id")
+      .eq("member_id", member.id)
+      .eq("domain_id", domain.id)
+      .maybeSingle(),
   ]);
 
   // Ce que ce membre a déjà réservé dans ce domaine.
@@ -91,6 +99,7 @@ export default async function Domaine({ params }) {
           <Gauge reserved={reserved} threshold={domain.threshold} participants={participants} />
         )}
         {deadline && <p className="muted">Date limite : {deadline}</p>}
+        <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
 
       {domain.story && (

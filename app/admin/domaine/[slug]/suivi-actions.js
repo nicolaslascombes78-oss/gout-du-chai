@@ -5,9 +5,10 @@ import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { envoyer } from "@/lib/push";
 
 // Étape suivante autorisée pour un domaine
-const SUIVANT = { ouvert: "declenche", bientot_atteint: "declenche", declenche: "expedie", expedie: "livre" };
+const SUIVANT = { a_venir: "ouvert", ouvert: "declenche", bientot_atteint: "declenche", declenche: "expedie", expedie: "livre" };
 
 const MESSAGES = {
+  ouvert: (d) => ({ title: d.name, body: "Les réservations sont ouvertes. Vous suivez ce domaine." }),
   declenche: (d) => ({ title: "Commande déclenchée", body: `Votre commande ${d.name} est déclenchée. Merci de votre confiance.` }),
   expedie: (d) => ({ title: "Vos bouteilles sont en route", body: `Votre commande ${d.name} a été expédiée.` }),
   livre: (d) => ({ title: "Commande livrée", body: `Votre commande ${d.name} est livrée. Belle dégustation !` }),
@@ -37,9 +38,14 @@ export async function avancerSuivi(formData) {
 
   let envoye = 0;
   if (notifier) {
-    const membres = [...new Set((await reservations(supabase, id)).map((r) => r.member_id))];
+    // Ouverture : les membres qui suivent le domaine. Ensuite : ses réservataires.
+    const membres =
+      vers === "ouvert"
+        ? ((await supabase.from("domain_follows").select("member_id").eq("domain_id", id)).data || []).map((f) => f.member_id)
+        : [...new Set((await reservations(supabase, id)).map((r) => r.member_id))];
     if (membres.length) {
-      const res = await envoyer(supabase, { userIds: membres, ...MESSAGES[vers](d), url: "/club/membre", tag: `suivi-${id}` });
+      const url = vers === "ouvert" ? `/club/domaine/${slug}` : "/club/membre";
+      const res = await envoyer(supabase, { userIds: membres, ...MESSAGES[vers](d), url, tag: `suivi-${id}` });
       envoye = res.ok || 0;
     }
   }

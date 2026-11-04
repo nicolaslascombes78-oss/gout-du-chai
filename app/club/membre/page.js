@@ -10,6 +10,16 @@ import { euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
 
+const STATUT_SUIVI = {
+  a_venir: "Bientôt",
+  ouvert: "Ouvert",
+  bientot_atteint: "Ouvert",
+  declenche: "Déclenché",
+  expedie: "Expédié",
+  livre: "Livré",
+  expire: "Clos",
+};
+
 export default async function Membre({ searchParams }) {
   const { supabase, member } = await requireMember();
   const params = await searchParams;
@@ -40,7 +50,15 @@ export default async function Membre({ searchParams }) {
     : { data: [] };
   const progress = Object.fromEntries((prog || []).map((p) => [p.domain_id, p]));
 
-  const { data: invites } = await supabase.rpc("my_invitations");
+  const [{ data: invites }, { data: suivis }] = await Promise.all([
+    supabase.rpc("my_invitations"),
+    supabase
+      .from("domain_follows")
+      .select("created_at, domains(id, name, slug, status)")
+      .eq("member_id", member.id)
+      .order("created_at", { ascending: false }),
+  ]);
+  const domainesSuivis = (suivis || []).map((f) => f.domains).filter(Boolean);
 
   const numero = String(member.member_number).padStart(3, "0");
   const since = new Date(member.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
@@ -123,6 +141,26 @@ export default async function Membre({ searchParams }) {
             Aucun débit tant que le seuil d&apos;un domaine n&apos;est pas atteint. L&apos;enregistrement de votre carte
             bancaire arrive très prochainement.
           </p>
+        )}
+      </section>
+
+      <section className="section stack">
+        <h2>Domaines suivis</h2>
+        {domainesSuivis.length === 0 ? (
+          <div className="card stack">
+            <p className="muted">
+              Touchez « Suivre ce domaine » sur la fiche d&apos;un domaine pour être prévenu de sa prochaine commande.
+            </p>
+          </div>
+        ) : (
+          <div className="card stack">
+            {domainesSuivis.map((d) => (
+              <div className="row" key={d.id}>
+                <Link href={`/club/domaine/${d.slug}`}>★ {d.name}</Link>
+                <span className="muted">{STATUT_SUIVI[d.status] || ""}</span>
+              </div>
+            ))}
+          </div>
         )}
       </section>
 

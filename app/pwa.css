@@ -101,7 +101,29 @@
   background: var(--ink-2);
 }
 .is-done .timeline-dot { background: var(--gold); border-color: var(--gold); }
-.is-current .timeline-dot { border-color: var(--gold-soft); box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.2); }
+.is-next .timeline-dot { border-color: var(--gold); border-style: dashed; }
 .timeline-label { font-size: 11px; line-height: 1.2; color: var(--ivory-dim); }
-.is-done .timeline-label { color: var(--ivory); }
-.is-current .timeline-label { color: var(--gold-soft); }
+.is-done .timeline-label { color: var(--gold-soft); }
+.timeline-caption {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ivory);
+  text-align: center;
+}
+
+/* Bouton « Suivre ce domaine » */
+.follow { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.follow-btn {
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ivory);
+  cursor: pointer;
+}
+.follow-btn span { color: var(--gold-soft); }
+.follow-btn.is-on { border-color: var(--gold); color: var(--gold-soft); }
+.follow-btn:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; }
+.follow .muted { font-size: 12px; }

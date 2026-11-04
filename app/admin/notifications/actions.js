@@ -45,6 +45,11 @@ export async function envoyerNotification(formData) {
         url,
         tag: `seuil-${d.id}`,
       };
+    } else if (type === "suiveurs") {
+      const { data: f } = await supabase.from("domain_follows").select("member_id").eq("domain_id", d.id);
+      userIds = (f || []).map((x) => x.member_id);
+      if (userIds.length === 0) redirect("/admin/notifications?erreur=suiveurs");
+      message = { title: d.name, body: `Nouvelle commande chez ${d.name}. Vous suivez ce domaine.`, url, tag: `suiveurs-${d.id}` };
     } else if (type === "declenche") {
       const { data: resa } = await supabase
         .from("reservations")
