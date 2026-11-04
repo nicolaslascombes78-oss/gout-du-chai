@@ -252,3 +252,28 @@ input[type="number"], input[type="date"] {
 .table .muted { font-size: 12px; }
 .nowrap { white-space: nowrap; }
 .summary { cursor: pointer; color: var(--gold-soft); }
+
+/* Photos et logos des domaines */
+.dom-img {
+  margin: 20px 0 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--ink-2);
+}
+.dom-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dom-img-hero { aspect-ratio: 16 / 10; }
+.dom-img-thumb { aspect-ratio: 16 / 9; margin: 0 0 12px; }
+.dom-img.is-logo { display: flex; align-items: center; justify-content: center; }
+.dom-img.is-logo img { width: auto; height: auto; max-width: 72%; max-height: 72%; object-fit: contain; }
+.dom-img.is-empty {
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 40%, #1d1912 0%, var(--ink) 75%);
+}
+.dom-img.is-empty span {
+  font-family: var(--font-serif), serif;
+  font-size: 56px; letter-spacing: 0.08em;
+  color: var(--gold);
+  opacity: 0.85;
+}
+.dom-img-thumb.is-empty span { font-size: 36px; }

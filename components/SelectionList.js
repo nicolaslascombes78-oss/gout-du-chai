@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import Gauge from "@/components/Gauge";
+import DomainImage from "@/components/DomainImage";
 import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
 
 const QUICK = [
@@ -17,7 +18,10 @@ export default function SelectionList({ domains, initialFilter }) {
   const [color, setColor] = useState("");
   const [quick, setQuick] = useState(QUICK.some((q) => q.key === initialFilter) ? initialFilter : "");
 
-  const regions = useMemo(() => [...new Set(domains.map((d) => d.region))].sort((a, b) => a.localeCompare(b, "fr")), [domains]);
+  const regions = useMemo(
+    () => [...new Set(domains.map((d) => d.region))].sort((a, b) => a.localeCompare(b, "fr")),
+    [domains]
+  );
 
   const newest = useMemo(() => {
     const sorted = [...domains].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -67,6 +71,7 @@ export default function SelectionList({ domains, initialFilter }) {
 
       {list.map((d) => (
         <Link href={`/club/domaine/${d.slug}`} key={d.id} className="card domain-card">
+          <DomainImage domain={d} variant="thumb" />
           <div className="row">
             <p className="muted">
               {d.region}
@@ -84,7 +89,11 @@ export default function SelectionList({ domains, initialFilter }) {
         </Link>
       ))}
 
-      {list.length === 0 && <p className="muted" style={{ textAlign: "center" }}>Aucun domaine ne correspond à ces filtres.</p>}
+      {list.length === 0 && (
+        <p className="muted" style={{ textAlign: "center" }}>
+          Aucun domaine ne correspond à ces filtres.
+        </p>
+      )}
     </div>
   );
 }

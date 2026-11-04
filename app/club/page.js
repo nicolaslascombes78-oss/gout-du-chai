@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
+import DomainImage from "@/components/DomainImage";
 import { requireMember, loadSelection } from "@/lib/data";
 import { COLOR_LABELS, displayStatus, euros } from "@/lib/catalogue";
 
@@ -12,23 +13,28 @@ export default async function Club() {
 
   const { data: favs } = await supabase
     .from("cuvees")
-    .select("id, name, vintage, color, member_price, domains(name, slug)")
+    .select("id, name, vintage, color, member_price, domains(name, slug, photos, photo_logo, photo_bg)")
     .eq("is_favorite", true)
     .eq("active", true)
     .limit(60);
 
   // Un coup de cœur par domaine et par couleur, 6 au maximum.
   const seen = new Set();
-  const coups = (favs || []).filter((c) => {
-    const k = `${c.domains?.slug}-${c.color}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  }).slice(0, 6);
+  const coups = (favs || [])
+    .filter((c) => {
+      const k = `${c.domains?.slug}-${c.color}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
+    .slice(0, 6);
 
   const withStatus = domains.map((d) => ({ ...d, st: displayStatus(d, d.reserved) }));
   const open = withStatus.filter((d) => d.st.key !== "a_venir");
-  const hot = [...open].filter((d) => d.threshold).sort((a, b) => b.reserved / b.threshold - a.reserved / a.threshold).slice(0, 3);
+  const hot = [...open]
+    .filter((d) => d.threshold)
+    .sort((a, b) => b.reserved / b.threshold - a.reserved / a.threshold)
+    .slice(0, 3);
 
   const numero = String(member.member_number).padStart(3, "0");
   const since = new Date(member.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
@@ -66,6 +72,7 @@ export default async function Club() {
           <div className="scroller">
             {coups.map((c) => (
               <Link href={`/club/domaine/${c.domains.slug}`} className="card mini" key={c.id}>
+                <DomainImage domain={c.domains} variant="thumb" />
                 <p className="muted">{COLOR_LABELS[c.color]}</p>
                 <h3>{c.name}</h3>
                 <p className="muted">{c.domains.name}</p>
@@ -87,6 +94,7 @@ export default async function Club() {
         </div>
         {hot.map((d) => (
           <Link href={`/club/domaine/${d.slug}`} className="card domain-card" key={d.id}>
+            <DomainImage domain={d} variant="thumb" />
             <p className="muted">{d.region}</p>
             <h3>{d.name}</h3>
             <Gauge reserved={d.reserved} threshold={d.threshold} participants={d.participants} />

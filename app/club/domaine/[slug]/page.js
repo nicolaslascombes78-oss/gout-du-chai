@@ -3,6 +3,7 @@ import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CuveeStepper from "@/components/CuveeStepper";
 import DomainCartLink from "@/components/DomainCartLink";
+import DomainImage from "@/components/DomainImage";
 import { requireMember } from "@/lib/data";
 import { COLOR_LABELS, COLOR_ORDER, displayStatus, euros } from "@/lib/catalogue";
 
@@ -21,7 +22,7 @@ export default async function Domaine({ params }) {
 
   const { data: domain } = await supabase
     .from("domains")
-    .select("id, slug, name, region, appellation, tagline, story, photos, threshold, pack_size, deadline, status")
+    .select("id, slug, name, region, appellation, tagline, story, photos, photo_logo, photo_bg, threshold, pack_size, deadline, status")
     .eq("slug", slug)
     .maybeSingle();
   if (!domain) notFound();
@@ -69,10 +70,7 @@ export default async function Domaine({ params }) {
     <main className="shell">
       <ClubHeader back={{ href: "/club/selection", label: "La Sélection" }} />
 
-      {domain.photos?.[0] && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={domain.photos[0]} alt={domain.name} className="hero-img" />
-      )}
+      <DomainImage domain={domain} variant="hero" />
 
       <p className="eyebrow" style={{ textAlign: "center", marginTop: 28 }}>
         {domain.region}
