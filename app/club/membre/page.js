@@ -208,6 +208,15 @@ export default async function Membre({ searchParams }) {
         )}
       </section>
 
+      <section className="section stack">
+        <h2>Aide et règles</h2>
+        <nav className="card help-links" aria-label="Aide et règles">
+          <Link href="/regles">Les règles du club</Link>
+          <Link href="/mentions-legales">Mentions légales</Link>
+          <Link href="/confidentialite">Confidentialité</Link>
+        </nav>
+      </section>
+
       {member.is_admin && (
         <section className="section">
           <Link href="/admin" className="btn btn-ghost">
