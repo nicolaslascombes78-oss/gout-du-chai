@@ -171,6 +171,11 @@ export default function CartView({ memberId }) {
         <p className="muted sous-btn">
           Vous ne serez débité que si la commande est lancée. Modifiable ou annulable jusque-là.
         </p>
+        <p className="sous-btn">
+          <Link href="/regles" className="terms-link">
+            Comment fonctionne une commande ?
+          </Link>
+        </p>
         <button type="button" className="link-btn" onClick={() => clearLines()}>
           Vider le panier
         </button>
