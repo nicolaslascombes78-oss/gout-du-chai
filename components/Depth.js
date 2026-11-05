@@ -4,7 +4,10 @@
 // - les photos des domaines glissent un peu moins vite que la page au défilement ;
 // - les cartes situées plus bas montent doucement et sortent de l'ombre en arrivant à l'écran ;
 // - fondu entre les pages : l'ancienne page s'assombrit au toucher d'un lien,
-//   puis chaque nouvelle page (écran de chargement compris) apparaît en fondu.
+//   puis chaque nouvelle page (écran de chargement compris) apparaît en fondu ;
+// - lumière vivante : le reflet doré des cartes suit l'inclinaison du téléphone (Android),
+//   le doigt sur l'écran (iPhone, qui exigerait sinon une autorisation à chaque ouverture)
+//   ou la souris (ordinateur).
 // Rien ne s'active si le téléphone est réglé sur « réduire les animations ».
 import { useEffect } from "react";
 
@@ -14,6 +17,8 @@ const AMPLITUDE = 5; // en % de la hauteur de la photo
 const PAGES = ".club-app main";
 const FONDU_ENTREE = 500; // durée d'apparition d'une nouvelle page, en millisecondes
 const FONDU_SORTIE = 180; // durée d'assombrissement de l'ancienne page
+const LUMIERE_REPOS = { x: 0.3, y: 0 }; // position du reflet quand rien ne bouge (en haut à gauche)
+const LUMIERE_DOUCEUR = 0.12; // 0,05 = très lent, 0,3 = très vif
 
 export default function Depth() {
   useEffect(() => {
@@ -111,6 +116,51 @@ export default function Depth() {
     };
     document.addEventListener("click", onClick, true);
 
+    // Lumière vivante : position du reflet doré sur les cartes
+    const cible = { ...LUMIERE_REPOS };
+    const lumiere = { ...LUMIERE_REPOS };
+    let lumiereRaf = 0;
+    const borne = (v, min, max) => Math.max(min, Math.min(max, v));
+    const anime = () => {
+      lumiereRaf = 0;
+      lumiere.x += (cible.x - lumiere.x) * LUMIERE_DOUCEUR;
+      lumiere.y += (cible.y - lumiere.y) * LUMIERE_DOUCEUR;
+      root.style.setProperty("--lx", `${(lumiere.x * 100).toFixed(1)}%`);
+      root.style.setProperty("--ly", `${(lumiere.y * 100).toFixed(1)}%`);
+      if (Math.abs(cible.x - lumiere.x) > 0.002 || Math.abs(cible.y - lumiere.y) > 0.002) {
+        lumiereRaf = requestAnimationFrame(anime);
+      }
+    };
+    const vise = (x, y) => {
+      cible.x = borne(x, -0.1, 1.1);
+      cible.y = borne(y, -0.1, 1.1);
+      if (!lumiereRaf) lumiereRaf = requestAnimationFrame(anime);
+    };
+    const auRepos = () => vise(LUMIERE_REPOS.x, LUMIERE_REPOS.y);
+
+    // Android (et appareils sans autorisation requise) : inclinaison du téléphone
+    const iPhone = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
+    const onOrientation = (e) => {
+      if (e.gamma == null || e.beta == null) return;
+      // gauche-droite : de -35° à +35° ; avant-arrière : autour de 45° (téléphone tenu en main)
+      vise(0.5 + e.gamma / 70, (e.beta - 25) / 50);
+    };
+    if (!iPhone) window.addEventListener("deviceorientation", onOrientation);
+
+    // iPhone et ordinateur : le reflet suit le doigt ou la souris
+    const onPointer = (e) => {
+      if (e.pointerType === "touch" && !iPhone) return; // sur Android, c'est l'inclinaison qui commande
+      vise(e.clientX / window.innerWidth, e.clientY / window.innerHeight);
+    };
+    const onPointerEnd = (e) => {
+      if (e.pointerType === "touch") auRepos();
+    };
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("pointerdown", onPointer, { passive: true });
+    window.addEventListener("pointerup", onPointerEnd, { passive: true });
+    window.addEventListener("pointercancel", onPointerEnd, { passive: true });
+    document.documentElement.addEventListener("mouseleave", auRepos);
+
     watch();
     // Nouvelles pages et nouveaux contenus (navigation dans l'appli)
     const mo = new MutationObserver(scheduleWatch);
@@ -126,6 +176,15 @@ export default function Depth() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       document.removeEventListener("click", onClick, true);
+      cancelAnimationFrame(lumiereRaf);
+      window.removeEventListener("deviceorientation", onOrientation);
+      window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("pointerup", onPointerEnd);
+      window.removeEventListener("pointercancel", onPointerEnd);
+      document.documentElement.removeEventListener("mouseleave", auRepos);
+      root.style.removeProperty("--lx");
+      root.style.removeProperty("--ly");
       root.classList.remove("depth-on");
     };
   }, []);
