@@ -11,7 +11,7 @@ export default function Confidentialite() {
         <p>
           Votre prénom, votre nom, votre adresse e-mail, votre adresse de livraison, vos réservations et commandes,
           les invitations que vous envoyez et, si vous les activez, l&apos;abonnement aux notifications de votre
-          appareil. Votre numéro de carte bancaire n&apos;est jamais stocké par le club : il est conservé par Stripe.
+          appareil. Votre numéro de carte bancaire ne sera jamais stocké par le club : il sera conservé par Stripe.
         </p>
       </section>
 
