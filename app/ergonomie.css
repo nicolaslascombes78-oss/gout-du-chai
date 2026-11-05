@@ -472,3 +472,6 @@ input[type="email"] { border-radius: 14px; }
 /* Fiche domaine : appel à l'action du bloc commande */
 .cta-commande { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .cta-commande .order-btn { width: 100%; }
+
+/* Sélection : cuvées trouvées par la recherche */
+.dcard-match { margin-top: 8px; font-size: 13px; color: var(--gold-soft); }
