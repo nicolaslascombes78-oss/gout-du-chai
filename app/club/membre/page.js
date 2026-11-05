@@ -27,7 +27,9 @@ export default async function Membre({ searchParams }) {
 
   const { data: resa } = await supabase
     .from("reservations")
-    .select("id, quantity, unit_price, status, cuvees(id, name, vintage, domains(id, name, slug, status, threshold, deadline))")
+    .select(
+      "id, quantity, unit_price, status, created_at, paid_at, cuvees(id, name, vintage, domains(id, name, slug, status, threshold, deadline, triggered_at, shipped_at, delivered_at, expected_delivery))"
+    )
     .eq("member_id", member.id)
     .in("status", ["en_attente", "confirmee", "payee"])
     .order("created_at");
@@ -37,10 +39,13 @@ export default async function Membre({ searchParams }) {
   for (const r of resa || []) {
     const d = r.cuvees?.domains;
     if (!d) continue;
-    const g = (byDomain[d.id] ||= { domain: d, lines: [], bottles: 0, total: 0 });
+    const g = (byDomain[d.id] ||= { domain: d, lines: [], bottles: 0, total: 0, reservedAt: null, paidAt: null });
     g.lines.push(r);
     g.bottles += r.quantity;
     g.total += r.quantity * Number(r.unit_price);
+    // Date de réservation : la première bouteille réservée ; date de paiement : le dernier paiement
+    if (r.created_at && (!g.reservedAt || r.created_at < g.reservedAt)) g.reservedAt = r.created_at;
+    if (r.paid_at && (!g.paidAt || r.paid_at > g.paidAt)) g.paidAt = r.paid_at;
   }
   const groups = Object.values(byDomain);
 
@@ -116,7 +121,20 @@ export default async function Membre({ searchParams }) {
                 <h3>{d.name}</h3>
                 {d.status === "expire" && <span className="badge">Close</span>}
               </div>
-              {d.status !== "expire" && <OrderTimeline status={d.status} paid={paid} />}
+              {d.status !== "expire" && (
+                <OrderTimeline
+                  status={d.status}
+                  paid={paid}
+                  prevue={d.expected_delivery}
+                  dates={{
+                    reservee: g.reservedAt,
+                    declenchee: d.triggered_at,
+                    payee: g.paidAt,
+                    expediee: d.shipped_at,
+                    livree: d.delivered_at,
+                  }}
+                />
+              )}
               {g.lines.map((r) => (
                 <div className="row" key={r.id}>
                   <p className="muted">
