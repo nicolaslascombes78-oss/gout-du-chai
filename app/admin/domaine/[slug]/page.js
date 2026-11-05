@@ -4,7 +4,7 @@ import Gauge from "@/components/Gauge";
 import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 import { updateDomain } from "@/app/admin/actions";
-import { avancerSuivi, marquerPaye } from "./suivi-actions";
+import { avancerSuivi, marquerPaye, fixerLivraison } from "./suivi-actions";
 
 const STATUS_LABELS = {
   a_venir: "À venir",
@@ -40,6 +40,14 @@ const SUIVI_OK = {
   livre: "Commande marquée comme livrée",
 };
 
+function leJour(v) {
+  if (!v) return null;
+  const d = typeof v === "string" && v.length === 10 ? new Date(`${v}T12:00:00Z`) : new Date(v);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "Europe/Paris" });
+}
+
 export default async function AdminDomaine({ params, searchParams }) {
   const { slug } = await params;
   const sp = await searchParams;
@@ -47,7 +55,9 @@ export default async function AdminDomaine({ params, searchParams }) {
 
   const { data: domain } = await supabase
     .from("domains")
-    .select("id, slug, name, region, appellation, threshold, deadline, status, pack_size")
+    .select(
+      "id, slug, name, region, appellation, threshold, deadline, status, pack_size, triggered_at, shipped_at, delivered_at, expected_delivery"
+    )
     .eq("slug", slug)
     .maybeSingle();
   if (!domain) notFound();
@@ -96,6 +106,12 @@ export default async function AdminDomaine({ params, searchParams }) {
   const payes = membres.filter((m) => m.paid).length;
   const suivant = SUIVANT[domain.status];
   const apresDeclenchement = ["declenche", "expedie", "livre"].includes(domain.status);
+  const avantLivraison = ["declenche", "expedie"].includes(domain.status);
+  const jalons = [
+    ["Déclenchée le", leJour(domain.triggered_at)],
+    ["Expédiée le", leJour(domain.shipped_at)],
+    ["Livrée le", leJour(domain.delivered_at)],
+  ].filter(([, v]) => v);
 
   return (
     <main className="shell">
@@ -131,6 +147,13 @@ export default async function AdminDomaine({ params, searchParams }) {
             {Number(sp.envoye) > 0 ? ` — notification envoyée à ${sp.envoye} appareil${Number(sp.envoye) > 1 ? "s" : ""}` : ""}.
           </p>
         )}
+        {sp?.livraison === "1" && (
+          <p className="success">
+            Date de livraison enregistrée
+            {Number(sp.envoye) > 0 ? ` — notification envoyée à ${sp.envoye} appareil${Number(sp.envoye) > 1 ? "s" : ""}` : ""}.
+          </p>
+        )}
+        {sp?.livraison === "0" && <p className="success">Date de livraison retirée.</p>}
         {sp?.paye === "1" && <p className="success">Paiement enregistré, le membre est prévenu.</p>}
         {sp?.paye === "0" && <p className="success">Paiement retiré.</p>}
         {sp?.erreurSuivi && <p className="error">L&apos;opération n&apos;a pas abouti. Rechargez la page et réessayez.</p>}
@@ -140,6 +163,9 @@ export default async function AdminDomaine({ params, searchParams }) {
             <p>Étape actuelle</p>
             <span className="badge">{ETAPE_ACTUELLE[domain.status] || domain.status}</span>
           </div>
+          {jalons.length > 0 && (
+            <p className="muted">{jalons.map(([label, v]) => `${label} ${v}`).join(" · ")}</p>
+          )}
           {suivant ? (
             <form action={avancerSuivi} className="stack">
               <input type="hidden" name="id" value={domain.id} />
@@ -162,6 +188,29 @@ export default async function AdminDomaine({ params, searchParams }) {
             </p>
           )}
         </div>
+
+        {avantLivraison && (
+          <form action={fixerLivraison} className="card stack">
+            <input type="hidden" name="id" value={domain.id} />
+            <input type="hidden" name="slug" value={domain.slug} />
+            <div>
+              <label htmlFor="expected_delivery">Livraison prévue</label>
+              <input
+                id="expected_delivery"
+                name="expected_delivery"
+                type="date"
+                defaultValue={domain.expected_delivery ?? ""}
+              />
+            </div>
+            <label className="check">
+              <input type="checkbox" name="notifier" value="1" defaultChecked /> Prévenir les réservataires par notification
+            </label>
+            <button className="btn btn-ghost">Enregistrer la date</button>
+            <p className="muted">
+              Les membres voient cette date sous la frise de leur commande. Laissez vide si elle n&apos;est pas encore connue.
+            </p>
+          </form>
+        )}
 
         {apresDeclenchement && membres.length > 0 && (
           <div className="card stack">

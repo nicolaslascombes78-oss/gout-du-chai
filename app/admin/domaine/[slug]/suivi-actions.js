@@ -52,6 +52,44 @@ export async function avancerSuivi(formData) {
   redirect(`/admin/domaine/${slug}?suivi=${vers}&envoye=${envoye}`);
 }
 
+// Date de livraison annoncée aux membres (vide = pas encore connue)
+export async function fixerLivraison(formData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id");
+  const slug = formData.get("slug");
+  const brute = String(formData.get("expected_delivery") || "").trim();
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(brute) ? brute : null;
+  const notifier = formData.get("notifier") === "1";
+
+  const { data: d } = await supabase.from("domains").select("id, name").eq("id", id).maybeSingle();
+  if (!d) redirect(`/admin/domaine/${slug}?erreurSuivi=1`);
+
+  const { error } = await supabase.from("domains").update({ expected_delivery: date }).eq("id", id);
+  if (error) redirect(`/admin/domaine/${slug}?erreurSuivi=1`);
+
+  let envoye = 0;
+  if (notifier && date) {
+    const membres = [...new Set((await reservations(supabase, id)).map((r) => r.member_id))];
+    if (membres.length) {
+      const jour = new Date(`${date}T12:00:00Z`).toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        timeZone: "Europe/Paris",
+      });
+      const res = await envoyer(supabase, {
+        userIds: membres,
+        title: "Date de livraison",
+        body: `Votre commande ${d.name} est prévue pour le ${jour}.`,
+        url: "/club/membre",
+        tag: `livraison-${id}`,
+      });
+      envoye = res.ok || 0;
+    }
+  }
+  redirect(`/admin/domaine/${slug}?livraison=${date ? 1 : 0}&envoye=${envoye}`);
+}
+
 export async function marquerPaye(formData) {
   const { supabase } = await requireAdmin();
   const domainId = formData.get("domain_id");
