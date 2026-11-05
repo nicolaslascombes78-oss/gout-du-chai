@@ -1,0 +1,53 @@
+/* Relief et profondeur : photos fondues dans les cartes, défilement en plans, toucher, apparition */
+
+/* Photos des domaines : voile doré en haut, ombre douce en bas, liseré lumineux */
+.dom-img { position: relative; }
+.dom-img:not(.is-logo):not(.is-empty)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(227, 201, 135, .07) 0%, transparent 28%, transparent 52%, rgba(14, 13, 11, .55) 100%);
+  box-shadow: inset 0 0 0 1px rgba(227, 201, 135, .08), inset 0 -36px 44px -24px rgba(14, 13, 11, .65);
+}
+.dom-img-thumb:not(.is-logo):not(.is-empty)::after {
+  background: linear-gradient(180deg, rgba(227, 201, 135, .05) 0%, transparent 40%, rgba(14, 13, 11, .35) 100%);
+}
+
+/* Défilement en plans : la photo est légèrement agrandie pour pouvoir glisser sans laisser de bord */
+html.depth-on .dom-img-hero:not(.is-logo):not(.is-empty) img,
+html.depth-on .dom-img-cover:not(.is-logo):not(.is-empty) img {
+  transform: translate3d(0, var(--py, 0%), 0) scale(1.12);
+  will-change: transform;
+}
+
+/* Au toucher, la carte s'enfonce légèrement */
+html body a.card,
+html body a.ncard {
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+html body a.card:active,
+html body a.ncard:active {
+  transform: scale(.985);
+  box-shadow:
+    inset 0 1px 0 rgba(227, 201, 135, calc(var(--amb-hl, .18) * .6)),
+    0 4px 12px rgba(0, 0, 0, .45);
+}
+
+/* Apparition des cartes plus bas dans la page */
+html.depth-on .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .6s ease, transform .65s cubic-bezier(.2, .7, .2, 1);
+}
+html.depth-on .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.depth-on .reveal { opacity: 1; transform: none; transition: none; }
+  html.depth-on .dom-img-hero img,
+  html.depth-on .dom-img-cover img { transform: none; }
+  html body a.card, html body a.ncard { transition: none; }
+}
