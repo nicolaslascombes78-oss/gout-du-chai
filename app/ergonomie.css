@@ -500,3 +500,44 @@ input[type="email"] { border-radius: 14px; }
   box-shadow: 0 0 0 2px var(--ink);
 }
 #notifications { scroll-margin-top: calc(16px + env(safe-area-inset-top, 0px)); }
+
+/* Pages Règles du club, Mentions légales, Confidentialité */
+.legal-title { text-align: left; font-size: 34px; line-height: 1.1; margin-top: 24px; }
+.legal-intro {
+  margin-top: 10px;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #cfc6b5;
+}
+.legal-maj { margin-top: 8px; font-size: 13px; color: var(--ivory-dim); }
+.legal-body { margin-top: 24px; }
+.legal-body section { padding: 18px 0; border-top: 1px solid var(--line); }
+.legal-body h2 { font-family: var(--font-serif), serif; font-size: 21px; margin-bottom: 8px; }
+.legal-body p { color: var(--ivory); line-height: 1.65; }
+.legal-body p + p { margin-top: 8px; }
+.legal-body a,
+.legal-links a,
+.help-links a,
+.terms-link {
+  color: var(--ivory);
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 164, 92, 0.6);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.legal-links nav { margin-bottom: 10px; }
+.legal-links nav a { display: inline-block; padding: 10px 2px; }
+
+/* Espace Membre : aide et règles */
+.help-links { display: flex; flex-direction: column; padding: 4px 18px; }
+.help-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+  text-decoration: none;
+}
+.help-links a + a { border-top: 1px solid var(--line); }
+.help-links a::after { content: "›"; color: var(--gold-soft); font-size: 22px; line-height: 1; }
