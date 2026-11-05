@@ -64,7 +64,7 @@ function metaLine(d) {
   );
 }
 
-function DomainCard({ d }) {
+function DomainCard({ d, matches = [] }) {
   const badge = cardBadge(d, d.st);
   const hasImage = Boolean(d.photos?.[0]);
   const showSeal = d.st.key !== "a_venir" && d.threshold;
@@ -95,6 +95,12 @@ function DomainCard({ d }) {
         </div>
         <h3 className="dcard-name">{d.name}</h3>
         {d.tagline && <p className="dcard-tag">{d.tagline}</p>}
+        {matches.length > 0 && (
+          <p className="dcard-match">
+            {matches.slice(0, 3).join(" · ")}
+            {matches.length > 3 ? ` et ${matches.length - 3} autre${matches.length - 3 > 1 ? "s" : ""}` : ""}
+          </p>
+        )}
         <div className="dcard-row">
           <Dots colors={d.colors} labels />
           {d.minPrice != null && <span className="dcard-price">dès {euros(d.minPrice)}</span>}
@@ -162,13 +168,18 @@ export default function SelectionList({ domains, initialFilter }) {
   }, [all]);
 
   const needle = norm(q.trim());
+  // Chaque mot cherché doit apparaître dans le domaine ou dans ses cuvées (nom, description, cépage).
+  const tokens = needle.split(/\s+/).filter(Boolean);
+  const hay = (d) => `${norm([d.name, d.region, d.appellation, d.tagline].join(" "))} ${d.searchIndex || ""}`;
+  const matchesOf = (d) =>
+    tokens.length ? [...new Set((d.cuveeNames || []).filter((n) => tokens.every((t) => norm(n).includes(t))))] : [];
   const list = all
     .filter((d) => (quick === "a_venir" ? d.st.key === "a_venir" : d.st.key !== "a_venir"))
     .filter((d) => !region || d.region === region)
     .filter((d) => !color || d.colors.includes(color))
     .filter((d) => quick !== "bientot" || d.st.key === "bientot")
     .filter((d) => quick !== "coeur" || d.favorite)
-    .filter((d) => !needle || norm([d.name, d.region, d.appellation, d.tagline].join(" ")).includes(needle));
+    .filter((d) => !tokens.length || tokens.every((t) => hay(d).includes(t)));
 
   const pct = (d) => (d.threshold ? d.reserved / d.threshold : -1);
   const sorted = [...list].sort((a, b) => {
@@ -204,8 +215,8 @@ export default function SelectionList({ domains, initialFilter }) {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Domaine, appellation, région…"
-          aria-label="Rechercher un domaine, une appellation ou une région"
+          placeholder="Domaine, cuvée, cépage, région…"
+          aria-label="Rechercher un domaine, une cuvée, un cépage ou une région"
           enterKeyHint="search"
         />
       </label>
@@ -336,7 +347,7 @@ export default function SelectionList({ domains, initialFilter }) {
         ) : (
           <div className="chapter-body">
             {sorted.map((d) => (
-              <DomainCard key={d.id} d={d} />
+              <DomainCard key={d.id} d={d} matches={matchesOf(d)} />
             ))}
           </div>
         )}
