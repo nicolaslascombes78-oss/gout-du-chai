@@ -1,6 +1,7 @@
 import { Bodoni_Moda, Inter } from "next/font/google";
 import "./globals.css";
 import "./pwa.css";
+import "./ambiance.css";
 
 const serif = Bodoni_Moda({ subsets: ["latin"], variable: "--font-serif", display: "swap" });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
