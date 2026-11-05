@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import InviteForm from "@/components/InviteForm";
+import { LegalLinks } from "@/components/LegalLayout";
 import { createClient } from "@/lib/supabase/server";
 
 // Quelques vignerons en vitrine (pas de prix en public).
@@ -62,10 +63,7 @@ export default async function Home({ searchParams }) {
         </p>
       </section>
 
-      <footer className="foot">
-        L&apos;abus d&apos;alcool est dangereux pour la santé, à consommer avec modération.
-        Vente réservée aux personnes majeures.
-      </footer>
+      <LegalLinks />
     </main>
   );
 }
