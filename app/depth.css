@@ -34,6 +34,16 @@ html body a.ncard:active {
     0 4px 12px rgba(0, 0, 0, .45);
 }
 
+/* Lumière vivante : un reflet doré dont la position (--lx, --ly) est pilotée par components/Depth.js */
+html.depth-on body .card,
+html.depth-on body .dcard,
+html.depth-on body .ncard,
+html.depth-on body .cuvee-list {
+  background-image:
+    radial-gradient(120% 90% at var(--lx, 30%) var(--ly, 0%), rgba(227, 201, 135, .12), transparent 55%),
+    linear-gradient(165deg, rgba(201, 164, 92, var(--amb-wash, .06)), rgba(0, 0, 0, var(--amb-dark, .2)));
+}
+
 /* Apparition des cartes plus bas dans la page */
 html.depth-on .reveal {
   opacity: 0;
