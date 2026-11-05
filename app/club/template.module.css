@@ -1,15 +1,5 @@
-/* Fondu entre les pages du club.
-   L'animation porte sur chaque nouvelle page (balise main), et non sur le gabarit :
-   ainsi, quand l'écran de chargement s'affiche d'abord, la vraie page a elle aussi
-   son fondu en arrivant, au lieu d'apparaître d'un coup.
-   « backwards » : une fois l'animation finie, plus aucun effet ne reste appliqué. */
-.fade :global(main) {
-  animation: page-in .5s cubic-bezier(.2, .7, .2, 1) backwards;
-}
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .fade :global(main) { animation: none; }
+/* Le fondu entre les pages est désormais piloté par components/Depth.js.
+   Ce gabarit reste en place mais n'anime plus rien lui-même (pas de double fondu). */
+.fade {
+  display: block;
 }
