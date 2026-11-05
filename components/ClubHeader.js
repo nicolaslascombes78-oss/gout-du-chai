@@ -1,5 +1,7 @@
 import Link from "next/link";
+import BellLink from "@/components/BellLink";
 
+// En-tête des écrans du club. La déconnexion se trouve en bas de l'espace Membre.
 export default function ClubHeader({ back }) {
   return (
     <div className="row" style={{ alignItems: "center" }}>
@@ -12,9 +14,7 @@ export default function ClubHeader({ back }) {
           Le Goût du Chai
         </Link>
       )}
-      <form action="/deconnexion" method="post">
-        <button className="link-btn">Déconnexion</button>
-      </form>
+      <BellLink />
     </div>
   );
 }
