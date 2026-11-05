@@ -475,3 +475,28 @@ input[type="email"] { border-radius: 14px; }
 
 /* Sélection : cuvées trouvées par la recherche */
 .dcard-match { margin-top: 8px; font-size: 13px; color: var(--gold-soft); }
+
+/* En-tête : cloche des notifications (remplace Déconnexion) */
+.bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  color: var(--ivory-dim);
+}
+.bell:hover { color: var(--gold-soft); }
+.bell:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; border-radius: 50%; }
+.bell-dot {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+#notifications { scroll-margin-top: calc(16px + env(safe-area-inset-top, 0px)); }
