@@ -29,8 +29,8 @@ export default function Regles() {
         <h2>Réserver</h2>
         <p>
           Vous choisissez vos bouteilles sur la fiche d&apos;un domaine, puis vous les réservez depuis votre panier.
-          Rien n&apos;est débité au moment de la réservation. Le paiement est confié à notre prestataire, Stripe, avec
-          la validation 3D Secure de votre banque : le club ne voit jamais votre numéro de carte.
+          Rien n&apos;est débité au moment de la réservation. Le paiement en ligne sera confié à notre prestataire,
+          Stripe, avec la validation 3D Secure de votre banque : le club ne verra jamais votre numéro de carte.
         </p>
       </section>
 
