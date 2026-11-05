@@ -6,9 +6,10 @@ import CuveeTabs from "@/components/CuveeTabs";
 import DomainCartLink from "@/components/DomainCartLink";
 import DomainImage from "@/components/DomainImage";
 import FollowButton from "@/components/FollowButton";
+import ShareOrder from "@/components/ShareOrder";
 import StoryClamp from "@/components/StoryClamp";
 import { requireMember } from "@/lib/data";
-import { COLOR_LABELS, COLOR_ORDER, cardBadge, displayStatus, euros } from "@/lib/catalogue";
+import { COLOR_LABELS, COLOR_ORDER, cardBadge, daysLeft, displayStatus, euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +76,12 @@ export default async function Domaine({ params }) {
   );
   const tabs = groups.map((g) => ({ color: g.color, label: COLOR_LABELS[g.color], count: g.items.length }));
   const favorites = (cuvees || []).filter((c) => c.is_favorite);
+
+  // Bloc commande : quand on peut encore réserver, un vrai appel à l'action + le partage.
+  const missing = domain.threshold ? Math.max(0, domain.threshold - reserved) : 0;
+  const jours = daysLeft(domain.deadline);
+  const urgent = (jours != null && jours >= 0 && jours <= 5) || (domain.threshold && missing <= 6);
+  const canAct = editable && groups.length > 0 && st.key !== "a_venir" && missing > 0;
   const forBar = (cuvees || []).map((c) => ({
     id: c.id,
     price: Number(c.member_price),
@@ -113,10 +120,21 @@ export default async function Domaine({ params }) {
             size={104}
           />
         )}
-        {groups.length > 0 && (
-          <a href="#cuvees" className="link-btn story-more jump-cuvees">
-            Voir les {(cuvees || []).length} cuvées
-          </a>
+        {canAct ? (
+          <div className="cta-commande">
+            <a href="#cuvees" className="btn">
+              {urgent
+                ? `Compléter la commande · plus que ${missing}`
+                : "Choisir mes bouteilles"}
+            </a>
+            <ShareOrder name={domain.name} region={domain.region} missing={missing} slug={domain.slug} />
+          </div>
+        ) : (
+          groups.length > 0 && (
+            <a href="#cuvees" className="link-btn story-more jump-cuvees">
+              Voir les {(cuvees || []).length} cuvées
+            </a>
+          )
         )}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
