@@ -177,7 +177,11 @@ export default function JoinForm({ code }) {
             }}
             {...aria("terms")}
           />
-          J&apos;accepte les conditions du club.
+          J&apos;accepte les{" "}
+          <Link href="/regles" target="_blank" rel="noopener" className="terms-link">
+            règles du club
+          </Link>
+          .
         </label>
         {fieldErr("terms")}
       </div>
