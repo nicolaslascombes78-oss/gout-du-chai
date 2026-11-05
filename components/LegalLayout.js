@@ -1,3 +1,5 @@
+// Ces pages sont hors de l’espace du club : elles chargent elles-mêmes leurs styles.
+import "@/app/ergonomie.css";
 import Link from "next/link";
 import { CLUB } from "@/lib/club-infos";
 
