@@ -7,15 +7,17 @@
 // Effets : l'anneau se trace quand le sceau apparaît à l'écran et le nombre
 // décompte jusqu'à sa valeur ; quand une réservation change, l'anneau glisse
 // vers la nouvelle valeur ; quand le seuil est atteint, la coche se dessine et
-// un éclat doré passe une fois. Tout est coupé si le téléphone est réglé
-// sur « réduire les animations ».
-import { useEffect, useRef, useState } from "react";
+// un éclat doré passe une fois. Ensuite, de temps en temps, un reflet de lumière
+// traverse la partie remplie de l'anneau, comme sur un sceau de cire.
+// Tout est coupé si le téléphone est réglé sur « réduire les animations ».
+import { useEffect, useId, useRef, useState } from "react";
 import styles from "./Seal.module.css";
 
 const C = 2 * Math.PI * 40;
 const FIRST_DURATION = 1100; // première apparition
 const UPDATE_DURATION = 600; // changement de réservation
 const ease = (t) => 1 - Math.pow(1 - t, 3);
+const ECLAT_CYCLE = 8; // un reflet toutes les 8 secondes environ, décalé d'un sceau à l'autre
 
 function reducedMotion() {
   return (
@@ -34,6 +36,15 @@ export default function Seal({ reserved = 0, mine = 0, threshold, size = 72, bar
   const started = useRef(false);
   const [v, setV] = useState({ r: 0, m: 0 });
   const [celebrate, setCelebrate] = useState(false);
+  const [calm, setCalm] = useState(true); // pas de reflet tant qu'on ne sait pas si les animations sont permises
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  const shineId = `seal-shine-${uid}`;
+  // Décalage stable propre à chaque sceau, pour que les reflets ne passent pas tous en même temps
+  const shineDelay = (uid.split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 997, 7) % 80) / 10;
+
+  useEffect(() => {
+    setCalm(reducedMotion());
+  }, []);
 
   useEffect(() => {
     if (!threshold) return undefined;
@@ -95,6 +106,9 @@ export default function Seal({ reserved = 0, mine = 0, threshold, size = 72, bar
   const a = (C * Math.max(0, v.r - v.m)) / threshold;
   const b = (C * v.m) / threshold;
   const drawnFull = v.r >= threshold - 0.001;
+  const settled = Math.abs(v.r - rTarget) < 0.001 && Math.abs(v.m - mTarget) < 0.001;
+  const filled = a + b;
+  const showShine = !calm && settled && filled > 0.01;
   const shownMissing = Math.max(0, Math.round(threshold - v.r));
   const missing = Math.max(0, threshold - reserved);
   const m = mTarget;
@@ -150,6 +164,41 @@ export default function Seal({ reserved = 0, mine = 0, threshold, size = 72, bar
             strokeDashoffset={-a}
             transform="rotate(-90 48 48)"
           />
+        )}
+        {showShine && (
+          <>
+            <defs>
+              <linearGradient id={shineId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="96" y2="96">
+                <stop offset="0" stopColor="#fff3d6" stopOpacity="0" />
+                <stop offset="0.42" stopColor="#fff3d6" stopOpacity="0" />
+                <stop offset="0.5" stopColor="#fff3d6" stopOpacity="0.85" />
+                <stop offset="0.58" stopColor="#fff3d6" stopOpacity="0" />
+                <stop offset="1" stopColor="#fff3d6" stopOpacity="0" />
+                <animateTransform
+                  attributeName="gradientTransform"
+                  type="translate"
+                  values="-110 -110; 110 110; 110 110"
+                  keyTimes="0; 0.15; 1"
+                  calcMode="spline"
+                  keySplines="0.4 0 0.2 1; 0 0 1 1"
+                  dur={`${ECLAT_CYCLE}s`}
+                  begin={`${shineDelay}s`}
+                  repeatCount="indefinite"
+                />
+              </linearGradient>
+            </defs>
+            <circle
+              cx="48"
+              cy="48"
+              r="40"
+              fill="none"
+              stroke={`url(#${shineId})`}
+              strokeWidth={stroke}
+              strokeDasharray={`${filled} ${C}`}
+              transform="rotate(-90 48 48)"
+              pointerEvents="none"
+            />
+          </>
         )}
         {drawnFull && (
           <path
