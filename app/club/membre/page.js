@@ -180,7 +180,7 @@ export default async function Membre({ searchParams }) {
         )}
       </section>
 
-      <section className="section stack">
+      <section className="section stack" id="notifications">
         <h2>Notifications</h2>
         <NotificationToggle />
       </section>
