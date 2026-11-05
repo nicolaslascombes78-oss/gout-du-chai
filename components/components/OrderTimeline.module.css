@@ -1,0 +1,23 @@
+/* Dates sous les étapes de la frise et livraison prévue */
+.date {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.2;
+  opacity: .65;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.prevue {
+  margin-top: 8px;
+  font-size: 14px;
+}
+.prevue strong {
+  color: var(--gold-soft);
+  font-weight: 500;
+}
+.attente {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: .7;
+}
