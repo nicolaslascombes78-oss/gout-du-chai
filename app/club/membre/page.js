@@ -55,14 +55,21 @@ export default async function Membre({ searchParams }) {
     : { data: [] };
   const progress = Object.fromEntries((prog || []).map((p) => [p.domain_id, p]));
 
-  const [{ data: invites }, { data: suivis }] = await Promise.all([
+  const [{ data: invites }, { data: suivis }, { data: carte }, { data: aRegler }] = await Promise.all([
     supabase.rpc("my_invitations"),
     supabase
       .from("domain_follows")
       .select("created_at, domains(id, name, slug, status)")
       .eq("member_id", member.id)
       .order("created_at", { ascending: false }),
+    supabase.from("member_cards").select("brand, last4, payment_method").eq("member_id", member.id).maybeSingle(),
+    supabase
+      .from("payments")
+      .select("id")
+      .eq("member_id", member.id)
+      .in("status", ["action_requise", "refusee", "sans_carte"]),
   ]);
+  const aUneCarte = Boolean(carte?.payment_method);
   const domainesSuivis = (suivis || []).map((f) => f.domains).filter(Boolean);
 
   const numero = String(member.member_number).padStart(3, "0");
@@ -86,6 +93,13 @@ export default async function Membre({ searchParams }) {
         </div>
         {member.email && <p className="muted">{member.email}</p>}
       </section>
+
+      {(aRegler || []).length > 0 && (
+        <Link href="/club/membre/carte" className="card stack" style={{ display: "block", borderColor: "var(--gold)" }}>
+          <p className="reserve-ok-t">Un paiement est à régler</p>
+          <p className="muted">Une commande est lancée mais son paiement n&apos;a pas abouti. Touchez pour la régler.</p>
+        </Link>
+      )}
 
       <section className="section stack">
         <h2>Mes commandes</h2>
@@ -171,11 +185,16 @@ export default async function Membre({ searchParams }) {
           );
         })}
         {groups.length > 0 && (
-          <p className="muted">
-            Aucun débit tant que le seuil d&apos;un domaine n&apos;est pas atteint. L&apos;enregistrement de votre carte
-            bancaire arrive très prochainement.
-          </p>
+          <p className="muted">Aucun débit tant que le seuil d&apos;un domaine n&apos;est pas atteint.</p>
         )}
+      </section>
+
+      <section className="section stack" id="paiement">
+        <h2>Paiement</h2>
+        <Link href="/club/membre/carte" className="card row" style={{ color: "var(--ivory)", alignItems: "center" }}>
+          <span>{aUneCarte ? `Carte •••• ${carte.last4}` : "Enregistrer ma carte"}</span>
+          <span className="muted">{aUneCarte ? "Gérer" : "Nécessaire pour commander"} ›</span>
+        </Link>
       </section>
 
       <section className="section stack">

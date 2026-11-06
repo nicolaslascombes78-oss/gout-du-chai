@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { envoyer } from "@/lib/push";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { aPayerParMembre, debiterMembre } from "@/lib/paiements";
 
 // Étape suivante autorisée pour un domaine
 const SUIVANT = { a_venir: "ouvert", ouvert: "declenche", bientot_atteint: "declenche", declenche: "expedie", expedie: "livre" };
@@ -107,6 +109,19 @@ export async function marquerPaye(formData) {
     .in("id", lignes);
   if (error) redirect(`/admin/domaine/${slug}?erreurSuivi=1`);
 
+  // Paiement Stripe du membre : aligné sur le marquage manuel (payé hors Stripe, ou à redébiter).
+  try {
+    const db = createAdminClient();
+    if (paye) {
+      await db.from("payments").update({ status: "payee", error: null, updated_at: new Date().toISOString() })
+        .eq("domain_id", domainId).eq("member_id", memberId);
+    } else {
+      await db.from("payments").delete().eq("domain_id", domainId).eq("member_id", memberId).eq("status", "payee");
+    }
+  } catch {
+    // paiement Stripe pas encore configuré : le marquage manuel suffit
+  }
+
   if (paye) {
     await envoyer(supabase, {
       userIds: [memberId],
@@ -117,4 +132,32 @@ export async function marquerPaye(formData) {
     });
   }
   redirect(`/admin/domaine/${slug}?paye=${paye ? 1 : 0}`);
+}
+
+// Débite la carte enregistrée de chaque réservataire pas encore payé.
+export async function debiterCartes(formData) {
+  await requireAdmin();
+  const id = formData.get("id");
+  const slug = formData.get("slug");
+  let bilan = null;
+  let erreur = "1";
+  try {
+    const db = createAdminClient();
+    const { data: d } = await db.from("domains").select("id, name, status").eq("id", id).maybeSingle();
+    if (d && ["declenche", "expedie", "livre"].includes(d.status)) {
+      bilan = { payee: 0, action_requise: 0, refusee: 0, sans_carte: 0, en_cours: 0 };
+      const parMembre = await aPayerParMembre(db, d.id);
+      for (const lignes of Object.values(parMembre)) {
+        const r = await debiterMembre(db, d, lignes);
+        if (r in bilan) bilan[r]++;
+      }
+    } else {
+      erreur = "statut";
+    }
+  } catch (e) {
+    erreur = String(e?.message || "").includes("cle_") ? "cles" : "1";
+  }
+  if (!bilan) redirect(`/admin/domaine/${slug}?erreurDebit=${erreur}`);
+  const b = bilan;
+  redirect(`/admin/domaine/${slug}?debit=${b.payee}-${b.action_requise}-${b.refusee}-${b.sans_carte}-${b.en_cours}`);
 }

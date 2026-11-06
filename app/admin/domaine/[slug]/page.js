@@ -4,7 +4,28 @@ import Gauge from "@/components/Gauge";
 import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 import { updateDomain } from "@/app/admin/actions";
-import { avancerSuivi, marquerPaye, fixerLivraison } from "./suivi-actions";
+import { avancerSuivi, marquerPaye, fixerLivraison, debiterCartes } from "./suivi-actions";
+
+// État du paiement Stripe de chaque membre
+const PAIEMENT = {
+  payee: "Payé par carte",
+  en_cours: "Débit en cours",
+  action_requise: "Validation bancaire demandée au membre",
+  refusee: "Refusé, membre prévenu",
+  sans_carte: "Pas de carte, membre prévenu",
+};
+
+function bilanDebit(v) {
+  const [payee, valider, refus, sansCarte, enCours] = String(v || "").split("-").map((n) => Number(n) || 0);
+  const parts = [
+    payee && `${payee} payé${payee > 1 ? "s" : ""}`,
+    valider && `${valider} à valider par le membre`,
+    refus && `${refus} refusé${refus > 1 ? "s" : ""}`,
+    sansCarte && `${sansCarte} sans carte`,
+    enCours && `${enCours} en cours`,
+  ].filter(Boolean);
+  return parts.length ? `Débit lancé : ${parts.join(", ")}.` : "Aucun membre à débiter.";
+}
 
 const STATUS_LABELS = {
   a_venir: "À venir",
@@ -62,7 +83,7 @@ export default async function AdminDomaine({ params, searchParams }) {
     .maybeSingle();
   if (!domain) notFound();
 
-  const [{ data: resa }, { data: progress }, { count: abonnes }] = await Promise.all([
+  const [{ data: resa }, { data: progress }, { count: abonnes }, { data: paiements }, { data: cartes }] = await Promise.all([
     supabase
       .from("reservations")
       .select(
@@ -73,7 +94,11 @@ export default async function AdminDomaine({ params, searchParams }) {
       .order("created_at"),
     supabase.from("domain_progress").select("reserved_bottles, participants").eq("domain_id", domain.id).maybeSingle(),
     supabase.from("domain_follows").select("member_id", { count: "exact", head: true }).eq("domain_id", domain.id),
+    supabase.from("payments").select("member_id, status").eq("domain_id", domain.id),
+    supabase.from("member_cards").select("member_id, last4, payment_method"),
   ]);
+  const paiementDe = Object.fromEntries((paiements || []).map((p) => [p.member_id, p.status]));
+  const carteDe = Object.fromEntries((cartes || []).filter((c) => c.payment_method).map((c) => [c.member_id, c.last4]));
 
   const lines = resa || [];
   const byCuvee = {};
@@ -104,6 +129,7 @@ export default async function AdminDomaine({ params, searchParams }) {
   }
   const membres = Object.values(byMember);
   const payes = membres.filter((m) => m.paid).length;
+  const aDebiter = membres.filter((m) => !m.paid).length;
   const suivant = SUIVANT[domain.status];
   const apresDeclenchement = ["declenche", "expedie", "livre"].includes(domain.status);
   const avantLivraison = ["declenche", "expedie"].includes(domain.status);
@@ -156,6 +182,16 @@ export default async function AdminDomaine({ params, searchParams }) {
         {sp?.livraison === "0" && <p className="success">Date de livraison retirée.</p>}
         {sp?.paye === "1" && <p className="success">Paiement enregistré, le membre est prévenu.</p>}
         {sp?.paye === "0" && <p className="success">Paiement retiré.</p>}
+        {sp?.debit && <p className="success">{bilanDebit(sp.debit)}</p>}
+        {sp?.erreurDebit && (
+          <p className="error">
+            {sp.erreurDebit === "cles"
+              ? "Le paiement n'est pas encore configuré : clés Stripe ou Supabase manquantes dans Vercel."
+              : sp.erreurDebit === "statut"
+                ? "La commande doit d'abord être déclenchée."
+                : "Le débit n'a pas abouti. Rechargez la page et réessayez."}
+          </p>
+        )}
         {sp?.erreurSuivi && <p className="error">L&apos;opération n&apos;a pas abouti. Rechargez la page et réessayez.</p>}
 
         <div className="card stack">
@@ -231,6 +267,9 @@ export default async function AdminDomaine({ params, searchParams }) {
                   <p className="muted">
                     n° {m.number} · {euros(m.total)}
                   </p>
+                  <p className="muted">
+                    {PAIEMENT[paiementDe[m.id]] || (carteDe[m.id] ? `Carte •••• ${carteDe[m.id]}` : "Pas de carte enregistrée")}
+                  </p>
                 </div>
                 <button className={m.paid ? "btn btn-ghost" : "btn"} style={{ width: "auto", padding: "8px 16px" }}>
                   {m.paid ? "Payé ✓" : "Marquer payé"}
@@ -239,7 +278,22 @@ export default async function AdminDomaine({ params, searchParams }) {
             ))}
             <p className="muted">
               Le membre reçoit une notification quand son paiement est marqué. Toucher « Payé ✓ » annule le marquage.
+              Utilisez « Marquer payé » seulement pour un règlement hors carte.
             </p>
+            {aDebiter > 0 && (
+              <form action={debiterCartes} className="stack">
+                <input type="hidden" name="id" value={domain.id} />
+                <input type="hidden" name="slug" value={domain.slug} />
+                <label className="check">
+                  <input type="checkbox" required /> Je confirme le débit de {aDebiter} membre{aDebiter > 1 ? "s" : ""}
+                </label>
+                <button className="btn">Débiter les cartes</button>
+                <p className="muted">
+                  Chaque membre pas encore payé est débité du montant exact de ses bouteilles. Ceux dont la banque demande
+                  une validation, ou sans carte, sont prévenus et règlent depuis leur espace.
+                </p>
+              </form>
+            )}
           </div>
         )}
       </section>
