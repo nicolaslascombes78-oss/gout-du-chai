@@ -5,6 +5,9 @@ import JoinForm from "@/components/JoinForm";
 export default async function Rejoindre({ searchParams }) {
   const params = await searchParams;
   const code = (params?.code || "").toString().trim().toUpperCase();
+  // Page où revenir après l'inscription (seulement une page du club).
+  const n = (params?.next || "").toString();
+  const next = n.startsWith("/club") && !n.startsWith("//") ? n : null;
   if (!code) redirect("/");
 
   return (
@@ -18,7 +21,7 @@ export default async function Rejoindre({ searchParams }) {
       </p>
       <div className="ornament" />
       <section className="card">
-        <JoinForm code={code} />
+        <JoinForm code={code} next={next} />
       </section>
     </main>
   );
