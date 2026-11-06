@@ -585,3 +585,40 @@ input[type="email"] { border-radius: 14px; }
 .share-title { text-align: left; font-size: 34px; line-height: 1.1; margin-top: 6px; }
 .share-seal { margin-top: 20px; }
 .share-invite { margin-top: 26px; }
+
+/* Partager une commande : menu membre / ami invité */
+.order-actions:has(.share-menu) { flex-direction: column; }
+.share-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(14, 13, 11, 0.5);
+}
+.share-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--ink-2);
+  color: var(--ivory);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.share-opt-main { border-color: var(--gold); }
+.share-opt:disabled { opacity: 0.7; cursor: progress; }
+.share-opt-t { font-size: 15px; }
+.share-opt-s { font-size: 12px; color: var(--ivory-dim); }
+.share-menu-t { font-size: 14px; }
+.share-menu-t strong { color: var(--gold-soft); letter-spacing: 0.04em; }
+.share-menu-row { display: flex; gap: 8px; }
+.share-menu-row > * { flex: 1; }
