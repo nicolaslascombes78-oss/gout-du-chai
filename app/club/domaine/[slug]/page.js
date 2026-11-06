@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CuveeStepper from "@/components/CuveeStepper";
@@ -91,6 +92,16 @@ export default async function Domaine({ params }) {
   return (
     <main className="shell">
       <ClubHeader back={{ href: "/club/selection", label: "La Sélection" }} />
+
+      {domain.threshold && reserved >= domain.threshold ? (
+        <Celebration
+          slug={domain.slug}
+          name={domain.name}
+          participants={participants}
+          threshold={domain.threshold}
+          mine={myBottles}
+        />
+      ) : null}
 
       <DomainImage domain={domain} variant="hero" />
 
