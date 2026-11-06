@@ -29,11 +29,12 @@ function estInstallee() {
   return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 }
 
-export default function NotificationToggle() {
+export default function NotificationToggle({ moment = null }) {
   // etat : chargement | indisponible | installer | refuse | inactif | actif
   const [etat, setEtat] = useState("chargement");
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState("");
+  const [vient, setVient] = useState(false); // activation demandée à l'instant
 
   useEffect(() => {
     (async () => {
@@ -52,6 +53,7 @@ export default function NotificationToggle() {
   }, []);
 
   const activer = async () => {
+    setVient(true);
     setErreur("");
     setOccupe(true);
     try {
@@ -109,6 +111,35 @@ export default function NotificationToggle() {
   };
 
   if (etat === "chargement") return null;
+
+  // Juste après une réservation : une seule proposition, au bon moment, et rien si c'est déjà réglé.
+  if (moment === "reservation") {
+    if (etat === "actif") {
+      return vient ? (
+        <p className="success notif-moment">C&apos;est noté : vous serez prévenu sur cet appareil.</p>
+      ) : null;
+    }
+    if (etat === "inactif") {
+      return (
+        <div className="notif-moment">
+          <p>Être prévenu quand le sceau se referme ?</p>
+          <button className="btn btn-ghost" onClick={activer} disabled={occupe}>
+            {occupe ? "Activation…" : "Me prévenir"}
+          </button>
+          {erreur && <p className="error">{erreur}</p>}
+        </div>
+      );
+    }
+    if (etat === "installer") {
+      return (
+        <p className="muted notif-moment">
+          Pour être prévenu quand le sceau se referme, ajoutez le club à votre écran d&apos;accueil (Partager, puis
+          « Sur l&apos;écran d&apos;accueil »).
+        </p>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="card stack">
