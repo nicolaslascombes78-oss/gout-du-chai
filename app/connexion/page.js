@@ -1,7 +1,12 @@
 import Link from "next/link";
 import LoginForm from "@/components/LoginForm";
 
-export default function Connexion() {
+export default async function Connexion({ searchParams }) {
+  // Page où revenir après la connexion (seulement une page du club).
+  const params = await searchParams;
+  const n = (params?.next || "").toString();
+  const next = n.startsWith("/club") && !n.startsWith("//") ? n : null;
+
   return (
     <main className="shell">
       <p className="brand">
@@ -11,7 +16,7 @@ export default function Connexion() {
       <p className="lead">Recevez votre code d&apos;accès par e-mail.</p>
       <div className="ornament" />
       <section className="card">
-        <LoginForm />
+        <LoginForm next={next} />
       </section>
       <section className="section" style={{ textAlign: "center" }}>
         <p className="muted">
