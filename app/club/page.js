@@ -166,7 +166,14 @@ export default async function Club() {
                   <Seal reserved={d.reserved} mine={mineByDomain[d.id]} threshold={d.threshold} size={88} />
                 </div>
                 <div className="order-actions">
-                  <ShareOrder name={d.name} region={d.region} missing={missing} slug={d.slug} />
+                  <ShareOrder
+                    name={d.name}
+                    region={d.region}
+                    missing={missing}
+                    slug={d.slug}
+                    canInvite={member.is_admin || member.invites_left > 0}
+                    invitesLeft={member.is_admin ? null : member.invites_left}
+                  />
                   <Link href={`/club/domaine/${d.slug}`} className="btn btn-ghost order-btn order-edit">
                     Modifier
                   </Link>
