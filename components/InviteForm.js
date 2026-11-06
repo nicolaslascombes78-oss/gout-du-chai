@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function InviteForm() {
+// next : page où revenir après l'inscription (par exemple la fiche d'un domaine partagé).
+export default function InviteForm({ next = null }) {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function InviteForm() {
       setError("Ce code n'est pas reconnu. Vérifiez-le auprès de la personne qui vous a invité.");
       return;
     }
-    router.push(`/rejoindre?code=${encodeURIComponent(clean)}`);
+    router.push(`/rejoindre?code=${encodeURIComponent(clean)}${next ? `&next=${encodeURIComponent(next)}` : ""}`);
   }
 
   return (
