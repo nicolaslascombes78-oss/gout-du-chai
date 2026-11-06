@@ -109,6 +109,7 @@ export default async function Membre({ searchParams }) {
               Vous ne serez débité que si la commande est lancée. Vous pouvez modifier ou annuler vos bouteilles
               jusque-là. Un ami amateur peut aider à compléter la commande : invitez-le plus bas.
             </p>
+            <NotificationToggle moment="reservation" />
           </div>
         )}
         {groups.length === 0 && (
