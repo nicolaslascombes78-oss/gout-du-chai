@@ -70,7 +70,10 @@ export default async function Club() {
     .filter((d) => (daysLeft(d.deadline) ?? 0) >= 0)
     .sort((a, b) => pct(b) - pct(a));
   const une = candidates[0];
-  const suivantes = candidates.slice(1, 4);
+  // « Bientôt complètes » seulement au-delà de la moitié du seuil ; sinon, « Les plus avancées ».
+  const avancees = candidates.slice(1).filter((d) => pct(d) >= 0.5);
+  const presque = avancees.length > 0;
+  const suivantes = (presque ? avancees : candidates.slice(1)).slice(0, 3);
 
   const numero = String(member.member_number).padStart(3, "0");
   const nouveau = mesCommandes.length === 0;
@@ -204,8 +207,8 @@ export default async function Club() {
       {suivantes.length > 0 && (
         <section className="section stack">
           <div className="row">
-            <h2 className="home-h2">Bientôt complètes</h2>
-            <Link href="/club/selection?filtre=bientot" className="muted">
+            <h2 className="home-h2">{presque ? "Bientôt complètes" : "Les plus avancées"}</h2>
+            <Link href="/club/selection" className="muted">
               Tout voir
             </Link>
           </div>
