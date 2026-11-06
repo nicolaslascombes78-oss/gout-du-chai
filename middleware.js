@@ -31,6 +31,9 @@ export async function middleware(request) {
   if (!user && request.nextUrl.pathname.startsWith("/club")) {
     const url = request.nextUrl.clone();
     url.pathname = "/connexion";
+    // Après connexion, le membre revient sur la page qu'il voulait ouvrir.
+    url.search = "";
+    url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 
