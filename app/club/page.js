@@ -73,7 +73,8 @@ export default async function Club() {
   // « Bientôt complètes » seulement au-delà de la moitié du seuil ; sinon, « Les plus avancées ».
   const avancees = candidates.slice(1).filter((d) => pct(d) >= 0.5);
   const presque = avancees.length > 0;
-  const suivantes = (presque ? avancees : candidates.slice(1)).slice(0, 3);
+  // Sans aucune réservation, la rubrique disparaît plutôt que d'afficher des commandes à zéro.
+  const suivantes = (presque ? avancees : candidates.slice(1).filter((d) => d.reserved > 0)).slice(0, 3);
 
   const numero = String(member.member_number).padStart(3, "0");
   const nouveau = mesCommandes.length === 0;
