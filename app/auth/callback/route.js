@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
+  // Page où revenir après la connexion (seulement une page du club).
+  const n = searchParams.get("next") || "";
+  const suite = n.startsWith("/club") && !n.startsWith("//") ? n : "/club";
 
   if (!code) return NextResponse.redirect(`${origin}/?erreur=lien`);
 
@@ -19,5 +22,5 @@ export async function GET(request) {
     return NextResponse.redirect(`${origin}/?erreur=invitation`);
   }
 
-  return NextResponse.redirect(`${origin}/club`);
+  return NextResponse.redirect(`${origin}${suite}`);
 }
