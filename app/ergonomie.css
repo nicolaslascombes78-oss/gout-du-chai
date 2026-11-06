@@ -622,3 +622,14 @@ input[type="email"] { border-radius: 14px; }
 .share-menu-t strong { color: var(--gold-soft); letter-spacing: 0.04em; }
 .share-menu-row { display: flex; gap: 8px; }
 .share-menu-row > * { flex: 1; }
+
+/* Après une réservation : proposition d'activer les notifications */
+.notif-moment {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.notif-moment p { font-size: 15px; }
