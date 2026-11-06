@@ -7,7 +7,8 @@ export default function ShareOrder({ name, region, missing, slug }) {
   const [copied, setCopied] = useState(false);
 
   async function share() {
-    const url = `${window.location.origin}/club/domaine/${slug}`;
+    // Lien public : un ami non membre voit la commande et peut rejoindre le club.
+    const url = `${window.location.origin}/c/${slug}`;
     const text =
       missing > 0
         ? `Il manque ${missing} bouteille${missing > 1 ? "s" : ""} pour lancer notre commande chez ${name}${region ? ` (${region})` : ""}. Tu en es ?`
