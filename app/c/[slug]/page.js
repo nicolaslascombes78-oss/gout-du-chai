@@ -22,12 +22,19 @@ async function loadShared(slug) {
       .eq("slug", slug)
       .maybeSingle();
     if (!d) return null;
-    const { data: p } = await db
-      .from("domain_progress")
-      .select("reserved_bottles, participants")
-      .eq("domain_id", d.id)
-      .maybeSingle();
-    return { ...d, reserved: p?.reserved_bottles || 0, participants: p?.participants || 0 };
+    // Avancement calculé directement sur les réservations (la vue domain_progress est réservée aux membres connectés).
+    const { data: cuv } = await db.from("cuvees").select("id").eq("domain_id", d.id);
+    const ids = (cuv || []).map((c) => c.id);
+    const { data: rs } = ids.length
+      ? await db
+          .from("reservations")
+          .select("member_id, quantity")
+          .in("cuvee_id", ids)
+          .in("status", ["en_attente", "confirmee", "payee"])
+      : { data: [] };
+    const reserved = (rs || []).reduce((t, r) => t + (r.quantity || 0), 0);
+    const participants = new Set((rs || []).map((r) => r.member_id)).size;
+    return { ...d, reserved, participants };
   } catch {
     return undefined; // lecture impossible : la page s'affiche sans le détail du domaine
   }
