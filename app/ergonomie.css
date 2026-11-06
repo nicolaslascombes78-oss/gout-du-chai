@@ -633,3 +633,46 @@ input[type="email"] { border-radius: 14px; }
   border-top: 1px solid var(--line);
 }
 .notif-moment p { font-size: 15px; }
+
+/* Célébration : le sceau se referme */
+.celebre {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 7, 5, 0.84);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: celebre-fondu 0.35s ease-out;
+}
+.celebre-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 24px 24px;
+  text-align: center;
+  border: 1px solid var(--gold);
+  border-radius: 20px;
+  background: var(--ink-2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 90px rgba(201, 164, 92, 0.14);
+}
+.celebre-card .btn { margin-top: 10px; }
+.celebre-seal { filter: drop-shadow(0 0 18px rgba(201, 164, 92, 0.25)); }
+.celebre-ring { stroke-dashoffset: 0; animation: celebre-anneau 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both; }
+.celebre-check { stroke-dasharray: 60; stroke-dashoffset: 60; animation: celebre-coche 0.5s ease-out 1.75s forwards; }
+.celebre-t { font-family: var(--font-serif), serif; font-size: 30px; line-height: 1.15; }
+.celebre-txt { color: var(--ivory-dim); line-height: 1.55; }
+.celebre-merci { font-family: var(--font-serif), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: var(--gold-soft); }
+@keyframes celebre-anneau { from { stroke-dashoffset: var(--from); } to { stroke-dashoffset: 0; } }
+@keyframes celebre-coche { to { stroke-dashoffset: 0; } }
+@keyframes celebre-fondu { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .celebre, .celebre-ring { animation: none; }
+  .celebre-check { animation: none; stroke-dashoffset: 0; }
+}
