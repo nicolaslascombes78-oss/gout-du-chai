@@ -91,7 +91,6 @@ export default async function Membre({ searchParams }) {
           </p>
           <p className="muted">Membre depuis {since}</p>
         </div>
-        {member.email && <p className="muted">{member.email}</p>}
       </section>
 
       {(aRegler || []).length > 0 && (
@@ -233,7 +232,7 @@ export default async function Membre({ searchParams }) {
                 <div className="row" key={i.code}>
                   <div>
                     <p>{i.code}</p>
-                    {i.invited_email && <p className="muted">{i.invited_email}</p>}
+                    {i.invited_email && <p className="muted">{masquer(i.invited_email)}</p>}
                   </div>
                   <span className={`badge ${i.used ? "badge-ouvert" : ""}`}>
                     {i.used ? `Inscrit·e : ${i.used_by_name || "oui"}` : expired ? "Expirée" : "En attente"}
@@ -263,10 +262,22 @@ export default async function Membre({ searchParams }) {
       )}
 
       <section className="section">
+        {member.email && (
+          <p className="muted" style={{ textAlign: "center", marginBottom: 10 }}>
+            Connecté avec {member.email}
+          </p>
+        )}
         <form action="/deconnexion" method="post">
           <button className="btn btn-ghost">Se déconnecter</button>
         </form>
       </section>
     </main>
   );
+}
+
+// Adresse d'un invité affichée en partie : « philippe.martin@gmail.com » devient « phi…@gmail.com ».
+function masquer(email) {
+  const [nom, domaine] = String(email).split("@");
+  if (!domaine) return "…";
+  return `${nom.slice(0, 3)}…@${domaine}`;
 }
