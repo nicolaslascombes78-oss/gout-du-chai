@@ -84,7 +84,16 @@ export default function CartView({ memberId, hasCard = true }) {
     }
     clearLines();
     // Sans carte enregistrée, on enchaîne sur son enregistrement (rien n'est débité).
-    router.push(hasCard ? "/club/membre?reserve=1" : "/club/membre/carte?apres=reservation");
+    // La réservation qui fait atteindre le seuil d'un domaine déclenche la célébration.
+    const lance = groups.find((g) => {
+      const p = progress[g.domain.id] || { reserved_bottles: 0 };
+      return g.domain.threshold && p.reserved_bottles < g.domain.threshold && p.reserved_bottles + g.delta >= g.domain.threshold;
+    });
+    router.push(
+      hasCard
+        ? `/club/membre?reserve=1${lance ? `&lance=${encodeURIComponent(lance.domain.slug)}` : ""}`
+        : "/club/membre/carte?apres=reservation"
+    );
     router.refresh();
   }
 
