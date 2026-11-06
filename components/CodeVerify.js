@@ -6,7 +6,7 @@ import { withTimeout } from "@/lib/withTimeout";
 
 // Connexion par code : le membre reste dans son navigateur habituel
 // (Safari, Chrome…) au lieu d'ouvrir le lien dans l'appli mail.
-export default function CodeVerify({ email, onResend }) {
+export default function CodeVerify({ email, onResend, next = null }) {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -44,7 +44,7 @@ export default function CodeVerify({ email, onResend }) {
       return;
     }
     // Rechargement complet pour que le serveur lise la nouvelle session.
-    window.location.href = "/club";
+    window.location.href = next && next.startsWith("/club") && !next.startsWith("//") ? next : "/club";
   }
 
   async function resend() {
