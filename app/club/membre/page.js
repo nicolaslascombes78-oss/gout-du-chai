@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
@@ -72,6 +73,10 @@ export default async function Membre({ searchParams }) {
   const aUneCarte = Boolean(carte?.payment_method);
   const domainesSuivis = (suivis || []).map((f) => f.domains).filter(Boolean);
 
+  // Le membre vient de compléter une commande : on célèbre.
+  const lanceGroupe = params?.lance ? groups.find((g) => g.domain.slug === params.lance) : null;
+  const lanceProg = lanceGroupe ? progress[lanceGroupe.domain.id] : null;
+
   const numero = String(member.member_number).padStart(3, "0");
   const since = new Date(member.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
   const today = new Date().toISOString().slice(0, 10);
@@ -79,6 +84,16 @@ export default async function Membre({ searchParams }) {
   return (
     <main className="shell">
       <ClubHeader />
+      {lanceGroupe && lanceGroupe.domain.threshold ? (
+        <Celebration
+          force
+          slug={lanceGroupe.domain.slug}
+          name={lanceGroupe.domain.name}
+          participants={lanceProg?.participants || 0}
+          threshold={lanceGroupe.domain.threshold}
+          mine={lanceGroupe.bottles}
+        />
+      ) : null}
       <h1 style={{ fontSize: 32 }}>Votre espace</h1>
       <div className="ornament" />
 
