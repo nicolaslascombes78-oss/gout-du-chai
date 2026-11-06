@@ -60,8 +60,10 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function Partage({ params }) {
+export default async function Partage({ params, searchParams }) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const code = (sp?.code || "").toString().trim().toUpperCase();
 
   // Un membre connecté va directement sur la fiche du domaine.
   const supabase = await createClient();
@@ -76,6 +78,13 @@ export default async function Partage({ params }) {
   const next = `/club/domaine/${slug}`;
   const missing = d?.threshold ? Math.max(0, d.threshold - d.reserved) : 0;
   const close = d ? closingLabel(d.deadline) : null;
+
+  // Invitation jointe au lien : on vérifie le code, l'ami n'a plus qu'à créer son compte.
+  let invitationOk = false;
+  if (code) {
+    const { data } = await supabase.rpc("check_invitation", { p_code: code });
+    invitationOk = Boolean(data);
+  }
 
   return (
     <main className="shell share">
@@ -121,13 +130,28 @@ export default async function Partage({ params }) {
       )}
 
       <section className="card stack share-invite">
-        <h2 className="home-h2">Rejoindre le club</h2>
+        <h2 className="home-h2">{invitationOk ? "Vous êtes invité" : "Rejoindre le club"}</h2>
         <p className="muted">
           Le Goût du Chai est un club privé d&apos;amateurs : on y commande ensemble chez des vignerons choisis, au
-          prix adhérent. L&apos;accès se fait sur invitation : demandez votre code à la personne qui vous a envoyé ce
-          lien.
+          prix adhérent.{" "}
+          {invitationOk
+            ? "Votre invitation est jointe à ce lien : il ne reste qu'à créer votre compte, en une minute."
+            : "L'accès se fait sur invitation : demandez votre code à la personne qui vous a envoyé ce lien."}
         </p>
-        <InviteForm next={next} />
+        {invitationOk ? (
+          <Link href={`/rejoindre?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`} className="btn">
+            Accepter l&apos;invitation
+          </Link>
+        ) : (
+          <>
+            {code && (
+              <p className="error" role="alert">
+                Ce code d&apos;invitation n&apos;est plus valable. Demandez-en un nouveau.
+              </p>
+            )}
+            <InviteForm next={next} />
+          </>
+        )}
       </section>
 
       <p className="muted" style={{ textAlign: "center", marginTop: 18 }}>
