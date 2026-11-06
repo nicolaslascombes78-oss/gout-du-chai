@@ -127,7 +127,14 @@ export default async function Domaine({ params }) {
                 ? `Compléter la commande · plus que ${missing}`
                 : "Choisir mes bouteilles"}
             </a>
-            <ShareOrder name={domain.name} region={domain.region} missing={missing} slug={domain.slug} />
+            <ShareOrder
+              name={domain.name}
+              region={domain.region}
+              missing={missing}
+              slug={domain.slug}
+              canInvite={member.is_admin || member.invites_left > 0}
+              invitesLeft={member.is_admin ? null : member.invites_left}
+            />
           </div>
         ) : (
           groups.length > 0 && (
