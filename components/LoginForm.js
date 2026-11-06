@@ -8,7 +8,7 @@ import CodeVerify from "@/components/CodeVerify";
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-export default function LoginForm() {
+export default function LoginForm({ next = null }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -23,7 +23,7 @@ export default function LoginForm() {
         email: address,
         options: {
           shouldCreateUser: false, // seuls les membres existants peuvent se connecter ici
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
         },
       })
     );
@@ -65,7 +65,7 @@ export default function LoginForm() {
   }
 
   if (sent) {
-    return <CodeVerify email={address} onResend={async () => !(await send())} />;
+    return <CodeVerify email={address} next={next} onResend={async () => !(await send())} />;
   }
 
   return (
