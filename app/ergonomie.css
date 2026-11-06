@@ -579,3 +579,9 @@ input[type="email"] { border-radius: 14px; }
 .errpage-title { text-align: left; font-size: 32px; line-height: 1.15; margin-top: 12px; }
 .errpage-txt { margin-top: 12px; font-size: 16px; line-height: 1.55; color: var(--ivory-dim); }
 .errpage-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+/* Page publique de partage d'une commande */
+.share-kicker { margin: 18px 0 10px; font-size: 13px; color: var(--gold-soft); }
+.share-title { text-align: left; font-size: 34px; line-height: 1.1; margin-top: 6px; }
+.share-seal { margin-top: 20px; }
+.share-invite { margin-top: 26px; }
