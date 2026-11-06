@@ -9,7 +9,7 @@ import CodeVerify from "@/components/CodeVerify";
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-export default function JoinForm({ code }) {
+export default function JoinForm({ code, next = null }) {
   const [form, setForm] = useState({ first_name: "", last_name: "", email: "" });
   const [adult, setAdult] = useState(false);
   const [terms, setTerms] = useState(false);
@@ -45,7 +45,7 @@ export default function JoinForm({ code }) {
       supabase.auth.signInWithOtp({
         email: address,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
           data: {
             first_name: form.first_name.trim(),
             last_name: form.last_name.trim(),
@@ -93,7 +93,7 @@ export default function JoinForm({ code }) {
   }
 
   if (sent) {
-    return <CodeVerify email={address} onResend={async () => !(await send())} />;
+    return <CodeVerify email={address} next={next} onResend={async () => !(await send())} />;
   }
 
   const fieldErr = (k) =>
