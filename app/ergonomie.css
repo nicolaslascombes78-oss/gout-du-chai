@@ -565,3 +565,17 @@ input[type="email"] { border-radius: 14px; }
   background: rgba(201, 164, 92, 0.14);
   box-shadow: inset 0 0 0 1px var(--gold);
 }
+
+/* Pages d'erreur (404 et incident) */
+.errpage { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.errpage-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 0 72px; }
+.errpage-code {
+  font-family: var(--font-serif), serif;
+  font-size: 88px;
+  line-height: 1;
+  color: var(--gold-soft);
+  opacity: 0.4;
+}
+.errpage-title { text-align: left; font-size: 32px; line-height: 1.15; margin-top: 12px; }
+.errpage-txt { margin-top: 12px; font-size: 16px; line-height: 1.55; color: var(--ivory-dim); }
+.errpage-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
