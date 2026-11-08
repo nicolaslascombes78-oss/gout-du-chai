@@ -728,3 +728,6 @@ input[type="email"] { border-radius: 14px; }
 .sheet-source a { color: var(--ivory-dim); text-decoration: underline; }
 @keyframes sheet-monte { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet, .sheet-card { animation: none; } }
+
+/* Fiche cuvée : cépage et labels sous le nom quand il n'y a pas d'autres détails */
+.cuvee-cep { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ivory-dim); }
