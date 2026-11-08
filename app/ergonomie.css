@@ -676,3 +676,55 @@ input[type="email"] { border-radius: 14px; }
   .celebre, .celebre-ring { animation: none; }
   .celebre-check { animation: none; stroke-dashoffset: 0; }
 }
+
+/* Fiche cuvée : panneau qui monte du bas de l'écran */
+.cuvee-open { display: inline; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.cuvee-open-hint {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--gold-soft);
+  vertical-align: 2px;
+}
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(8, 7, 5, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: celebre-fondu 0.25s ease-out;
+}
+.sheet-card {
+  width: 100%;
+  max-width: 480px;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  background: var(--ink-2);
+  animation: sheet-monte 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.sheet-close { width: 44px; height: 44px; margin: -10px -10px 0 0; border: 0; background: none; color: var(--ivory-dim); font-size: 28px; line-height: 1; cursor: pointer; }
+.sheet-title { text-align: left; font-size: 28px; line-height: 1.15; margin-top: 4px; }
+.sheet-labels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.sheet-label { padding: 3px 10px; border: 1px solid var(--gold); border-radius: 999px; font-size: 12px; color: var(--gold-soft); }
+.sheet-accroche { margin-top: 14px; font-family: var(--font-serif), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #cfc6b5; }
+.sheet-rows { margin: 16px 0 0; }
+.sheet-rows > div { padding: 12px 0; border-top: 1px solid var(--line); }
+.sheet-rows dt { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ivory-dim); }
+.sheet-rows dd { margin: 4px 0 0; line-height: 1.5; }
+.sheet-source { margin-top: 14px; font-size: 12px; color: var(--ivory-dim); }
+.sheet-source a { color: var(--ivory-dim); text-decoration: underline; }
+@keyframes sheet-monte { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sheet, .sheet-card { animation: none; } }
