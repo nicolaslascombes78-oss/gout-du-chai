@@ -73,3 +73,39 @@ export async function updateMember(formData) {
   revalidatePath("/admin/membres");
   redirect(`/admin/membres?${error ? "erreur=1" : "ok=1"}`);
 }
+
+// Fiche détaillée d'une cuvée (page « Fiches des cuvées » de l'admin).
+export async function updateCuveeFiche(formData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id");
+  const slug = formData.get("slug");
+  const txt = (k) => {
+    const v = (formData.get(k) || "").toString().trim();
+    return v || null;
+  };
+  const deg = parseFloat((formData.get("degre") || "").toString().replace(",", "."));
+  const labels = formData
+    .getAll("labels")
+    .map(String)
+    .filter((l) => ["bio", "biodynamie", "nature"].includes(l));
+  const source = txt("source_fiche");
+
+  const { error } = await supabase
+    .from("cuvees")
+    .update({
+      description: (formData.get("description") || "").toString().trim(),
+      cepages: txt("cepages"),
+      elevage: txt("elevage"),
+      accords: txt("accords"),
+      service: txt("service"),
+      garde: txt("garde"),
+      degre: Number.isFinite(deg) && deg > 0 && deg < 100 ? Math.round(deg * 10) / 10 : null,
+      labels: labels.length ? labels : null,
+      source_fiche: source && /^https?:\/\//.test(source) ? source : null,
+    })
+    .eq("id", id);
+
+  revalidatePath(`/admin/domaine/${slug}/cuvees`);
+  revalidatePath(`/club/domaine/${slug}`);
+  redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}`}#c-${id}`);
+}
