@@ -731,3 +731,16 @@ input[type="email"] { border-radius: 14px; }
 
 /* Fiche cuvée : cépage et labels sous le nom quand il n'y a pas d'autres détails */
 .cuvee-cep { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ivory-dim); }
+
+/* Admin : fiches des cuvées */
+.fiche-edit summary { display: flex; flex-direction: column; gap: 2px; cursor: pointer; list-style: none; }
+.fiche-edit summary::-webkit-details-marker { display: none; }
+.fiche-nom { font-weight: 600; }
+.fiche-meta { font-size: 13px; }
+.fiche-form { margin-top: 14px; }
+.fiche-form > label, .fiche-row > label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.fiche-form textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; resize: vertical; }
+.fiche-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fiche-labels { display: flex; flex-wrap: wrap; gap: 16px; margin: 0; padding: 0; border: 0; }
+.fiche-labels legend { margin-bottom: 6px; font-size: 14px; }
+.fiche-check { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
