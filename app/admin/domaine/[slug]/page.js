@@ -149,6 +149,11 @@ export default async function AdminDomaine({ params, searchParams }) {
         {domain.region}
         {domain.appellation ? ` · ${domain.appellation}` : ""}
       </p>
+      <p style={{ marginTop: 8 }}>
+        <Link href={`/admin/domaine/${slug}/cuvees`} className="link-btn">
+          Fiches des cuvées (cépages, élevage, accords…) →
+        </Link>
+      </p>
       <div className="ornament" />
 
       <section className="card stack">
