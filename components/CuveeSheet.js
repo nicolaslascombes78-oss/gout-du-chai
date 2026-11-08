@@ -20,7 +20,10 @@ export default function CuveeSheet({ c, domainName }) {
     ["Degré", c.degre ? `${String(c.degre).replace(".", ",")} %` : null],
   ].filter(([, v]) => v);
   const labels = (c.labels || []).filter(Boolean);
-  const hasDetails = rows.length > 0 || labels.length > 0;
+  // La fiche ne s'ouvre que s'il y a de vrais détails (élevage, accords, service, garde, degré) ;
+  // sinon, le cépage et les labels s'affichent directement sous le nom.
+  const hasDetails = rows.some(([k]) => k !== "Cépages");
+  const resume = [c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +46,14 @@ export default function CuveeSheet({ c, domainName }) {
       {c.is_favorite && <span className="heart"> ♥</span>}
     </>
   );
-  if (!hasDetails) return nom;
+  if (!hasDetails) {
+    return (
+      <>
+        {nom}
+        {resume && <span className="cuvee-cep">{resume}</span>}
+      </>
+    );
+  }
 
   return (
     <>
