@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
+import CuveeSheet from "@/components/CuveeSheet";
 import CuveeStepper from "@/components/CuveeStepper";
 import CuveeTabs from "@/components/CuveeTabs";
 import DomainCartLink from "@/components/DomainCartLink";
@@ -36,7 +37,7 @@ export default async function Domaine({ params }) {
   const [{ data: cuvees }, { data: progress }, { data: follow }] = await Promise.all([
     supabase
       .from("cuvees")
-      .select("id, name, vintage, color, member_price, description, is_favorite, pack_size")
+      .select("id, name, vintage, color, member_price, description, is_favorite, pack_size, cepages, elevage, accords, service, garde, degre, labels, source_fiche")
       .eq("domain_id", domain.id)
       .eq("active", true)
       .order("member_price"),
@@ -194,8 +195,7 @@ export default async function Domaine({ params }) {
                   <div className="cuvee" key={c.id}>
                     <div>
                       <p>
-                        {c.name}
-                        {c.is_favorite && <span className="heart"> ♥</span>}
+                        <CuveeSheet c={c} domainName={domain.name} />
                       </p>
                       <p className="muted">
                         {c.vintage || "Sans millésime"}
