@@ -1,38 +1,46 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Cloche en haut des écrans du club : mène aux réglages de notifications de l'espace Membre.
-// Un point doré signale que les notifications ne sont pas encore activées sur cet appareil.
+// Cloche en haut des écrans du club : mène au fil « Au club ».
+// Un point doré signale qu'il s'est passé quelque chose depuis la dernière visite.
 export default function BellLink() {
-  const [off, setOff] = useState(false);
+  const pathname = usePathname();
+  const [nouveau, setNouveau] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) return;
-        if (Notification.permission === "denied") return;
-        const reg = await navigator.serviceWorker.getRegistration("/");
-        const abo = reg ? await reg.pushManager.getSubscription() : null;
-        setOff(!abo);
-      } catch {
-        // la cloche reste simplement sans point
-      }
-    })();
-  }, []);
+    if (pathname === "/club/activite") {
+      setNouveau(false);
+      return;
+    }
+    let annule = false;
+    fetch("/api/activite", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (annule || !d?.latest) return;
+        let vu = null;
+        try {
+          vu = localStorage.getItem("gdc-activite-vue");
+        } catch {
+          // stockage indisponible
+        }
+        setNouveau(!vu || new Date(d.latest) > new Date(vu));
+      })
+      .catch(() => {});
+    return () => {
+      annule = true;
+    };
+  }, [pathname]);
 
   return (
-    <Link
-      href="/club/membre#notifications"
-      className="bell"
-      aria-label={off ? "Notifications : pas encore activées" : "Notifications"}
-    >
+    <Link href="/club/activite" className="bell" aria-label={nouveau ? "Au club : du nouveau" : "Au club"}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z" />
         <path d="M10 19a2 2 0 0 0 4 0" />
       </svg>
-      {off && <span className="bell-dot" aria-hidden="true" />}
+      {nouveau && <span className="bell-dot" aria-hidden="true" />}
     </Link>
   );
 }
