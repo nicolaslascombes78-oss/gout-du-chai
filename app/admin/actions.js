@@ -158,3 +158,31 @@ export async function updateCuveeVente(formData) {
   revalidatePath("/club");
   redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}&quoi=vente`}#c-${id}`);
 }
+
+// Annulation de réservations par un administrateur (lignes en attente ou confirmées uniquement ;
+// une ligne payée doit d'abord être remboursée dans Stripe).
+export async function cancelReservations(formData) {
+  const { supabase } = await requireAdmin();
+  const ids = formData.getAll("id").map(String).filter(Boolean);
+  const brut = (formData.get("retour") || "/admin").toString();
+  const retour = brut.startsWith("/admin/") ? brut : "/admin";
+
+  let n = 0;
+  let error = null;
+  if (ids.length) {
+    const res = await supabase
+      .from("reservations")
+      .update({ status: "annulee" })
+      .in("id", ids)
+      .in("status", ["en_attente", "confirmee"])
+      .select("id");
+    error = res.error;
+    n = res.data?.length || 0;
+  }
+
+  revalidatePath(retour);
+  revalidatePath("/admin");
+  revalidatePath("/admin/domaine/[slug]", "page");
+  revalidatePath("/club", "layout");
+  redirect(`${retour}${retour.includes("?") ? "&" : "?"}${error ? "erreur=1" : `annule=${n}`}`);
+}
