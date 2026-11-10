@@ -151,7 +151,7 @@ export default async function AdminDomaine({ params, searchParams }) {
       </p>
       <p style={{ marginTop: 8 }}>
         <Link href={`/admin/domaine/${slug}/cuvees`} className="link-btn">
-          Fiches des cuvées (cépages, élevage, accords…) →
+          Cuvées : prix, vente et fiches →
         </Link>
       </p>
       <div className="ornament" />
