@@ -109,3 +109,52 @@ export async function updateCuveeFiche(formData) {
   revalidatePath(`/club/domaine/${slug}`);
   redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}`}#c-${id}`);
 }
+
+// Vente d'une cuvée : nom, prix membre, vente par carton, millésime, couleur, en vente, coup de cœur.
+export async function updateCuveeVente(formData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id");
+  const slug = formData.get("slug");
+  const name = (formData.get("name") || "").toString().trim();
+  const prix = parseFloat(
+    (formData.get("member_price") || "")
+      .toString()
+      .replace(",", ".")
+      .replace(/[^\d.]/g, "")
+  );
+  const pack = parseInt((formData.get("pack_size") || "").toString(), 10);
+  const millesime = (formData.get("vintage") || "").toString().trim();
+  const vintage = /^\d{4}$/.test(millesime) ? parseInt(millesime, 10) : null;
+  const color = (formData.get("color") || "").toString();
+
+  const valide =
+    name &&
+    Number.isFinite(prix) &&
+    prix > 0 &&
+    prix < 100000 &&
+    Number.isInteger(pack) &&
+    pack >= 1 &&
+    pack <= 120 &&
+    ["blanc", "rouge", "rose", "bulles", "autre"].includes(color);
+
+  let error = !valide;
+  if (valide) {
+    ({ error } = await supabase
+      .from("cuvees")
+      .update({
+        name,
+        member_price: Math.round(prix * 100) / 100,
+        pack_size: pack,
+        vintage,
+        color,
+        active: formData.get("active") === "on",
+        is_favorite: formData.get("is_favorite") === "on",
+      })
+      .eq("id", id));
+  }
+
+  revalidatePath(`/admin/domaine/${slug}/cuvees`);
+  revalidatePath(`/club/domaine/${slug}`);
+  revalidatePath("/club");
+  redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}`}#c-${id}`);
+}
