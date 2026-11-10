@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import "@/app/ergonomie.css";
 import { requireAdmin } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
+import ConfirmSubmit from "@/components/ConfirmSubmit";
+import { cancelReservations } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +19,15 @@ const ETAT_DOMAINE = {
   expire: "Expirée",
 };
 const ACTIVES = ["en_attente", "confirmee", "payee"];
+const ANNULABLES = ["en_attente", "confirmee"];
 
 const dateCourte = (iso) =>
   iso ? new Date(iso).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "short" }) : "";
 
 // Admin : tout ce qu'un membre a réservé, regroupé par domaine.
-export default async function DetailMembre({ params }) {
+export default async function DetailMembre({ params, searchParams }) {
   const { id } = await params;
+  const sp = await searchParams;
   const { supabase } = await requireAdmin();
 
   const { data: m } = await supabase
@@ -92,6 +96,18 @@ export default async function DetailMembre({ params }) {
         {m.is_admin ? " · administrateur" : ""}
         {m.status && m.status !== "actif" ? ` · ${m.status}` : ""}
       </p>
+      {sp?.annule && (
+        <p className="success" role="status">
+          {Number(sp.annule) > 0
+            ? `${sp.annule} réservation${Number(sp.annule) > 1 ? "s" : ""} annulée${Number(sp.annule) > 1 ? "s" : ""}.`
+            : "Rien à annuler : ces lignes étaient déjà payées ou annulées."}
+        </p>
+      )}
+      {sp?.erreur && (
+        <p className="error" role="alert">
+          L&apos;annulation a échoué. Réessayez.
+        </p>
+      )}
 
       <section className="card stack mdet-infos">
         <p>
@@ -149,6 +165,7 @@ export default async function DetailMembre({ params }) {
                     <th>Prix</th>
                     <th>Total</th>
                     <th>État</th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
@@ -165,6 +182,17 @@ export default async function DetailMembre({ params }) {
                         {ETAT_RESA[l.status] || l.status}
                         {l.paid_at ? <span className="mdet-date">le {dateCourte(l.paid_at)}</span> : null}
                       </td>
+                      <td>
+                        {ANNULABLES.includes(l.status) ? (
+                          <form action={cancelReservations}>
+                            <input type="hidden" name="id" value={l.id} />
+                            <input type="hidden" name="retour" value={`/admin/membres/${m.id}`} />
+                            <ConfirmSubmit message={`Annuler ${l.quantity} × ${l.cuvee?.name || "cette cuvée"} pour ${nom} ?`}>
+                              Annuler
+                            </ConfirmSubmit>
+                          </form>
+                        ) : null}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,10 +203,38 @@ export default async function DetailMembre({ params }) {
                     <td />
                     <td className="nowrap">{euros(g.montant)}</td>
                     <td />
+                    <td />
                   </tr>
                 </tfoot>
               </table>
             </div>
+            {(() => {
+              const annulables = g.lignes.filter((l) => ANNULABLES.includes(l.status));
+              const payees = g.lignes.some((l) => l.status === "payee");
+              const nb = annulables.reduce((s, l) => s + (l.quantity || 0), 0);
+              return (
+                <>
+                  {annulables.length > 1 && (
+                    <form action={cancelReservations} className="mdet-annuler-tout">
+                      {annulables.map((l) => (
+                        <input key={l.id} type="hidden" name="id" value={l.id} />
+                      ))}
+                      <input type="hidden" name="retour" value={`/admin/membres/${m.id}`} />
+                      <ConfirmSubmit
+                        message={`Annuler toute la commande de ${nom} chez ${g.d?.name || "ce domaine"} (${nb} bouteille${nb > 1 ? "s" : ""}) ?`}
+                      >
+                        Annuler toute la commande chez {g.d?.name || "ce domaine"}
+                      </ConfirmSubmit>
+                    </form>
+                  )}
+                  {payees && (
+                    <p className="muted mdet-note">
+                      Les lignes payées ne s&apos;annulent pas ici : remboursez d&apos;abord le membre dans Stripe.
+                    </p>
+                  )}
+                </>
+              );
+            })()}
           </section>
         ))
       )}
