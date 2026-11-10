@@ -1,3 +1,5 @@
+import Link from "next/link";
+import "@/app/ergonomie.css";
 import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { updateMember } from "@/app/admin/actions";
 
@@ -31,10 +33,17 @@ export default async function AdminMembres({ searchParams }) {
           <div className="card stack" key={m.id}>
             <div className="row">
               <h3>
-                {m.first_name} {m.last_name}
+                <Link href={`/admin/membres/${m.id}`} className="member-link">
+                  {m.first_name} {m.last_name}
+                </Link>
               </h3>
               <p className="muted nowrap">n° {String(m.member_number).padStart(3, "0")}</p>
             </div>
+            <p>
+              <Link href={`/admin/membres/${m.id}`} className="link-btn">
+                Voir ses commandes →
+              </Link>
+            </p>
             <p className="muted">
               {m.email}
               {m.phone ? ` · ${m.phone}` : ""}
