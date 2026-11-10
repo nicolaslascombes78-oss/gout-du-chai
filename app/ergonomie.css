@@ -790,3 +790,14 @@ input[type="email"] { border-radius: 14px; }
 .fiche-vente { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 .fiche-form select { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; }
 .fiche-note { font-size: 13px; line-height: 1.4; }
+
+/* Admin : encadré À faire */
+.afaire { margin: 20px 0 24px; padding: 16px; border: 1px solid var(--gold); border-radius: 16px; }
+.afaire-titre { margin: 0 0 8px; font-size: 20px; }
+.afaire-liste { margin: 0; padding: 0; list-style: none; }
+.afaire-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 0 10px 12px; border-left: 3px solid var(--line); color: inherit; text-decoration: none; }
+.afaire-liste li + li .afaire-item { margin-top: 6px; }
+.afaire-item strong { font-weight: 600; }
+.afaire-item span { font-size: 14px; color: var(--ivory-dim); }
+.afaire-r0, .afaire-r1 { border-left-color: var(--gold); }
+.afaire-item:hover strong { color: var(--gold); }
