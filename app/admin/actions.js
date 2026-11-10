@@ -156,5 +156,5 @@ export async function updateCuveeVente(formData) {
   revalidatePath(`/admin/domaine/${slug}/cuvees`);
   revalidatePath(`/club/domaine/${slug}`);
   revalidatePath("/club");
-  redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}`}#c-${id}`);
+  redirect(`/admin/domaine/${slug}/cuvees?${error ? "erreur=1" : `ok=${id}&quoi=vente`}#c-${id}`);
 }
