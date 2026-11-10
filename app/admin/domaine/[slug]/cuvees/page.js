@@ -55,7 +55,7 @@ export default async function FichesCuvees({ params, searchParams }) {
       </p>
       {sp?.ok && (
         <p className="success" role="status">
-          Fiche enregistrée.
+          {sp?.quoi === "vente" ? "Vente enregistrée." : "Fiche enregistrée."}
         </p>
       )}
       {sp?.erreur && (
@@ -89,7 +89,7 @@ export default async function FichesCuvees({ params, searchParams }) {
               <div className="fiche-row">
                 <label>
                   Prix membre (€)
-                  <input name="member_price" required inputMode="decimal" defaultValue={String(c.member_price).replace(".", ",")} />
+                  <input name="member_price" required inputMode="decimal" defaultValue={Number(c.member_price).toFixed(2).replace(".", ",")} />
                 </label>
                 <label>
                   Vendu par (bouteilles)
