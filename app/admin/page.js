@@ -1,4 +1,6 @@
 import Link from "next/link";
+import "@/app/ergonomie.css";
+import AdminAFaire from "@/components/AdminAFaire";
 import { requireAdmin, loadSelection, ACTIVE_RESERVATION } from "@/lib/data";
 import { displayStatus, euros, percent } from "@/lib/catalogue";
 
@@ -23,6 +25,8 @@ export default async function AdminHome() {
       <h1 style={{ fontSize: 30, marginTop: 24 }}>Tableau de bord</h1>
       <div className="ornament" />
 
+      <AdminAFaire />
+
       <section className="kpis">
         <div className="card">
           <p className="num-big">{members ?? 0}</p>
@@ -34,7 +38,7 @@ export default async function AdminHome() {
         </div>
         <div className="card">
           <p className="num-big">{euros(amount)}</p>
-          <p className="muted">en attente</p>
+          <p className="muted">réservations en cours</p>
         </div>
       </section>
 
