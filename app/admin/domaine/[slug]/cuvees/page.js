@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import "@/app/ergonomie.css";
 import { requireAdmin } from "@/lib/data";
 import { COLOR_LABELS, euros } from "@/lib/catalogue";
-import { updateCuveeFiche } from "@/app/admin/actions";
+import { updateCuveeFiche, updateCuveeVente } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +11,14 @@ const LABELS = [
   ["bio", "Bio"],
   ["biodynamie", "Biodynamie"],
   ["nature", "Nature"],
+];
+
+const COULEURS = [
+  ["rouge", "Rouge"],
+  ["blanc", "Blanc"],
+  ["rose", "Rosé"],
+  ["bulles", "Bulles"],
+  ["autre", "Autre"],
 ];
 
 // Admin : compléter la fiche de chaque cuvée (cépages, élevage, accords, service, garde, degré, labels).
@@ -25,7 +33,7 @@ export default async function FichesCuvees({ params, searchParams }) {
   const { data: cuvees } = await supabase
     .from("cuvees")
     .select(
-      "id, name, vintage, color, member_price, active, description, cepages, elevage, accords, service, garde, degre, labels, source_fiche"
+      "id, name, vintage, color, member_price, pack_size, is_favorite, active, description, cepages, elevage, accords, service, garde, degre, labels, source_fiche"
     )
     .eq("domain_id", domain.id)
     .order("active", { ascending: false })
@@ -40,7 +48,7 @@ export default async function FichesCuvees({ params, searchParams }) {
       <Link href={`/admin/domaine/${slug}`} className="muted">
         ← {domain.name}
       </Link>
-      <h1 style={{ fontSize: 28, marginTop: 16 }}>Fiches des cuvées</h1>
+      <h1 style={{ fontSize: 28, marginTop: 16 }}>Cuvées : prix et fiches</h1>
       <p className="lead">
         {nb} cuvée{nb > 1 ? "s" : ""} renseignée{nb > 1 ? "s" : ""} sur {list.length}. Seules les informations remplies
         apparaissent aux membres : laissez vide ce qui n&apos;est pas sûr.
@@ -70,6 +78,56 @@ export default async function FichesCuvees({ params, searchParams }) {
                 {remplie(c) ? " · fiche renseignée" : " · fiche vide"}
               </span>
             </summary>
+            <form action={updateCuveeVente} className="stack fiche-form fiche-vente">
+              <input type="hidden" name="id" value={c.id} />
+              <input type="hidden" name="slug" value={slug} />
+              <p className="fiche-section">Vente</p>
+              <label>
+                Nom de la cuvée
+                <input name="name" required defaultValue={c.name} />
+              </label>
+              <div className="fiche-row">
+                <label>
+                  Prix membre (€)
+                  <input name="member_price" required inputMode="decimal" defaultValue={String(c.member_price).replace(".", ",")} />
+                </label>
+                <label>
+                  Vendu par (bouteilles)
+                  <input name="pack_size" required inputMode="numeric" defaultValue={c.pack_size} />
+                </label>
+              </div>
+              <div className="fiche-row">
+                <label>
+                  Millésime
+                  <input name="vintage" inputMode="numeric" defaultValue={c.vintage ?? ""} placeholder="vide = sans millésime" />
+                </label>
+                <label>
+                  Couleur
+                  <select name="color" defaultValue={c.color}>
+                    {COULEURS.map(([v, t]) => (
+                      <option key={v} value={v}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="fiche-labels">
+                <label className="fiche-check">
+                  <input type="checkbox" name="active" defaultChecked={c.active} /> En vente
+                </label>
+                <label className="fiche-check">
+                  <input type="checkbox" name="is_favorite" defaultChecked={c.is_favorite} /> Coup de cœur
+                </label>
+              </div>
+              <p className="muted fiche-note">
+                Les réservations déjà faites gardent leur prix. Un membre qui modifie ensuite sa quantité passe au nouveau prix.
+              </p>
+              <button className="btn" type="submit">
+                Enregistrer la vente
+              </button>
+            </form>
+            <p className="fiche-section">Fiche détaillée</p>
             <form action={updateCuveeFiche} className="stack fiche-form">
               <input type="hidden" name="id" value={c.id} />
               <input type="hidden" name="slug" value={slug} />
