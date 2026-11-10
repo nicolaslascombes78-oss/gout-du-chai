@@ -801,3 +801,10 @@ input[type="email"] { border-radius: 14px; }
 .afaire-item span { font-size: 14px; color: var(--ivory-dim); }
 .afaire-r0, .afaire-r1 { border-left-color: var(--gold); }
 .afaire-item:hover strong { color: var(--gold); }
+
+/* Admin : annulation de réservations */
+.btn-annuler { min-height: 36px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ivory-dim); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.btn-annuler:hover, .btn-annuler:focus-visible { border-color: #c0564b; color: #e07a6f; }
+.mdet-annuler-tout { margin-top: 12px; }
+.mdet-annuler-tout .btn-annuler { width: 100%; min-height: 44px; }
+.mdet-note { margin-top: 8px; font-size: 13px; }
