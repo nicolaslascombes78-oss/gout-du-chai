@@ -1,0 +1,34 @@
+/* Sélection : quand on déplie une région, ses domaines arrivent en cascade.
+   Chaque carte monte en fondu, un court instant après la précédente.
+   Pour régler : DECALAGE = temps entre deux cartes, la durée est dans « animation ».
+   Pour couper l'effet : retirer la ligne import "@/app/cascade.css" dans app/club/layout.js. */
+:root { --cascade-decalage: 70ms; }
+
+.chapter.is-open > .chapter-body > .dcard {
+  animation: cascade-entree 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  animation-delay: calc(var(--cascade-i, 0) * var(--cascade-decalage));
+}
+
+.chapter.is-open > .chapter-body > .dcard:nth-child(2) { --cascade-i: 1; }
+.chapter.is-open > .chapter-body > .dcard:nth-child(3) { --cascade-i: 2; }
+.chapter.is-open > .chapter-body > .dcard:nth-child(4) { --cascade-i: 3; }
+.chapter.is-open > .chapter-body > .dcard:nth-child(5) { --cascade-i: 4; }
+.chapter.is-open > .chapter-body > .dcard:nth-child(6) { --cascade-i: 5; }
+.chapter.is-open > .chapter-body > .dcard:nth-child(7) { --cascade-i: 6; }
+/* Au-delà, les cartes sont hors de l'écran : inutile de les faire attendre davantage */
+.chapter.is-open > .chapter-body > .dcard:nth-child(n + 8) { --cascade-i: 7; }
+
+@keyframes cascade-entree {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter.is-open > .chapter-body > .dcard { animation: none; }
+}

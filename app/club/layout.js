@@ -1,5 +1,6 @@
 import "@/app/ergonomie.css";
 import "@/app/depth.css";
+import "@/app/cascade.css";
 import BottomNav from "@/components/BottomNav";
 import InstallBanner from "@/components/InstallBanner";
 import Depth from "@/components/Depth";
