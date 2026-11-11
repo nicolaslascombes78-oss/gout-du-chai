@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Gauge from "@/components/Gauge";
 import { requireAdmin, ACTIVE_RESERVATION } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
-import { updateDomain } from "@/app/admin/actions";
+import "@/app/ergonomie.css";
+import { updateDomain, updateDomaineInfos } from "@/app/admin/actions";
 import { avancerSuivi, marquerPaye, fixerLivraison, debiterCartes } from "./suivi-actions";
 
 // État du paiement Stripe de chaque membre
@@ -77,11 +78,13 @@ export default async function AdminDomaine({ params, searchParams }) {
   const { data: domain } = await supabase
     .from("domains")
     .select(
-      "id, slug, name, region, appellation, threshold, deadline, status, pack_size, triggered_at, shipped_at, delivered_at, expected_delivery"
+      "id, slug, name, region, appellation, tagline, threshold, deadline, status, pack_size, triggered_at, shipped_at, delivered_at, expected_delivery"
     )
     .eq("slug", slug)
     .maybeSingle();
   if (!domain) notFound();
+  const { data: lesRegions } = await supabase.from("domains").select("region");
+  const regions = [...new Set((lesRegions || []).map((r) => r.region).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
 
   const [{ data: resa }, { data: progress }, { count: abonnes }, { data: paiements }, { data: cartes }] = await Promise.all([
     supabase
@@ -154,6 +157,53 @@ export default async function AdminDomaine({ params, searchParams }) {
           Cuvées : prix, vente et fiches →
         </Link>
       </p>
+      {sp?.infos && (
+        <p className={sp.infos === "1" ? "success" : "error"} role={sp.infos === "1" ? "status" : "alert"}>
+          {sp.infos === "1"
+            ? "Nom et présentation enregistrés."
+            : "L’enregistrement a échoué : le nom et la région sont obligatoires."}
+        </p>
+      )}
+      <details className="card fiche-edit" style={{ marginTop: 12 }} open={Boolean(sp?.infos && sp.infos !== "1")}>
+        <summary>
+          <span className="fiche-nom">Modifier le nom et la présentation</span>
+          <span className="muted fiche-meta">Nom, région, appellation, accroche sous le nom</span>
+        </summary>
+        <form action={updateDomaineInfos} className="stack fiche-form">
+          <input type="hidden" name="id" value={domain.id} />
+          <input type="hidden" name="slug" value={slug} />
+          <label>
+            Nom du domaine
+            <input name="name" required maxLength={120} defaultValue={domain.name} />
+          </label>
+          <div className="fiche-row">
+            <label>
+              Région
+              <input name="region" required maxLength={60} list="regions-club" defaultValue={domain.region || ""} />
+            </label>
+            <label>
+              Appellation
+              <input name="appellation" maxLength={120} defaultValue={domain.appellation || ""} />
+            </label>
+          </div>
+          <datalist id="regions-club">
+            {regions.map((r) => (
+              <option key={r} value={r} />
+            ))}
+          </datalist>
+          <label>
+            Accroche (phrase affichée sous le nom)
+            <textarea name="tagline" rows={2} maxLength={300} defaultValue={domain.tagline || ""} />
+          </label>
+          <p className="muted fiche-note">
+            Choisissez la région dans la liste pour que le domaine reste regroupé avec les autres dans la Sélection.
+            L’adresse de la fiche (/club/domaine/{slug}) ne change pas : les liens déjà partagés continuent de fonctionner.
+          </p>
+          <button className="btn" type="submit">
+            Enregistrer
+          </button>
+        </form>
+      </details>
       <div className="ornament" />
 
       <section className="card stack">
