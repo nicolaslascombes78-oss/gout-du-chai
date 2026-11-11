@@ -1,6 +1,7 @@
 import Link from "next/link";
 import "@/app/ergonomie.css";
 import AdminAFaire from "@/components/AdminAFaire";
+import AdminInterets from "@/components/AdminInterets";
 import { requireAdmin, loadSelection, ACTIVE_RESERVATION } from "@/lib/data";
 import { displayStatus, euros, percent } from "@/lib/catalogue";
 
@@ -26,6 +27,7 @@ export default async function AdminHome() {
       <div className="ornament" />
 
       <AdminAFaire />
+      <AdminInterets />
 
       <section className="kpis">
         <div className="card">
