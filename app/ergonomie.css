@@ -867,3 +867,10 @@ input[type="email"] { border-radius: 14px; }
 
 /* Fiche domaine : bouton Voir les autres cuvées */
 .cuvee-more { display: block; width: 100%; min-height: 44px; margin-top: 4px; padding: 10px 0; border: 1px dashed var(--line); border-radius: 12px; text-align: center; }
+
+/* Fiche domaine : confort tactile et lisibilité sur téléphone */
+.stepper-wrap .stepper button { width: 44px; height: 44px; font-size: 20px; }
+.stepper-wrap .stepper .qty-input { height: 44px; min-width: 36px; font-size: 16px; } /* 16 px : évite le zoom automatique d'iOS au toucher */
+.cuvee .muted { font-size: 14px; line-height: 1.45; }
+.cuvee .cuvee-cep { font-size: 13.5px; }
+.stepper-wrap .hint { font-size: 13px; }
