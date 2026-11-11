@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import CuveeReviews from "@/components/CuveeReviews";
+import Seals from "@/components/Seals";
 import { COLOR_LABELS } from "@/lib/catalogue";
+import { noteTexte } from "@/lib/avis";
 
 const LABELS = { bio: "Bio", biodynamie: "Biodynamie", nature: "Nature" };
 
-// Nom d'une cuvée sur la fiche domaine. Si la cuvée a des détails (cépages, élevage…),
+// Nom d'une cuvée sur la fiche domaine. Si la cuvée a des détails (cépages, élevage…) ou des avis,
 // le nom ouvre une fiche qui monte du bas de l'écran ; sinon il reste un simple texte.
-export default function CuveeSheet({ c, domainName }) {
+export default function CuveeSheet({ c, domainName, slug, avis }) {
   const [open, setOpen] = useState(false);
   const fermer = useRef(null);
 
@@ -20,9 +23,10 @@ export default function CuveeSheet({ c, domainName }) {
     ["Degré", c.degre ? `${String(c.degre).replace(".", ",")} %` : null],
   ].filter(([, v]) => v);
   const labels = (c.labels || []).filter(Boolean);
-  // La fiche ne s'ouvre que s'il y a de vrais détails (élevage, accords, service, garde, degré) ;
-  // sinon, le cépage et les labels s'affichent directement sous le nom.
+  // La fiche s'ouvre s'il y a de vrais détails (élevage, accords, service, garde, degré)
+  // ou des avis à lire ou à donner ; sinon, le cépage et les labels s'affichent directement sous le nom.
   const hasDetails = rows.some(([k]) => k !== "Cépages");
+  const aDesAvis = (avis?.nb || 0) > 0 || Boolean(avis?.mien) || Boolean(avis?.peutDonner);
   const resume = [c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
 
   useEffect(() => {
@@ -46,7 +50,15 @@ export default function CuveeSheet({ c, domainName }) {
       {c.is_favorite && <span className="heart"> ♥</span>}
     </>
   );
-  if (!hasDetails) {
+  const mini =
+    avis?.moyenne != null ? (
+      <span className="avis-mini">
+        <Seals value={avis.moyenne} label={`Note des membres ${noteTexte(avis.moyenne)} sur 5`} />
+        {noteTexte(avis.moyenne)} ({avis.nb})
+      </span>
+    ) : null;
+
+  if (!hasDetails && !aDesAvis) {
     return (
       <>
         {nom}
@@ -59,8 +71,10 @@ export default function CuveeSheet({ c, domainName }) {
     <>
       <button type="button" className="cuvee-open" onClick={() => setOpen(true)} aria-haspopup="dialog">
         {nom}
-        <span className="cuvee-open-hint">Fiche</span>
+        <span className="cuvee-open-hint">{hasDetails ? "Fiche" : avis?.peutDonner && !avis?.mien ? "Donner mon avis" : "Avis"}</span>
       </button>
+      {mini}
+      {!hasDetails && resume && <span className="cuvee-cep">{resume}</span>}
       {open && (
         <div className="sheet" role="dialog" aria-modal="true" aria-labelledby={`fiche-${c.id}`} onClick={() => setOpen(false)}>
           <div className="sheet-card" onClick={(e) => e.stopPropagation()}>
@@ -105,6 +119,7 @@ export default function CuveeSheet({ c, domainName }) {
                 </a>
               </p>
             )}
+            {avis && <CuveeReviews cuveeId={c.id} slug={slug} avis={avis} />}
           </div>
         </div>
       )}

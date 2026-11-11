@@ -1,0 +1,5 @@
+-- Avis des membres sur les cuvées (déjà appliqué sur Supabase le 11 novembre 2026, copie pour mémoire)
+-- Table cuvee_reviews : note 1 à 5, mots-clés, commentaire (600 caractères max), auteur « Prénom I. »,
+-- masquage réservé aux admins. Un avis par membre et par cuvée.
+-- Droit de donner un avis : fonction can_review (cuvée réservée et domaine au statut « livré »).
+-- Voir la migration « avis_cuvees » dans Supabase pour le détail.

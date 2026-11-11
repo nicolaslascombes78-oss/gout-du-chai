@@ -10,7 +10,8 @@ import DomainImage from "@/components/DomainImage";
 import FollowButton from "@/components/FollowButton";
 import ShareOrder from "@/components/ShareOrder";
 import StoryClamp from "@/components/StoryClamp";
-import { requireMember } from "@/lib/data";
+import { requireMember, ACTIVE_RESERVATION } from "@/lib/data";
+import { moyenne } from "@/lib/avis";
 import { COLOR_LABELS, COLOR_ORDER, cardBadge, daysLeft, displayStatus, euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
@@ -50,19 +51,50 @@ export default async function Domaine({ params }) {
       .maybeSingle(),
   ]);
 
-  // Ce que ce membre a déjà réservé dans ce domaine.
+  // Ce que ce membre a déjà réservé dans ce domaine, les avis des membres,
+  // et (commande livrée) les cuvées qu'il a reçues et peut donc noter.
   const ids = (cuvees || []).map((c) => c.id);
-  const { data: mine } = ids.length
-    ? await supabase
-        .from("reservations")
-        .select("cuvee_id, quantity")
-        .eq("member_id", member.id)
-        .eq("status", "en_attente")
-        .in("cuvee_id", ids)
-    : { data: [] };
+  const vide = { data: [] };
+  const [{ data: mine }, { data: avisLignes }, { data: recues }] = ids.length
+    ? await Promise.all([
+        supabase
+          .from("reservations")
+          .select("cuvee_id, quantity")
+          .eq("member_id", member.id)
+          .eq("status", "en_attente")
+          .in("cuvee_id", ids),
+        supabase
+          .from("cuvee_reviews")
+          .select("id, cuvee_id, member_id, rating, tags, comment, author_name, hidden, created_at, updated_at")
+          .in("cuvee_id", ids)
+          .order("updated_at", { ascending: false }),
+        domain.status === "livre"
+          ? supabase
+              .from("reservations")
+              .select("cuvee_id")
+              .eq("member_id", member.id)
+              .in("status", ACTIVE_RESERVATION)
+              .in("cuvee_id", ids)
+          : vide,
+      ])
+    : [vide, vide, vide];
   const reservedByCuvee = {};
   (mine || []).forEach((r) => (reservedByCuvee[r.cuvee_id] = (reservedByCuvee[r.cuvee_id] || 0) + r.quantity));
   const myBottles = Object.values(reservedByCuvee).reduce((s, n) => s + n, 0);
+
+  const recuesIds = new Set((recues || []).map((r) => r.cuvee_id));
+  const avisParCuvee = {};
+  for (const id of ids) {
+    const lignes = (avisLignes || []).filter((a) => a.cuvee_id === id);
+    const visibles = lignes.filter((a) => !a.hidden);
+    avisParCuvee[id] = {
+      liste: visibles,
+      nb: visibles.length,
+      moyenne: moyenne(visibles),
+      mien: lignes.find((a) => a.member_id === member.id) || null,
+      peutDonner: recuesIds.has(id),
+    };
+  }
 
   const reserved = progress?.reserved_bottles || 0;
   const participants = progress?.participants || 0;
@@ -89,6 +121,9 @@ export default async function Domaine({ params }) {
     price: Number(c.member_price),
     reserved: reservedByCuvee[c.id] || 0,
   }));
+
+  // Commande livrée : on invite le membre à noter les cuvées reçues qu'il n'a pas encore notées.
+  const aNoter = ids.filter((id) => avisParCuvee[id].peutDonner && !avisParCuvee[id].mien).length;
 
   return (
     <main className="shell">
@@ -135,9 +170,7 @@ export default async function Domaine({ params }) {
         {canAct ? (
           <div className="cta-commande">
             <a href="#cuvees" className="btn">
-              {urgent
-                ? `Compléter la commande · plus que ${missing}`
-                : "Choisir mes bouteilles"}
+              {urgent ? `Compléter la commande · plus que ${missing}` : "Choisir mes bouteilles"}
             </a>
             <ShareOrder
               name={domain.name}
@@ -157,6 +190,18 @@ export default async function Domaine({ params }) {
         )}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
+
+      {aNoter > 0 && (
+        <section className="section card stack">
+          <p>Vos bouteilles sont arrivées. Qu&apos;en avez-vous pensé ?</p>
+          <p className="muted">
+            Touchez le nom d&apos;une cuvée pour lui donner une note. Vos avis guident les prochaines commandes du club.
+          </p>
+          <a href="#cuvees" className="btn btn-ghost">
+            Donner mon avis
+          </a>
+        </section>
+      )}
 
       {domain.story && (
         <section className="section stack">
@@ -195,7 +240,7 @@ export default async function Domaine({ params }) {
                   <div className="cuvee" key={c.id}>
                     <div>
                       <p>
-                        <CuveeSheet c={c} domainName={domain.name} />
+                        <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
                       </p>
                       <p className="muted">
                         {c.vintage || "Sans millésime"}
