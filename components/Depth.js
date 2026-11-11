@@ -7,7 +7,9 @@
 //   puis chaque nouvelle page (écran de chargement compris) apparaît en fondu ;
 // - lumière vivante : le reflet doré des cartes suit l'inclinaison du téléphone (Android),
 //   le doigt sur l'écran (iPhone, qui exigerait sinon une autorisation à chaque ouverture)
-//   ou la souris (ordinateur).
+//   ou la souris (ordinateur). Le reflet se met en pause pendant un défilement :
+//   le faire bouger en même temps obligeait l'iPhone à redessiner tout l'écran,
+//   ce qui faisait décoller la barre du bas.
 // Rien ne s'active si le téléphone est réglé sur « réduire les animations ».
 import { useEffect } from "react";
 
@@ -19,6 +21,7 @@ const FONDU_ENTREE = 500; // durée d'apparition d'une nouvelle page, en millise
 const FONDU_SORTIE = 180; // durée d'assombrissement de l'ancienne page
 const LUMIERE_REPOS = { x: 0.3, y: 0 }; // position du reflet quand rien ne bouge (en haut à gauche)
 const LUMIERE_DOUCEUR = 0.12; // 0,05 = très lent, 0,3 = très vif
+const LUMIERE_PAUSE = 200; // le reflet reprend 200 ms après la fin du défilement
 
 export default function Depth() {
   useEffect(() => {
@@ -120,9 +123,12 @@ export default function Depth() {
     const cible = { ...LUMIERE_REPOS };
     const lumiere = { ...LUMIERE_REPOS };
     let lumiereRaf = 0;
+    let defile = false; // vrai pendant un défilement : le reflet ne bouge pas
+    let finDefile = 0;
     const borne = (v, min, max) => Math.max(min, Math.min(max, v));
     const anime = () => {
       lumiereRaf = 0;
+      if (defile) return;
       lumiere.x += (cible.x - lumiere.x) * LUMIERE_DOUCEUR;
       lumiere.y += (cible.y - lumiere.y) * LUMIERE_DOUCEUR;
       root.style.setProperty("--lx", `${(lumiere.x * 100).toFixed(1)}%`);
@@ -131,12 +137,29 @@ export default function Depth() {
         lumiereRaf = requestAnimationFrame(anime);
       }
     };
+    const relance = () => {
+      if (!lumiereRaf && !defile) lumiereRaf = requestAnimationFrame(anime);
+    };
     const vise = (x, y) => {
       cible.x = borne(x, -0.1, 1.1);
       cible.y = borne(y, -0.1, 1.1);
-      if (!lumiereRaf) lumiereRaf = requestAnimationFrame(anime);
+      relance();
     };
     const auRepos = () => vise(LUMIERE_REPOS.x, LUMIERE_REPOS.y);
+
+    // Pendant un défilement, le reflet s'arrête ; il reprend juste après
+    const onScrollLumiere = () => {
+      defile = true;
+      if (lumiereRaf) {
+        cancelAnimationFrame(lumiereRaf);
+        lumiereRaf = 0;
+      }
+      clearTimeout(finDefile);
+      finDefile = setTimeout(() => {
+        defile = false;
+        relance();
+      }, LUMIERE_PAUSE);
+    };
 
     // Android (et appareils sans autorisation requise) : inclinaison du téléphone
     const iPhone = typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function";
@@ -166,6 +189,7 @@ export default function Depth() {
     const mo = new MutationObserver(scheduleWatch);
     mo.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScrollLumiere, { passive: true });
     window.addEventListener("resize", onScroll);
 
     return () => {
@@ -174,9 +198,11 @@ export default function Depth() {
       io.disconnect();
       mo.disconnect();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScrollLumiere);
       window.removeEventListener("resize", onScroll);
       document.removeEventListener("click", onClick, true);
       cancelAnimationFrame(lumiereRaf);
+      clearTimeout(finDefile);
       window.removeEventListener("deviceorientation", onOrientation);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("pointerdown", onPointer);
