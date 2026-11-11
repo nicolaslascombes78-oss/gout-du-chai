@@ -864,3 +864,6 @@ input[type="email"] { border-radius: 14px; }
 .ma-resa-liste { margin: 6px 0 8px; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
 .cuvee { scroll-margin-top: 76px; }
 .cuvee:target { outline: 1px solid var(--gold); outline-offset: 6px; border-radius: 12px; }
+
+/* Fiche domaine : bouton Voir les autres cuvées */
+.cuvee-more { display: block; width: 100%; min-height: 44px; margin-top: 4px; padding: 10px 0; border: 1px dashed var(--line); border-radius: 12px; text-align: center; }
