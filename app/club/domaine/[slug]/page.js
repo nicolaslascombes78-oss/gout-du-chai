@@ -10,6 +10,7 @@ import DomainImage from "@/components/DomainImage";
 import DomainRecommend from "@/components/DomainRecommend";
 import FollowButton from "@/components/FollowButton";
 import ShareOrder from "@/components/ShareOrder";
+import StickyProgress from "@/components/StickyProgress";
 import StoryClamp from "@/components/StoryClamp";
 import { requireMember, ACTIVE_RESERVATION } from "@/lib/data";
 import { moyenne, texteRecommandation } from "@/lib/avis";
@@ -111,7 +112,7 @@ export default async function Domaine({ params }) {
   const editable = ["ouvert", "bientot_atteint"].includes(domain.status) && !pastDeadline;
   const closedLabel = pastDeadline ? "Réservations closes" : CLOSED[domain.status] || "Réservations closes";
 
-  const groups = COLOR_ORDER.map((c) => ({ color: c, items: (cuvees || []).filter((x) => x.color === c) })).filter(
+  const groups = COLOR_ORDER.map((c) => ({ color: c, items: (cuvees || []).filter((x) => x.color === c).sort((a, b) => Number(Boolean(b.is_favorite)) - Number(Boolean(a.is_favorite))) })).filter(
     (g) => g.items.length
   );
   const tabs = groups.map((g) => ({ color: g.color, label: COLOR_LABELS[g.color], count: g.items.length }));
@@ -160,7 +161,7 @@ export default async function Domaine({ params }) {
       {domain.tagline && <p className="lead">{domain.tagline}</p>}
       <div className="ornament" />
 
-      <section className="card stack">
+      <section className="card stack" id="commande">
         <div className="row">
           <p className="eyebrow">Commande groupée</p>
           {badge && <span className={`badge badge-${badge.key}`}>{badge.label}</span>}
@@ -201,49 +202,24 @@ export default async function Domaine({ params }) {
         )}
         {recommandation && <p className="reco-ligne">{recommandation}</p>}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
+        {domain.story && (
+          <a href="#histoire" className="link-btn histoire-lien">
+            Pourquoi on l’aime ↓
+          </a>
+        )}
       </section>
+
+      {st.key !== "a_venir" && (
+        <StickyProgress
+          name={domain.name}
+          reserved={reserved}
+          threshold={domain.threshold}
+          echeance={jours != null && jours >= 0 ? (jours === 0 ? "clôture aujourd’hui" : `clôture dans ${jours} j`) : null}
+        />
+      )}
 
       {peutRecommander && (
         <DomainRecommend domainId={domain.id} slug={domain.slug} domainName={domain.name} mienne={maReco} aNoter={aNoter} />
-      )}
-
-      {domain.story && (
-        <section className="section stack">
-          <h2>Pourquoi on l&apos;aime</h2>
-          <StoryClamp text={domain.story} />
-        </section>
-      )}
-
-      {motsMembres.length > 0 && (
-        <section className="section stack">
-          <h2>Ce qu&apos;en disent les membres</h2>
-          <ul className="reco-mots">
-            {motsMembres.map((r) => (
-              <li key={r.id}>
-                <blockquote>« {r.comment} »</blockquote>
-                <cite>{r.author_name || "Un membre"}</cite>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {favorites.length > 0 && (
-        <section className="section stack">
-          <p className="eyebrow">Coup de cœur du club</p>
-          {favorites.slice(0, 2).map((c) => (
-            <div className="card fav" key={c.id}>
-              <div className="row">
-                <h3>{c.name}</h3>
-                <p className="price">{euros(c.member_price)}</p>
-              </div>
-              <p className="muted">
-                {COLOR_LABELS[c.color]}
-                {c.vintage ? ` · ${c.vintage}` : ""}
-              </p>
-            </div>
-          ))}
-        </section>
       )}
 
       <section className="section stack" id="cuvees">
@@ -261,6 +237,7 @@ export default async function Domaine({ params }) {
                         <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
                       </p>
                       <p className="muted">
+                        {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
                         {c.vintage || "Sans millésime"}
                         {c.description ? ` · ${c.description}` : ""}
                       </p>
@@ -284,6 +261,27 @@ export default async function Domaine({ params }) {
         </CuveeTabs>
         <p className="muted">Prix adhérents TTC, départ domaine.</p>
       </section>
+
+      {domain.story && (
+        <section className="section stack" id="histoire">
+          <h2>Pourquoi on l&apos;aime</h2>
+          <StoryClamp text={domain.story} />
+        </section>
+      )}
+
+      {motsMembres.length > 0 && (
+        <section className="section stack">
+          <h2>Ce qu&apos;en disent les membres</h2>
+          <ul className="reco-mots">
+            {motsMembres.map((r) => (
+              <li key={r.id}>
+                <blockquote>« {r.comment} »</blockquote>
+                <cite>{r.author_name || "Un membre"}</cite>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="section">
         <DomainCartLink
