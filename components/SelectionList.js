@@ -16,6 +16,7 @@ const SORTS = [
   { key: "cloture", label: "Clôture proche" },
   { key: "nouveautes", label: "Nouveautés" },
   { key: "prix", label: "Prix croissant" },
+  { key: "region", label: "Par région" },
 ];
 const NEW_DAYS = 14;
 
@@ -190,8 +191,9 @@ export default function SelectionList({ domains, initialFilter }) {
     return pct(b) - pct(a);
   });
 
-  // Sans recherche ni filtre, la page se lit par régions (chapitres repliés).
-  const libre = !needle && !region && !color && !quick && sort === "avancees";
+  // Par défaut : une liste directe, triée par avancement. Le tri « Par région » ramène les chapitres repliés.
+  const accueil = !needle && !region && !color && !quick && sort === "avancees";
+  const libre = !needle && !region && !color && !quick && sort === "region";
   const groups = regions
     .map((r) => ({ region: r, items: sorted.filter((d) => d.region === r) }))
     .filter((g) => g.items.length);
@@ -283,7 +285,7 @@ export default function SelectionList({ domains, initialFilter }) {
         </label>
       </div>
 
-      {libre && fresh.length > 0 && (
+      {(libre || accueil) && fresh.length > 0 && (
         <section className="sel-section">
           <div className="sel-head">
             <h2 className="home-h2">Nouvelles maisons</h2>
@@ -299,7 +301,7 @@ export default function SelectionList({ domains, initialFilter }) {
 
       <section className="sel-section">
         <div className="sel-head sel-head-line">
-          <h2 className="home-h2">{libre ? "Toutes les maisons" : "Résultats"}</h2>
+          <h2 className="home-h2">{libre || accueil ? "Toutes les maisons" : "Résultats"}</h2>
           <span className="muted">{list.length}</span>
         </div>
 
