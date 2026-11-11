@@ -1,0 +1,5 @@
+-- Recommandation des domaines (déjà appliqué sur Supabase le 11 novembre 2026, copie pour mémoire)
+-- Table domain_reviews : verdict oui / peut_etre / non, ou « ignore » (le membre a touché « Plus tard »),
+-- un mot facultatif (300 caractères), auteur « Prénom I. », masquage réservé aux admins.
+-- Droit de répondre : fonction can_review_domain (commande du domaine reçue, statut « livré »).
+-- Voir la migration « recommandation_domaines » dans Supabase pour le détail.

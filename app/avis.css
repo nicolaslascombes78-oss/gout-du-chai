@@ -69,3 +69,25 @@
 @media (prefers-reduced-motion: reduce) {
   .avis-pick button { transition: none; }
 }
+
+/* Recommandation des domaines */
+.reco-encart { border-color: var(--gold); }
+.reco-choix { display: flex; flex-wrap: wrap; gap: 8px; }
+.reco-choix .chip { padding: 10px 16px; font-size: 14px; }
+.reco-texte {
+  width: 100%; min-height: 72px; resize: vertical;
+  background: transparent; border: 1px solid var(--line); border-radius: 10px;
+  color: var(--ivory); font: inherit; font-size: 16px; padding: 12px 14px; outline: none;
+}
+.reco-texte:focus { border-color: var(--gold); }
+.reco-encart .avis-retirer { align-self: flex-start; }
+.reco-mienne { margin-top: 14px; text-align: center; }
+.reco-ligne { display: flex; align-items: center; gap: 8px; color: var(--gold-soft); font-size: 14px; }
+.reco-ligne::before {
+  content: ""; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  background: radial-gradient(circle at 35% 35%, var(--gold-soft) 0%, var(--gold) 70%);
+}
+.reco-mots { list-style: none; }
+.reco-mots li + li { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.reco-mots blockquote { font-family: var(--font-serif), serif; font-size: 17px; line-height: 1.55; color: var(--ivory); }
+.reco-mots cite { display: block; margin-top: 6px; font-style: normal; font-size: 12px; color: var(--ivory-dim); }

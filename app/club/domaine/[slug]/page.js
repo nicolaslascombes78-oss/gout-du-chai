@@ -7,11 +7,12 @@ import CuveeStepper from "@/components/CuveeStepper";
 import CuveeTabs from "@/components/CuveeTabs";
 import DomainCartLink from "@/components/DomainCartLink";
 import DomainImage from "@/components/DomainImage";
+import DomainRecommend from "@/components/DomainRecommend";
 import FollowButton from "@/components/FollowButton";
 import ShareOrder from "@/components/ShareOrder";
 import StoryClamp from "@/components/StoryClamp";
 import { requireMember, ACTIVE_RESERVATION } from "@/lib/data";
-import { moyenne } from "@/lib/avis";
+import { moyenne, texteRecommandation } from "@/lib/avis";
 import { COLOR_LABELS, COLOR_ORDER, cardBadge, daysLeft, displayStatus, euros } from "@/lib/catalogue";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function Domaine({ params }) {
     .maybeSingle();
   if (!domain) notFound();
 
-  const [{ data: cuvees }, { data: progress }, { data: follow }] = await Promise.all([
+  const [{ data: cuvees }, { data: progress }, { data: follow }, { data: recos }] = await Promise.all([
     supabase
       .from("cuvees")
       .select("id, name, vintage, color, member_price, description, is_favorite, pack_size, cepages, elevage, accords, service, garde, degre, labels, source_fiche")
@@ -49,6 +50,11 @@ export default async function Domaine({ params }) {
       .eq("member_id", member.id)
       .eq("domain_id", domain.id)
       .maybeSingle(),
+    supabase
+      .from("domain_reviews")
+      .select("id, member_id, verdict, comment, author_name, hidden, updated_at")
+      .eq("domain_id", domain.id)
+      .order("updated_at", { ascending: false }),
   ]);
 
   // Ce que ce membre a déjà réservé dans ce domaine, les avis des membres,
@@ -122,8 +128,13 @@ export default async function Domaine({ params }) {
     reserved: reservedByCuvee[c.id] || 0,
   }));
 
-  // Commande livrée : on invite le membre à noter les cuvées reçues qu'il n'a pas encore notées.
+  // Commande livrée : le membre qui a reçu des bouteilles peut recommander le domaine.
   const aNoter = ids.filter((id) => avisParCuvee[id].peutDonner && !avisParCuvee[id].mien).length;
+  const peutRecommander = recuesIds.size > 0;
+  const maReco = (recos || []).find((r) => r.member_id === member.id) || null;
+  const reponses = (recos || []).filter((r) => !r.hidden && r.verdict !== "ignore");
+  const recommandation = texteRecommandation(reponses.filter((r) => r.verdict === "oui").length, reponses.length);
+  const motsMembres = reponses.filter((r) => r.comment).slice(0, 3);
 
   return (
     <main className="shell">
@@ -188,25 +199,32 @@ export default async function Domaine({ params }) {
             </a>
           )
         )}
+        {recommandation && <p className="reco-ligne">{recommandation}</p>}
         <FollowButton domainId={domain.id} initial={Boolean(follow)} />
       </section>
 
-      {aNoter > 0 && (
-        <section className="section card stack">
-          <p>Vos bouteilles sont arrivées. Qu&apos;en avez-vous pensé ?</p>
-          <p className="muted">
-            Touchez le nom d&apos;une cuvée pour lui donner une note. Vos avis guident les prochaines commandes du club.
-          </p>
-          <a href="#cuvees" className="btn btn-ghost">
-            Donner mon avis
-          </a>
-        </section>
+      {peutRecommander && (
+        <DomainRecommend domainId={domain.id} slug={domain.slug} domainName={domain.name} mienne={maReco} aNoter={aNoter} />
       )}
 
       {domain.story && (
         <section className="section stack">
           <h2>Pourquoi on l&apos;aime</h2>
           <StoryClamp text={domain.story} />
+        </section>
+      )}
+
+      {motsMembres.length > 0 && (
+        <section className="section stack">
+          <h2>Ce qu&apos;en disent les membres</h2>
+          <ul className="reco-mots">
+            {motsMembres.map((r) => (
+              <li key={r.id}>
+                <blockquote>« {r.comment} »</blockquote>
+                <cite>{r.author_name || "Un membre"}</cite>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
