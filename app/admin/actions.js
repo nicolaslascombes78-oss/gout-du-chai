@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/data";
+import { envoyer } from "@/lib/push";
 
 const STATUSES = ["a_venir", "ouvert", "bientot_atteint", "declenche", "livre", "expire"];
 
@@ -15,11 +16,32 @@ export async function updateDomain(formData) {
   const deadline = formData.get("deadline") || null;
   if (!STATUSES.includes(status)) redirect(`/admin/domaine/${slug}?erreur=statut`);
 
+  const { data: avant } = await supabase.from("domains").select("status, name").eq("id", id).maybeSingle();
+
   const { error } = await supabase
     .from("domains")
     .update({ status, threshold: Number.isFinite(threshold) && threshold > 0 ? threshold : null, deadline })
     .eq("id", id);
   if (error) redirect(`/admin/domaine/${slug}?erreur=enregistrement`);
+
+  // Ouverture d’un domaine « à venir » : on prévient les membres qui s’y sont dits intéressés
+  if (avant?.status === "a_venir" && status === "ouvert") {
+    const { data: suivis } = await supabase.from("domain_follows").select("member_id").eq("domain_id", id);
+    const ids = [...new Set((suivis || []).map((f) => f.member_id))];
+    if (ids.length) {
+      try {
+        await envoyer(supabase, {
+          userIds: ids,
+          title: `${avant.name} ouvre ses réservations`,
+          body: "Vous étiez intéressé : les réservations sont ouvertes, à vous de choisir vos bouteilles.",
+          url: `/club/domaine/${slug}`,
+          tag: `ouverture-${slug}`,
+        });
+      } catch {
+        // une notification qui échoue ne doit pas bloquer l’ouverture du domaine
+      }
+    }
+  }
   revalidatePath("/admin");
   revalidatePath(`/admin/domaine/${slug}`);
   redirect(`/admin/domaine/${slug}?ok=1`);
