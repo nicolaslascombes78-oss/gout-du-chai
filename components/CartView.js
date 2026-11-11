@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { clearLines, reservationError, useCart } from "@/lib/cart";
+import { clearLines, readCart, reservationError, useCart } from "@/lib/cart";
 import { euros } from "@/lib/catalogue";
 import { lancerPaillettes } from "@/lib/paillettes";
 import CuveeStepper from "@/components/CuveeStepper";
@@ -19,40 +19,53 @@ export default function CartView({ memberId, hasCard = true }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  // Cuvées à afficher : les réservations en cours du membre + les lignes modifiées du panier.
+  // Chargées à l'ouverture, puis complétées si une nouvelle cuvée arrive dans le panier.
+  const manquantes = rows === null ? null : Object.keys(cart).filter((id) => !rows.some((c) => c.id === id));
+  const cleManquantes = manquantes === null ? "init" : manquantes.sort().join(",");
+
   useEffect(() => {
     if (!ready) return;
-    const ids = Object.keys(cart);
-    if (ids.length === 0) {
-      setRows([]);
-      return;
-    }
+    if (rows !== null && manquantes.length === 0) return;
     const supabase = createClient();
     (async () => {
-      const [{ data: cuvees }, { data: resa }] = await Promise.all([
-        supabase
-          .from("cuvees")
-          .select("id, name, vintage, member_price, pack_size, domains(id, name, slug, threshold, status, deadline)")
-          .in("id", ids),
-        supabase
-          .from("reservations")
-          .select("cuvee_id, quantity")
-          .eq("member_id", memberId)
-          .eq("status", "en_attente")
-          .in("cuvee_id", ids),
-      ]);
+      // Réservations en cours (tour actuel, pas encore parties chez le vigneron)
+      const { data: resa } = await supabase
+        .from("reservations")
+        .select("cuvee_id, quantity, group_order_id, archived")
+        .eq("member_id", memberId)
+        .eq("status", "en_attente");
+      const enCours = (resa || []).filter((r) => !r.group_order_id && !r.archived);
       const cur = {};
-      (resa || []).forEach((r) => (cur[r.cuvee_id] = (cur[r.cuvee_id] || 0) + r.quantity));
-      const domainIds = [...new Set((cuvees || []).map((c) => c.domains.id))];
+      enCours.forEach((r) => (cur[r.cuvee_id] = (cur[r.cuvee_id] || 0) + r.quantity));
+
+      const ids = [...new Set([...Object.keys(cur), ...Object.keys(readCart())])];
+      if (ids.length === 0) {
+        setCurrent({});
+        setRows([]);
+        return;
+      }
+      const { data: cuvees } = await supabase
+        .from("cuvees")
+        .select("id, name, vintage, member_price, pack_size, domains(id, name, slug, threshold, status, deadline)")
+        .in("id", ids);
+      // Réservations : seulement les domaines encore ouverts (les autres sont dans l'espace Membre)
+      const today = new Date().toISOString().slice(0, 10);
+      const visibles = (cuvees || []).filter((c) => {
+        if (readCart()[c.id]) return true;
+        const d = c.domains;
+        return ["ouvert", "bientot_atteint"].includes(d.status) && (!d.deadline || d.deadline >= today);
+      });
+      const domainIds = [...new Set(visibles.map((c) => c.domains.id))];
       const { data: prog } = domainIds.length
         ? await supabase.from("domain_progress").select("domain_id, reserved_bottles, participants").in("domain_id", domainIds)
         : { data: [] };
       setCurrent(cur);
       setProgress(Object.fromEntries((prog || []).map((p) => [p.domain_id, p])));
-      setRows(cuvees || []);
+      setRows(visibles);
     })();
-    // On charge une seule fois : les lignes restent affichées même si on revient à la quantité d'origine.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready]);
+  }, [ready, cleManquantes]);
 
   const groups = useMemo(() => {
     const byDomain = {};
@@ -127,13 +140,13 @@ export default function CartView({ memberId, hasCard = true }) {
     );
   }
 
-  if (rows.length === 0 || (changes === 0 && !saving)) {
+  if (rows.length === 0) {
     return (
       <section className="card stack" style={{ textAlign: "center" }}>
         <h2>Votre panier est vide</h2>
         <p className="muted">
-          Choisissez vos bouteilles sur la fiche d&apos;un domaine. Vos réservations déjà enregistrées se trouvent
-          dans votre espace Membre.
+          Choisissez vos bouteilles sur la fiche d&apos;un domaine. Vos commandes déjà lancées se trouvent dans
+          votre espace Membre.
         </p>
         <Link href="/club/selection" className="btn">
           Parcourir la Sélection
@@ -144,6 +157,12 @@ export default function CartView({ memberId, hasCard = true }) {
 
   return (
     <div className="stack">
+      {changes === 0 && !saving && (
+        <p className="muted" style={{ textAlign: "center" }}>
+          Vos réservations en cours. Changez une quantité avec − ou + pour les modifier.
+        </p>
+      )}
+
       {retire && (
         <section className="card stack" role="status" style={{ borderColor: "var(--gold)" }}>
           <p>
@@ -175,6 +194,7 @@ export default function CartView({ memberId, hasCard = true }) {
                   <p className="muted">
                     {c.vintage || "Sans millésime"} · {euros(c.member_price)}
                     {c.qty === 0 && c.before > 0 ? " · sera annulée" : ""}
+                    {c.qty === c.before && c.before > 0 ? " · réservée" : ""}
                     {c.qty > 0 && c.qty < c.before ? ` · passera de ${c.before} à ${c.qty}` : ""}
                   </p>
                 </div>
@@ -199,61 +219,69 @@ export default function CartView({ memberId, hasCard = true }) {
       <section className="card stack">
         <div className="row">
           <p>
-            Total · {bottles} bouteille{bottles > 1 ? "s" : ""}
+            {changes === 0 ? "Total réservé" : "Total"} · {bottles} bouteille{bottles > 1 ? "s" : ""}
           </p>
           <p className="price" style={{ fontSize: 22 }}>
             {euros(total)}
           </p>
         </div>
-        {annulationSeule ? (
+        {changes === 0 && !saving ? (
           <p className="muted">
-            Ces bouteilles seront retirées de vos réservations. Rien ne vous a été débité.
+            Tout est enregistré. Vous ne serez débité que si la commande est lancée.
           </p>
         ) : (
-          <div className="recap">
-            <p className="recap-titre">Ce qui se passe ensuite</p>
-            <ol className="recap-etapes">
-              <li>
-                <strong>Aujourd’hui</strong> : vos bouteilles sont réservées, rien n’est débité.
-                {hasCard ? "" : " Vous enregistrerez ensuite votre carte, toujours sans débit."}
-              </li>
-              <li>
-                <strong>Jusqu’au lancement</strong> : vous pouvez ajouter, retirer ou annuler, librement et sans frais.
-              </li>
-              <li>
-                <strong>Seuil atteint</strong> : la commande part chez le vigneron. Vous êtes prévenu, puis débité de vos
-                seules bouteilles de ce domaine{groups.length > 1 ? ", domaine par domaine" : ""}.
-              </li>
-              <li>
-                <strong>Seuil non atteint à la clôture</strong> : la commande est annulée, vous n’êtes pas débité et vous
-                êtes prévenu.
-              </li>
-            </ol>
-          </div>
-        )}
-        {error && (
-          <p className="error" role="alert">
-            {error}
+          <>
+          {annulationSeule ? (
+            <p className="muted">
+              Ces bouteilles seront retirées de vos réservations. Rien ne vous a été débité.
+            </p>
+          ) : (
+            <div className="recap">
+              <p className="recap-titre">Ce qui se passe ensuite</p>
+              <ol className="recap-etapes">
+                <li>
+                  <strong>Aujourd’hui</strong> : vos bouteilles sont réservées, rien n’est débité.
+                  {hasCard ? "" : " Vous enregistrerez ensuite votre carte, toujours sans débit."}
+                </li>
+                <li>
+                  <strong>Jusqu’au lancement</strong> : vous pouvez ajouter, retirer ou annuler, librement et sans frais.
+                </li>
+                <li>
+                  <strong>Seuil atteint</strong> : la commande part chez le vigneron. Vous êtes prévenu, puis débité de vos
+                  seules bouteilles de ce domaine{groups.length > 1 ? ", domaine par domaine" : ""}.
+                </li>
+                <li>
+                  <strong>Seuil non atteint à la clôture</strong> : la commande est annulée, vous n’êtes pas débité et vous
+                  êtes prévenu.
+                </li>
+              </ol>
+            </div>
+          )}
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <button className="btn" onClick={confirm} disabled={saving}>
+            {saving ? "Enregistrement…" : libelleBouton}
+          </button>
+          {!annulationSeule && (
+            <p className="muted sous-btn">
+              Vous ne serez débité que si la commande est lancée. Modifiable ou annulable jusque-là.
+            </p>
+          )}
+          <p className="sous-btn">
+            <Link href="/regles" className="terms-link">
+              Comment fonctionne une commande ?
+            </Link>
           </p>
-        )}
-        <button className="btn" onClick={confirm} disabled={saving}>
-          {saving ? "Enregistrement…" : libelleBouton}
-        </button>
-        {!annulationSeule && (
-          <p className="muted sous-btn">
-            Vous ne serez débité que si la commande est lancée. Modifiable ou annulable jusque-là.
-          </p>
-        )}
-        <p className="sous-btn">
-          <Link href="/regles" className="terms-link">
-            Comment fonctionne une commande ?
-          </Link>
-        </p>
-        <button type="button" className="link-btn" onClick={() => clearLines()}>
-          Abandonner ces modifications
-        </button>
-        {retire && (
-          <p className="muted sous-btn">Vos réservations actuelles resteront alors inchangées.</p>
+          <button type="button" className="link-btn" onClick={() => clearLines()}>
+            Abandonner ces modifications
+          </button>
+          {retire && (
+            <p className="muted sous-btn">Vos réservations actuelles resteront alors inchangées.</p>
+          )}
+          </>
         )}
       </section>
     </div>
