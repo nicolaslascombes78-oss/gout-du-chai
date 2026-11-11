@@ -66,7 +66,7 @@ export default async function Domaine({ params }) {
     ? await Promise.all([
         supabase
           .from("reservations")
-          .select("cuvee_id, quantity")
+          .select("cuvee_id, quantity, unit_price")
           .eq("member_id", member.id)
           .eq("status", "en_attente")
           .in("cuvee_id", ids),
@@ -88,6 +88,11 @@ export default async function Domaine({ params }) {
   const reservedByCuvee = {};
   (mine || []).forEach((r) => (reservedByCuvee[r.cuvee_id] = (reservedByCuvee[r.cuvee_id] || 0) + r.quantity));
   const myBottles = Object.values(reservedByCuvee).reduce((s, n) => s + n, 0);
+  // Ma réservation chez ce domaine, résumée dans la carte de commande
+  const monMontant = (mine || []).reduce((t, r) => t + (r.quantity || 0) * Number(r.unit_price || 0), 0);
+  const mesLignes = (cuvees || [])
+    .filter((c) => reservedByCuvee[c.id])
+    .map((c) => ({ id: c.id, nom: c.vintage ? `${c.name} ${c.vintage}` : c.name, qte: reservedByCuvee[c.id] }));
 
   const recuesIds = new Set((recues || []).map((r) => r.cuvee_id));
   const avisParCuvee = {};
@@ -179,6 +184,28 @@ export default async function Domaine({ params }) {
             size={104}
           />
         )}
+        {mesLignes.length > 0 && (
+          <div className="ma-resa">
+            <p className="ma-resa-titre">
+              Vous avez réservé {myBottles} bouteille{myBottles > 1 ? "s" : ""}
+              {monMontant > 0 ? ` · ${euros(monMontant)}` : ""}
+            </p>
+            <ul className="ma-resa-liste">
+              {mesLignes.map((l) => (
+                <li key={l.id}>
+                  {l.qte} × {l.nom}
+                </li>
+              ))}
+            </ul>
+            {editable ? (
+              <a href={`#cuvee-${mesLignes[0].id}`} className="link-btn">
+                Modifier ma réservation
+              </a>
+            ) : (
+              <p className="muted">La commande est close : votre réservation ne peut plus être modifiée.</p>
+            )}
+          </div>
+        )}
         {canAct ? (
           <div className="cta-commande">
             <a href="#cuvees" className="btn">
@@ -231,7 +258,7 @@ export default async function Domaine({ params }) {
               <p className="eyebrow">{COLOR_LABELS[g.color]}</p>
               <div className="cuvee-list">
                 {g.items.map((c) => (
-                  <div className="cuvee" key={c.id}>
+                  <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
                     <div>
                       <p>
                         <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
