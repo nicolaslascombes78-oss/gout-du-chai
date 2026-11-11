@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ClubHeader from "@/components/ClubHeader";
 import Dismissible from "@/components/Dismissible";
+import FeedbackForm from "@/components/FeedbackForm";
 import Gauge from "@/components/Gauge";
 import Seal from "@/components/Seal";
 import ShareOrder from "@/components/ShareOrder";
@@ -271,6 +272,14 @@ export default async function Club() {
         <Link href="/club/membre#invitations" className="btn btn-ghost">
           Inviter un ami
         </Link>
+      </section>
+
+      <section className="section card stack" id="idees">
+        <h2 className="home-h2">Une envie, une idée ?</h2>
+        <p className="muted">
+          Un domaine que vous aimeriez voir au club, une amélioration, un souci : écrivez-nous.
+        </p>
+        <FeedbackForm />
       </section>
 
       <section className="section">
