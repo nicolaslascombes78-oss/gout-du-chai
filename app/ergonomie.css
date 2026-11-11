@@ -857,3 +857,10 @@ input[type="email"] { border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) { .sticky-progress { transition: none; } }
 .cuvee-fav { color: var(--gold); font-weight: 600; }
 .histoire-lien { align-self: center; font-size: 14px; }
+
+/* Fiche domaine : ma réservation dans la carte de commande */
+.ma-resa { padding: 12px 14px; border: 1px solid var(--gold); border-radius: 14px; background: rgba(201, 162, 39, 0.08); }
+.ma-resa-titre { margin: 0; font-weight: 600; }
+.ma-resa-liste { margin: 6px 0 8px; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
+.cuvee { scroll-margin-top: 76px; }
+.cuvee:target { outline: 1px solid var(--gold); outline-offset: 6px; border-radius: 12px; }
