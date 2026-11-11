@@ -186,3 +186,29 @@ export async function cancelReservations(formData) {
   revalidatePath("/club", "layout");
   redirect(`${retour}${retour.includes("?") ? "&" : "?"}${error ? "erreur=1" : `annule=${n}`}`);
 }
+
+// Boîte à idées : suivi d’un message de membre (nouveau, lu, prévu, fait) et note interne.
+// Le passage à « Fait » date le message : le membre le voit alors sous sa cloche.
+export async function updateIdee(formData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id");
+  const status = (formData.get("status") || "").toString();
+  const note = (formData.get("admin_note") || "").toString().trim();
+  const brut = (formData.get("retour") || "/admin/idees").toString();
+  const retour = brut.startsWith("/admin/idees") ? brut : "/admin/idees";
+
+  let error = !["nouveau", "lu", "prevu", "fait"].includes(status);
+  if (!error) {
+    const { data: avant } = await supabase.from("feedbacks").select("status, done_at").eq("id", id).maybeSingle();
+    const done_at =
+      status === "fait" ? (avant?.status === "fait" && avant?.done_at ? avant.done_at : new Date().toISOString()) : null;
+    ({ error } = await supabase
+      .from("feedbacks")
+      .update({ status, admin_note: note || null, done_at })
+      .eq("id", id));
+  }
+
+  revalidatePath("/admin/idees");
+  revalidatePath("/admin");
+  redirect(`${retour}${retour.includes("?") ? "&" : "?"}${error ? "erreur=1" : "ok=1"}#a-${id}`);
+}
