@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ClubHeader from "@/components/ClubHeader";
+import Dismissible from "@/components/Dismissible";
 import Gauge from "@/components/Gauge";
 import Seal from "@/components/Seal";
 import ShareOrder from "@/components/ShareOrder";
@@ -88,7 +89,7 @@ export default async function Club() {
       </h1>
       <p className="home-sub">
         {nouveau
-          ? "Bienvenue au club. Voici comment ça marche."
+          ? "Bienvenue au club."
           : `${mesCommandes.length > 1 ? `${mesCommandes.length} de vos commandes avancent` : "Votre commande avance"}. Il manque ${manqueTotal} bouteille${manqueTotal > 1 ? "s" : ""} en tout pour ${mesCommandes.length > 1 ? "les" : "la"} lancer.`}
       </p>
 
@@ -100,7 +101,7 @@ export default async function Club() {
       </Link>
 
       {nouveau ? (
-        <section className="section card stack">
+        <Dismissible id="comment-ca-marche" className="section card stack" label="Fermer « Comment ça marche »">
           <h2 className="home-h2">Comment ça marche</h2>
           <ol className="howto">
             <li>
@@ -133,7 +134,7 @@ export default async function Club() {
               </span>
             </li>
           </ol>
-        </section>
+        </Dismissible>
       ) : (
         <section className="section stack">
           <div className="row">
