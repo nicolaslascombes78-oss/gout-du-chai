@@ -48,9 +48,9 @@ function metaLine(d) {
     d.reserved === 0
       ? [<span key="p" className="gauge-first">Soyez le premier</span>, `seuil de ${d.threshold} bouteilles`]
       : [
-          `${d.reserved} / ${d.threshold} bouteilles`,
-          d.participants > 0 ? `${d.participants} membre${d.participants > 1 ? "s" : ""}` : null,
-        ];
+        `${d.reserved} / ${d.threshold} bouteilles`,
+        d.participants > 0 ? `${d.participants} membre${d.participants > 1 ? "s" : ""}` : null,
+      ];
   return (
     <p className={`dcard-meta${urgent ? " is-urgent" : ""}`}>
       {parts.filter(Boolean).map((p, i) => (
@@ -95,6 +95,7 @@ function DomainCard({ d, matches = [] }) {
         </div>
         <h3 className="dcard-name">{d.name}</h3>
         {d.tagline && <p className="dcard-tag">{d.tagline}</p>}
+        {d.recommandation && <p className="reco-ligne dcard-reco">{d.recommandation}</p>}
         {matches.length > 0 && (
           <p className="dcard-match">
             {matches.slice(0, 3).join(" · ")}

@@ -91,3 +91,4 @@
 .reco-mots li + li { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .reco-mots blockquote { font-family: var(--font-serif), serif; font-size: 17px; line-height: 1.55; color: var(--ivory); }
 .reco-mots cite { display: block; margin-top: 6px; font-style: normal; font-size: 12px; color: var(--ivory-dim); }
+.dcard-reco { margin-top: 6px; font-size: 13px; }
