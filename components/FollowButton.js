@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // « Suivre ce domaine » : le membre est prévenu à l'ouverture de sa prochaine commande.
-export default function FollowButton({ domainId, initial = false }) {
+export default function FollowButton({ domainId, initial = false, interet = false }) {
   const [suivi, setSuivi] = useState(initial);
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState(false);
@@ -40,14 +40,24 @@ export default function FollowButton({ domainId, initial = false }) {
         disabled={occupe}
         aria-pressed={suivi}
       >
-        <span aria-hidden="true">{suivi ? "★" : "☆"}</span> {suivi ? "Domaine suivi" : "Suivre ce domaine"}
+        <span aria-hidden="true">{suivi ? "★" : "☆"}</span> {suivi
+          ? interet
+            ? "Vous êtes intéressé"
+            : "Domaine suivi"
+          : interet
+            ? "Je suis intéressé"
+            : "Suivre ce domaine"}
       </button>
       <p className="muted">
         {erreur
           ? "L'enregistrement n'a pas abouti. Réessayez dans un instant."
           : suivi
-            ? "Vous serez prévenu à l'ouverture de sa prochaine commande."
-            : "Soyez prévenu à l'ouverture de sa prochaine commande."}
+            ? interet
+              ? "Vous serez prévenu dès l’ouverture des réservations."
+              : "Vous serez prévenu à l'ouverture de sa prochaine commande."
+            : interet
+              ? "Ce domaine vous tente ? Dites-le : vous serez prévenu dès son ouverture."
+              : "Soyez prévenu à l'ouverture de sa prochaine commande."}
       </p>
     </div>
   );
