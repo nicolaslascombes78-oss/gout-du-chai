@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
+import FeedbackForm from "@/components/FeedbackForm";
 import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
 import InviteFriend from "@/components/InviteFriend";
@@ -258,6 +259,16 @@ export default async function Membre({ searchParams }) {
             })}
           </div>
         )}
+      </section>
+
+      <section className="section stack" id="idees">
+        <h2>Une envie, une idée ?</h2>
+        <p className="muted">
+          Un domaine que vous aimeriez voir au club, une amélioration, un souci : écrivez-nous.
+        </p>
+        <div className="card">
+          <FeedbackForm />
+        </div>
       </section>
 
       <section className="section stack">
