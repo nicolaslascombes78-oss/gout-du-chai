@@ -5,6 +5,7 @@ import FeedbackForm from "@/components/FeedbackForm";
 import Gauge from "@/components/Gauge";
 import CancelDomainButton from "@/components/CancelDomainButton";
 import InviteFriend from "@/components/InviteFriend";
+import MemberCard from "@/components/MemberCard";
 import NotificationToggle from "@/components/NotificationToggle";
 import OrderTimeline from "@/components/OrderTimeline";
 import { requireMember } from "@/lib/data";
@@ -98,7 +99,7 @@ export default async function Membre({ searchParams }) {
       <h1 style={{ fontSize: 32 }}>Votre espace</h1>
       <div className="ornament" />
 
-      <section className="member-card stack">
+      <MemberCard>
         <p className="eyebrow">Carte de membre</p>
         <p className="num">N° {numero}</p>
         <div className="row">
@@ -107,7 +108,7 @@ export default async function Membre({ searchParams }) {
           </p>
           <p className="muted">Membre depuis {since}</p>
         </div>
-      </section>
+      </MemberCard>
 
       {(aRegler || []).length > 0 && (
         <Link href="/club/membre/carte" className="card stack" style={{ display: "block", borderColor: "var(--gold)" }}>
