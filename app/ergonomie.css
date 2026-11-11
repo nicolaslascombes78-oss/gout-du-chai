@@ -881,3 +881,12 @@ input[type="email"] { border-radius: 14px; }
 .recap-etapes { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
 .recap-etapes li + li { margin-top: 4px; }
 .recap-etapes strong { color: var(--ivory); font-weight: 600; }
+
+/* Admin : domaines à venir, intérêt des membres */
+.interets { margin: 0 0 24px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; }
+.interets-liste { margin: 0; padding: 0; list-style: none; }
+.interets-liste a { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+.interets-liste li:first-child a { border-top: 0; }
+.interets-n { flex: none; font-size: 13px; font-weight: 600; color: var(--ivory-dim); }
+.interets-n.on { color: var(--gold); }
+.interets-note { margin-top: 10px; font-size: 13px; }
