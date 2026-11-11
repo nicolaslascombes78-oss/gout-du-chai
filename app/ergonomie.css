@@ -814,3 +814,11 @@ input[type="email"] { border-radius: 14px; }
 .dismissible > .home-h2 { padding-right: 44px; }
 .dismiss-x { position: absolute; top: 6px; right: 6px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--ivory-dim); font-size: 26px; line-height: 1; cursor: pointer; }
 .dismiss-x:hover, .dismiss-x:focus-visible { color: var(--ivory); background: rgba(255, 255, 255, 0.06); }
+
+/* Fil Au club : onglets Domaines / Membres */
+.act-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 20px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; }
+.act-tab { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 999px; color: var(--ivory-dim); text-decoration: none; font-weight: 500; }
+.act-tab.on { background: var(--gold); color: var(--ink); }
+.act-count { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); font-size: 12px; text-align: center; }
+.act-tab.on .act-count { background: rgba(0, 0, 0, 0.15); }
+.act-filleul { background: var(--gold); color: var(--ink); }
