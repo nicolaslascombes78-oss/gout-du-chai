@@ -8,7 +8,7 @@ import { loadActivity } from "@/lib/activite";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Au club — Le Goût du Chai" };
 
-const ICONES = { nouveau: "✦", sceau: "●", resa: "+", lance: "↗", expedie: "→", livre: "✓", membres: "◇" };
+const ICONES = { nouveau: "✦", sceau: "●", resa: "+", lance: "↗", expedie: "→", livre: "✓", membres: "◇", filleul: "★" };
 
 const cleJour = (d) =>
   new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
@@ -21,9 +21,16 @@ function libelleJour(iso) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default async function Activite() {
-  await requireMember();
-  const { events, aVenir, latest } = await loadActivity();
+export default async function Activite({ searchParams }) {
+  const sp = await searchParams;
+  const onglet = sp?.onglet === "membres" ? "membres" : "domaines";
+  const { member } = await requireMember();
+  const { events: tous, aVenir, latest } = await loadActivity(member?.id);
+  const events = tous.filter((e) => e.onglet === onglet);
+  const nb = {
+    domaines: tous.filter((e) => e.onglet === "domaines").length,
+    membres: tous.filter((e) => e.onglet === "membres").length,
+  };
 
   const groupes = [];
   for (const e of events) {
@@ -44,7 +51,24 @@ export default async function Activite() {
         <NotificationToggle moment="reservation" />
       </div>
 
-      {aVenir.length > 0 && (
+      <nav className="act-tabs" aria-label="Type d'activité">
+        <Link
+          href="/club/activite"
+          className={`act-tab${onglet === "domaines" ? " on" : ""}`}
+          aria-current={onglet === "domaines" ? "page" : undefined}
+        >
+          Domaines <span className="act-count">{nb.domaines}</span>
+        </Link>
+        <Link
+          href="/club/activite?onglet=membres"
+          className={`act-tab${onglet === "membres" ? " on" : ""}`}
+          aria-current={onglet === "membres" ? "page" : undefined}
+        >
+          Membres <span className="act-count">{nb.membres}</span>
+        </Link>
+      </nav>
+
+      {onglet === "domaines" && aVenir.length > 0 && (
         <section>
           <h2 className="act-h2">À ne pas manquer</h2>
           <ul className="act-list">
@@ -71,7 +95,9 @@ export default async function Activite() {
       )}
 
       {groupes.length === 0 ? (
-        <p className="muted act-vide">Rien de nouveau ces dernières semaines. Les prochaines commandes s&apos;annonceront ici.</p>
+        <p className="muted act-vide">{onglet === "membres"
+            ? "Pas de nouveau membre ces dernières semaines."
+            : "Rien de nouveau ces dernières semaines. Les prochaines commandes s’annonceront ici."}</p>
       ) : (
         groupes.map((g) => (
           <section key={g.titre}>
