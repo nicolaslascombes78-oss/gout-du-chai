@@ -874,3 +874,10 @@ input[type="email"] { border-radius: 14px; }
 .cuvee .muted { font-size: 14px; line-height: 1.45; }
 .cuvee .cuvee-cep { font-size: 13.5px; }
 .stepper-wrap .hint { font-size: 13px; }
+
+/* Panier : récapitulatif avant de réserver */
+.recap { padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, 0.03); }
+.recap-titre { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.recap-etapes { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
+.recap-etapes li + li { margin-top: 4px; }
+.recap-etapes strong { color: var(--ivory); font-weight: 600; }
