@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { usePathname } from "next/navigation";
-import { envoyerAvis } from "@/app/club/avis/actions";
+import { envoyerIdee } from "@/app/club/idees/actions";
 
 const TYPES = [
   { v: "envie", ico: "🍷", t: "Une envie de vin", aide: "Un domaine, une région, un cépage, un budget…" },
@@ -13,13 +13,13 @@ const TYPES = [
 function Formulaire({ type, sujet, messageInitial, onAutre }) {
   const pathname = usePathname();
   const [kind, setKind] = useState(TYPES.some((x) => x.v === type) ? type : "");
-  const [etat, action, envoi] = useActionState(envoyerAvis, null);
+  const [etat, action, envoi] = useActionState(envoyerIdee, null);
   const choisi = TYPES.find((x) => x.v === kind);
 
   if (etat?.ok) {
     return (
-      <div className="avis-merci" role="status">
-        <p className="avis-merci-titre">Merci, c’est bien reçu.</p>
+      <div className="idee-merci" role="status">
+        <p className="idee-merci-titre">Merci, c’est bien reçu.</p>
         <p className="muted">
           Philippe et Nicolas lisent chaque message. Quand votre idée aura abouti, vous en serez prévenu sous la cloche.
         </p>
@@ -31,20 +31,20 @@ function Formulaire({ type, sujet, messageInitial, onAutre }) {
   }
 
   return (
-    <form action={action} className="avis-form stack">
+    <form action={action} className="idee-form stack">
       <input type="hidden" name="page" value={pathname || ""} />
       {sujet && <input type="hidden" name="sujet" value={sujet} />}
-      <fieldset className="avis-types">
-        <legend className="avis-legend">Votre message concerne :</legend>
+      <fieldset className="idee-types">
+        <legend className="idee-legend">Votre message concerne :</legend>
         {TYPES.map((x) => (
-          <label key={x.v} className={`avis-type${kind === x.v ? " on" : ""}`}>
+          <label key={x.v} className={`idee-type${kind === x.v ? " on" : ""}`}>
             <input type="radio" name="kind" value={x.v} checked={kind === x.v} onChange={() => setKind(x.v)} />
             <span aria-hidden="true">{x.ico}</span> {x.t}
           </label>
         ))}
       </fieldset>
       {sujet && <p className="muted">À propos : {sujet}</p>}
-      <label className="avis-label">
+      <label className="idee-label">
         Votre message
         <textarea
           name="message"
