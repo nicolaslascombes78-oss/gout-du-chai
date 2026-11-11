@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { clearLines, reservationError, useCart } from "@/lib/cart";
 import { euros } from "@/lib/catalogue";
+import { lancerPaillettes } from "@/lib/paillettes";
 import CuveeStepper from "@/components/CuveeStepper";
 import Gauge from "@/components/Gauge";
 
@@ -71,7 +72,9 @@ export default function CartView({ memberId, hasCard = true }) {
   const total = groups.reduce((s, g) => s + g.subtotal, 0);
   const bottles = groups.reduce((s, g) => s + g.items.reduce((n, c) => n + c.qty, 0), 0);
 
-  async function confirm() {
+  async function confirm(e) {
+    // Position du bouton, d'où partiront les paillettes
+    const origine = e?.currentTarget?.getBoundingClientRect?.() || null;
     setError("");
     setSaving(true);
     const items = Object.entries(cart).map(([cuvee_id, l]) => ({ cuvee_id, quantity: l.qty }));
@@ -82,6 +85,8 @@ export default function CartView({ memberId, hasCard = true }) {
       setError(reservationError(error));
       return;
     }
+    // Paillettes d'or seulement si le membre ajoute des bouteilles (pas pour une simple annulation)
+    if (bottles > 0) lancerPaillettes(origine);
     clearLines();
     // Sans carte enregistrée, on enchaîne sur son enregistrement (rien n'est débité).
     // La réservation qui fait atteindre le seuil d'un domaine déclenche la célébration.
