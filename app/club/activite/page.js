@@ -8,7 +8,7 @@ import { loadActivity } from "@/lib/activite";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Au club — Le Goût du Chai" };
 
-const ICONES = { nouveau: "✦", sceau: "●", resa: "+", lance: "↗", expedie: "→", livre: "✓", membres: "◇", filleul: "★" };
+const ICONES = { nouveau: "✦", sceau: "●", resa: "+", lance: "↗", expedie: "→", livre: "✓", membres: "◇", filleul: "★", idee: "♥" };
 
 const cleJour = (d) =>
   new Intl.DateTimeFormat("fr-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
