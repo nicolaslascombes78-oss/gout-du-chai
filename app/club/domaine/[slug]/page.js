@@ -11,6 +11,7 @@ import DomainRecommend from "@/components/DomainRecommend";
 import FollowButton from "@/components/FollowButton";
 import ShareOrder from "@/components/ShareOrder";
 import StickyProgress from "@/components/StickyProgress";
+import ShowMore from "@/components/ShowMore";
 import StoryClamp from "@/components/StoryClamp";
 import { requireMember, ACTIVE_RESERVATION } from "@/lib/data";
 import { moyenne, texteRecommandation } from "@/lib/avis";
@@ -90,6 +91,16 @@ export default async function Domaine({ params }) {
   const myBottles = Object.values(reservedByCuvee).reduce((s, n) => s + n, 0);
   // Ma réservation chez ce domaine, résumée dans la carte de commande
   const monMontant = (mine || []).reduce((t, r) => t + (r.quantity || 0) * Number(r.unit_price || 0), 0);
+  // Listes de cuvées raccourcies : les 6 premières de chaque couleur (coups de cœur en tête),
+  // plus toutes celles déjà réservées par le membre ; le reste derrière « Voir les autres ».
+  const LIMITE = 6;
+  const partage = (items) => {
+    if (items.length <= LIMITE + 2) return { visibles: items, caches: [] };
+    const visibles = [];
+    const caches = [];
+    items.forEach((c, i) => (i < LIMITE || reservedByCuvee[c.id] ? visibles : caches).push(c));
+    return { visibles, caches };
+  };
   const mesLignes = (cuvees || [])
     .filter((c) => reservedByCuvee[c.id])
     .map((c) => ({ id: c.id, nom: c.vintage ? `${c.name} ${c.vintage}` : c.name, qte: reservedByCuvee[c.id] }));
@@ -257,7 +268,7 @@ export default async function Domaine({ params }) {
             <div key={g.color} className="stack cuvee-group" data-c={g.color}>
               <p className="eyebrow">{COLOR_LABELS[g.color]}</p>
               <div className="cuvee-list">
-                {g.items.map((c) => (
+                {partage(g.items).visibles.map((c) => (
                   <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
                     <div>
                       <p>
@@ -282,6 +293,35 @@ export default async function Domaine({ params }) {
                     </div>
                   </div>
                 ))}
+                {partage(g.items).caches.length > 0 && (
+                  <ShowMore count={partage(g.items).caches.length}>
+                    {partage(g.items).caches.map((c) => (
+                    <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
+                      <div>
+                        <p>
+                          <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
+                        </p>
+                        <p className="muted">
+                          {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
+                          {c.vintage || "Sans millésime"}
+                          {c.description ? ` · ${c.description}` : ""}
+                        </p>
+                      </div>
+                      <div className="cuvee-side">
+                        <p className="price">{euros(c.member_price)}</p>
+                        <CuveeStepper
+                          cuveeId={c.id}
+                          domainSlug={domain.slug}
+                          step={c.pack_size}
+                          reserved={reservedByCuvee[c.id] || 0}
+                          editable={editable}
+                          label={c.name}
+                        />
+                      </div>
+                    </div>
+                    ))}
+                  </ShowMore>
+                )}
               </div>
             </div>
           ))}
