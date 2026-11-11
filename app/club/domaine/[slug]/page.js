@@ -239,7 +239,7 @@ export default async function Domaine({ params }) {
           )
         )}
         {recommandation && <p className="reco-ligne">{recommandation}</p>}
-        <FollowButton domainId={domain.id} initial={Boolean(follow)} />
+        <FollowButton domainId={domain.id} initial={Boolean(follow)} interet={st.key === "a_venir"} />
         {domain.story && (
           <a href="#histoire" className="link-btn histoire-lien">
             Pourquoi on l’aime ↓
