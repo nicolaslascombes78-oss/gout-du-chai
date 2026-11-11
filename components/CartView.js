@@ -175,6 +175,26 @@ export default function CartView({ memberId, hasCard = true }) {
             {euros(total)}
           </p>
         </div>
+        <div className="recap">
+          <p className="recap-titre">Ce qui se passe ensuite</p>
+          <ol className="recap-etapes">
+            <li>
+              <strong>Aujourd’hui</strong> : vos bouteilles sont réservées, rien n’est débité.
+              {hasCard ? "" : " Vous enregistrerez ensuite votre carte, toujours sans débit."}
+            </li>
+            <li>
+              <strong>Jusqu’au lancement</strong> : vous pouvez ajouter, retirer ou annuler, librement et sans frais.
+            </li>
+            <li>
+              <strong>Seuil atteint</strong> : la commande part chez le vigneron. Vous êtes prévenu, puis débité de vos
+              seules bouteilles de ce domaine{groups.length > 1 ? ", domaine par domaine" : ""}.
+            </li>
+            <li>
+              <strong>Seuil non atteint à la clôture</strong> : la commande est annulée, vous n’êtes pas débité et vous
+              êtes prévenu.
+            </li>
+          </ol>
+        </div>
         {error && (
           <p className="error" role="alert">
             {error}
