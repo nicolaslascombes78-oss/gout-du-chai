@@ -212,3 +212,27 @@ export async function updateIdee(formData) {
   revalidatePath("/admin");
   redirect(`${retour}${retour.includes("?") ? "&" : "?"}${error ? "erreur=1" : "ok=1"}#a-${id}`);
 }
+
+// Nom et présentation d’un domaine (le slug, donc l’adresse de la fiche, ne change pas).
+export async function updateDomaineInfos(formData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id");
+  const slug = (formData.get("slug") || "").toString();
+  const txt = (k, max) => (formData.get(k) || "").toString().trim().slice(0, max);
+  const name = txt("name", 120);
+  const region = txt("region", 60);
+
+  let error = !name || !region;
+  if (!error) {
+    ({ error } = await supabase
+      .from("domains")
+      .update({ name, region, appellation: txt("appellation", 120) || null, tagline: txt("tagline", 300) || null })
+      .eq("id", id));
+  }
+
+  revalidatePath(`/admin/domaine/${slug}`);
+  revalidatePath("/admin");
+  revalidatePath("/club", "layout");
+  revalidatePath("/c/[slug]", "page");
+  redirect(`/admin/domaine/${slug}?infos=${error ? "erreur" : "1"}`);
+}
