@@ -12,10 +12,11 @@ const jours = (n) => `${n} jour${n > 1 ? "s" : ""}`;
 
 export default async function AdminAFaire() {
   const db = createAdminClient();
-  const [{ data: domains }, { data: cuvees }, { data: resas }] = await Promise.all([
+  const [{ data: domains }, { data: cuvees }, { data: resas }, { count: nouvellesIdees }] = await Promise.all([
     db.from("domains").select("id, slug, name, status, threshold, deadline, triggered_at, shipped_at"),
     db.from("cuvees").select("id, domain_id"),
     db.from("reservations").select("cuvee_id, quantity").in("status", ACTIVES),
+    db.from("feedbacks").select("id", { count: "exact", head: true }).eq("status", "nouveau"),
   ]);
 
   const domaineDe = Object.fromEntries((cuvees || []).map((c) => [c.id, c.domain_id]));
@@ -77,6 +78,14 @@ export default async function AdminAFaire() {
         texte: `Expédiée il y a ${jours(Math.floor((Date.now() - new Date(d.shipped_at)) / JOUR))}.`,
       });
     }
+  }
+  if (nouvellesIdees > 0) {
+    items.push({
+      rang: 2,
+      href: "/admin/idees?statut=nouveau",
+      titre: `${nouvellesIdees} nouveau${nouvellesIdees > 1 ? "x" : ""} message${nouvellesIdees > 1 ? "s" : ""} dans la boîte à idées`,
+      texte: "Envies de vin, idées et problèmes signalés par les membres.",
+    });
   }
   items.sort((a, b) => a.rang - b.rang);
 
