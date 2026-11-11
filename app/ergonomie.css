@@ -822,3 +822,26 @@ input[type="email"] { border-radius: 14px; }
 .act-count { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); font-size: 12px; text-align: center; }
 .act-tab.on .act-count { background: rgba(0, 0, 0, 0.15); }
 .act-filleul { background: var(--gold); color: var(--ink); }
+
+/* Boîte à idées (membres et admin) */
+.idee-form { gap: 14px; }
+.idee-types { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; }
+.idee-legend { margin-bottom: 8px; font-size: 14px; color: var(--ivory-dim); }
+.idee-type { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+.idee-type input { position: absolute; opacity: 0; pointer-events: none; }
+.idee-type.on { border-color: var(--gold); background: rgba(201, 162, 39, 0.1); color: var(--ivory); }
+.idee-type:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+.idee-label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.idee-label textarea, .idee-suivi textarea, .idee-suivi select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; }
+.idee-label textarea { min-height: 110px; resize: vertical; }
+.idee-merci { display: flex; flex-direction: column; gap: 8px; text-align: center; }
+.idee-merci-titre { margin: 0; font-size: 18px; font-weight: 600; color: var(--gold); }
+.idee-filtres { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.idee-filtres a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--ivory-dim); text-decoration: none; font-size: 14px; }
+.idee-filtres a.on { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+.idee-item.idee-nouveau { border-color: var(--gold); }
+.idee-message { margin: 8px 0; white-space: pre-wrap; line-height: 1.5; }
+.idee-suivi { display: grid; gap: 10px; margin-top: 10px; }
+.idee-suivi label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.idee-note { margin-top: 8px; font-size: 13px; }
+.act-idee { background: var(--gold); color: var(--ink); }
