@@ -358,6 +358,10 @@ export default function SelectionList({ domains, initialFilter }) {
             <button type="button" className="link-btn story-more" onClick={reset}>
               Retirer les filtres
             </button>
+            <p className="muted" style={{ marginTop: 12 }}>
+              Vous ne trouvez pas ce domaine ?{" "}
+              <Link href={`/club/idees?type=envie${q.trim() ? `&q=${encodeURIComponent(q.trim())}` : ""}`}>Proposez-le-nous</Link>
+            </p>
           </div>
         )}
       </section>
