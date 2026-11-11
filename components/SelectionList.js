@@ -16,7 +16,6 @@ const SORTS = [
   { key: "cloture", label: "Clôture proche" },
   { key: "nouveautes", label: "Nouveautés" },
   { key: "prix", label: "Prix croissant" },
-  { key: "region", label: "Par région" },
 ];
 const NEW_DAYS = 14;
 
@@ -49,9 +48,9 @@ function metaLine(d) {
     d.reserved === 0
       ? [<span key="p" className="gauge-first">Soyez le premier</span>, `seuil de ${d.threshold} bouteilles`]
       : [
-        `${d.reserved} / ${d.threshold} bouteilles`,
-        d.participants > 0 ? `${d.participants} membre${d.participants > 1 ? "s" : ""}` : null,
-      ];
+          `${d.reserved} / ${d.threshold} bouteilles`,
+          d.participants > 0 ? `${d.participants} membre${d.participants > 1 ? "s" : ""}` : null,
+        ];
   return (
     <p className={`dcard-meta${urgent ? " is-urgent" : ""}`}>
       {parts.filter(Boolean).map((p, i) => (
@@ -191,9 +190,8 @@ export default function SelectionList({ domains, initialFilter }) {
     return pct(b) - pct(a);
   });
 
-  // Par défaut : une liste directe, triée par avancement. Le tri « Par région » ramène les chapitres repliés.
-  const accueil = !needle && !region && !color && !quick && sort === "avancees";
-  const libre = !needle && !region && !color && !quick && sort === "region";
+  // Sans recherche ni filtre, la page se lit par régions (chapitres repliés).
+  const libre = !needle && !region && !color && !quick && sort === "avancees";
   const groups = regions
     .map((r) => ({ region: r, items: sorted.filter((d) => d.region === r) }))
     .filter((g) => g.items.length);
@@ -285,7 +283,7 @@ export default function SelectionList({ domains, initialFilter }) {
         </label>
       </div>
 
-      {(libre || accueil) && fresh.length > 0 && (
+      {libre && fresh.length > 0 && (
         <section className="sel-section">
           <div className="sel-head">
             <h2 className="home-h2">Nouvelles maisons</h2>
@@ -301,7 +299,7 @@ export default function SelectionList({ domains, initialFilter }) {
 
       <section className="sel-section">
         <div className="sel-head sel-head-line">
-          <h2 className="home-h2">{libre || accueil ? "Toutes les maisons" : "Résultats"}</h2>
+          <h2 className="home-h2">{libre ? "Toutes les maisons" : "Résultats"}</h2>
           <span className="muted">{list.length}</span>
         </div>
 
