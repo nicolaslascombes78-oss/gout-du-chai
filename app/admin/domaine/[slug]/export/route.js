@@ -24,6 +24,7 @@ export async function GET(request, { params }) {
     .select("quantity, unit_price, created_at, members(member_number, first_name, last_name, email, phone), cuvees!inner(id, name, vintage, domain_id)")
     .eq("cuvees.domain_id", domain.id)
     .in("status", ACTIVE_RESERVATION)
+    .eq("archived", false)
     .order("created_at");
   const lines = resa || [];
 

@@ -7,7 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { aPayerParMembre, debiterMembre } from "@/lib/paiements";
 
 // Étape suivante autorisée pour un domaine
-const SUIVANT = { a_venir: "ouvert", ouvert: "declenche", bientot_atteint: "declenche", declenche: "expedie", expedie: "livre" };
+const SUIVANT = { a_venir: "ouvert", ouvert: "declenche", bientot_atteint: "declenche", declenche: "expedie", expedie: "livre", livre: "ouvert" };
 
 const MESSAGES = {
   ouvert: (d) => ({ title: d.name, body: "Les réservations sont ouvertes. Vous suivez ce domaine." }),
@@ -21,7 +21,8 @@ async function reservations(supabase, domainId) {
     .from("reservations")
     .select("id, member_id, cuvees!inner(domain_id)")
     .eq("cuvees.domain_id", domainId)
-    .in("status", ACTIVE_RESERVATION);
+    .in("status", ACTIVE_RESERVATION)
+    .eq("archived", false);
   return data || [];
 }
 

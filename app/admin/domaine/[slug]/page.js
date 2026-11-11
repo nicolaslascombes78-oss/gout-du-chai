@@ -45,6 +45,7 @@ const SUIVANT = {
   bientot_atteint: { vers: "declenche", label: "Déclencher la commande" },
   declenche: { vers: "expedie", label: "Marquer comme expédiée" },
   expedie: { vers: "livre", label: "Marquer comme livrée" },
+  livre: { vers: "ouvert", label: "Rouvrir pour une nouvelle commande" },
 };
 const ETAPE_ACTUELLE = {
   a_venir: "À venir",
@@ -94,6 +95,7 @@ export default async function AdminDomaine({ params, searchParams }) {
       )
       .eq("cuvees.domain_id", domain.id)
       .in("status", ACTIVE_RESERVATION)
+      .eq("archived", false)
       .order("created_at"),
     supabase.from("domain_progress").select("reserved_bottles, participants").eq("domain_id", domain.id).maybeSingle(),
     supabase.from("domain_follows").select("member_id", { count: "exact", head: true }).eq("domain_id", domain.id),
@@ -262,6 +264,11 @@ export default async function AdminDomaine({ params, searchParams }) {
               <input type="hidden" name="id" value={domain.id} />
               <input type="hidden" name="slug" value={domain.slug} />
               <input type="hidden" name="vers" value={suivant.vers} />
+              {domain.status === "livre" && (
+                <p className="muted">
+                  La commande livrée sera archivée : les membres gardent leur historique et peuvent toujours laisser un avis. Le sceau repart à zéro et l’ancienne date limite est effacée, pensez à en fixer une nouvelle.
+                </p>
+              )}
               <label className="check">
                 <input type="checkbox" name="notifier" value="1" defaultChecked />{" "}
                 {suivant.vers === "ouvert"

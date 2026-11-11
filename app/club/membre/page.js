@@ -31,7 +31,7 @@ export default async function Membre({ searchParams }) {
   const { data: resa } = await supabase
     .from("reservations")
     .select(
-      "id, quantity, unit_price, status, created_at, paid_at, cuvees(id, name, vintage, domains(id, name, slug, status, threshold, deadline, triggered_at, shipped_at, delivered_at, expected_delivery))"
+      "id, quantity, unit_price, status, created_at, paid_at, archived, group_order_id, group_orders(triggered_at, shipped_at, delivered_at, expected_delivery), cuvees(id, name, vintage, domains(id, name, slug, status, threshold, deadline, triggered_at, shipped_at, delivered_at, expected_delivery))"
     )
     .eq("member_id", member.id)
     .in("status", ["en_attente", "confirmee", "payee"])
@@ -40,9 +40,15 @@ export default async function Membre({ searchParams }) {
   // Regroupe les bouteilles par domaine.
   const byDomain = {};
   for (const r of resa || []) {
-    const d = r.cuvees?.domains;
-    if (!d) continue;
-    const g = (byDomain[d.id] ||= { domain: d, lines: [], bottles: 0, total: 0, reservedAt: null, paidAt: null });
+    const d0 = r.cuvees?.domains;
+    if (!d0) continue;
+    // Commande passée d’un domaine rouvert depuis : affichée à part, avec ses propres dates.
+    const go = r.archived ? r.group_orders : null;
+    const d = go
+      ? { ...d0, status: "livre", triggered_at: go.triggered_at, shipped_at: go.shipped_at, delivered_at: go.delivered_at, expected_delivery: go.expected_delivery }
+      : d0;
+    const cle = go ? `${d0.id}:${r.group_order_id}` : d0.id;
+    const g = (byDomain[cle] ||= { cle, archive: !!go, domain: d, lines: [], bottles: 0, total: 0, reservedAt: null, paidAt: null });
     g.lines.push(r);
     g.bottles += r.quantity;
     g.total += r.quantity * Number(r.unit_price);
@@ -50,7 +56,8 @@ export default async function Membre({ searchParams }) {
     if (r.created_at && (!g.reservedAt || r.created_at < g.reservedAt)) g.reservedAt = r.created_at;
     if (r.paid_at && (!g.paidAt || r.paid_at > g.paidAt)) g.paidAt = r.paid_at;
   }
-  const groups = Object.values(byDomain);
+  // Commandes en cours d’abord, commandes passées ensuite.
+  const groups = Object.values(byDomain).sort((a, b) => Number(a.archive) - Number(b.archive));
 
   const ids = groups.map((g) => g.domain.id);
   const { data: prog } = ids.length
@@ -76,7 +83,7 @@ export default async function Membre({ searchParams }) {
   const domainesSuivis = (suivis || []).map((f) => f.domains).filter(Boolean);
 
   // Le membre vient de compléter une commande : on célèbre.
-  const lanceGroupe = params?.lance ? groups.find((g) => g.domain.slug === params.lance) : null;
+  const lanceGroupe = params?.lance ? groups.find((g) => g.domain.slug === params.lance && !g.archive) : null;
   const lanceProg = lanceGroupe ? progress[lanceGroupe.domain.id] : null;
 
   const numero = String(member.member_number).padStart(3, "0");
@@ -147,7 +154,7 @@ export default async function Membre({ searchParams }) {
           const paid = g.lines.every((r) => r.status === "payee");
           const enAttente = ["ouvert", "bientot_atteint", "a_venir"].includes(d.status);
           return (
-            <div className="card stack" key={d.id}>
+            <div className="card stack" key={g.cle}>
               <div className="row">
                 <h3>{d.name}</h3>
                 {d.status === "expire" && <span className="badge">Close</span>}
