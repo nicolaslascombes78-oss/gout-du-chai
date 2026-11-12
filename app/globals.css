@@ -53,9 +53,9 @@ h2 { font-size: 24px; line-height: 1.2; }
 h3 { font-size: 19px; }
 
 .lead { color: var(--ivory-dim); text-align: center; margin-top: 16px; }
-.muted { color: var(--ivory-dim); font-size: 14px; }
+.muted { color: var(--ivory-dim); font-size: 15px; }
 .eyebrow {
-  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
 }
 
 .card {
@@ -68,7 +68,7 @@ h3 { font-size: 19px; }
 .stack > * + * { margin-top: 14px; }
 .section { margin-top: 36px; }
 
-label { display: block; font-size: 13px; color: var(--ivory-dim); margin-bottom: 6px; }
+label { display: block; font-size: 14px; color: var(--ivory-dim); margin-bottom: 6px; }
 
 input[type="text"], input[type="email"] {
   width: 100%;
@@ -83,7 +83,7 @@ input[type="text"], input[type="email"] {
 input:focus { border-color: var(--gold); }
 input.code { text-transform: uppercase; letter-spacing: 0.15em; text-align: center; }
 
-.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--ivory-dim); }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--ivory-dim); }
 .check input { margin-top: 4px; accent-color: var(--gold); }
 
 .btn {
@@ -97,8 +97,8 @@ input.code { text-transform: uppercase; letter-spacing: 0.15em; text-align: cent
 .btn:disabled { opacity: 0.5; cursor: default; }
 .btn-ghost { background: transparent; color: var(--gold-soft); border: 1px solid var(--line); }
 
-.error { color: var(--error); font-size: 14px; }
-.success { color: var(--gold-soft); font-size: 14px; }
+.error { color: var(--error); font-size: 15px; }
+.success { color: var(--gold-soft); font-size: 15px; }
 
 .vitrine { display: grid; gap: 12px; }
 .vitrine .card h3 { margin-top: 4px; }
@@ -116,10 +116,10 @@ input.code { text-transform: uppercase; letter-spacing: 0.15em; text-align: cent
 
 .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 
-footer.foot { margin-top: auto; padding-top: 40px; text-align: center; font-size: 12px; color: var(--ivory-dim); }
+footer.foot { margin-top: auto; padding-top: 40px; text-align: center; font-size: 13px; color: var(--ivory-dim); }
 
 /* Catalogue */
-.link-btn { background: none; border: none; color: var(--ivory-dim); font: inherit; font-size: 14px; cursor: pointer; }
+.link-btn { background: none; border: none; color: var(--ivory-dim); font: inherit; font-size: 15px; cursor: pointer; }
 .select {
   width: 100%; background: var(--ink-2); color: var(--ivory); border: 1px solid var(--line);
   border-radius: 10px; padding: 13px 14px; font: inherit; appearance: none;
@@ -127,13 +127,13 @@ footer.foot { margin-top: auto; padding-top: 40px; text-align: center; font-size
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   border: 1px solid var(--line); background: transparent; color: var(--ivory-dim);
-  border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13px; cursor: pointer;
+  border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer;
 }
 .chip.on { border-color: var(--gold); color: var(--ink); background: var(--gold); }
 .domain-card { display: block; color: var(--ivory); }
 .domain-card h3 { margin: 4px 0 2px; }
 .badge {
-  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
   border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--ivory-dim);
 }
 .badge-ouvert { border-color: var(--gold); color: var(--gold-soft); }
@@ -143,7 +143,7 @@ footer.foot { margin-top: auto; padding-top: 40px; text-align: center; font-size
 .cuvee-list { border: 1px solid var(--line); border-radius: 14px; background: var(--ink-2); }
 .cuvee { display: flex; justify-content: space-between; gap: 14px; padding: 14px 16px; }
 .cuvee + .cuvee { border-top: 1px solid var(--line); }
-.cuvee .muted { font-size: 13px; }
+.cuvee .muted { font-size: 14px; }
 .heart { color: var(--gold); }
 .fav { border-color: var(--gold); }
 .hero-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; margin-top: 20px; }
@@ -181,7 +181,7 @@ input.otp {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   padding: 6px 0;
   color: var(--ivory-dim);
-  font-size: 11px; letter-spacing: 0.04em;
+  font-size: 13px; letter-spacing: 0.04em;
 }
 .bottom-nav a.on { color: var(--gold-soft); }
 .bottom-nav a:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
@@ -202,7 +202,7 @@ input.otp {
 .stepper button:disabled { color: var(--line); cursor: default; }
 .stepper button:focus-visible { outline: 1px solid var(--gold); outline-offset: -3px; border-radius: 999px; }
 .stepper .qty { min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
-.hint { font-size: 12px; color: var(--ivory-dim); }
+.hint { font-size: 13px; color: var(--ivory-dim); }
 
 .cart-line { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
 .cart-line + .cart-line { border-top: 1px solid var(--line); padding-top: 14px; }
@@ -212,7 +212,7 @@ input.otp {
   position: absolute; top: -6px; right: -10px;
   min-width: 18px; height: 18px; padding: 0 5px;
   border-radius: 999px; background: var(--gold); color: var(--ink);
-  font-size: 11px; font-weight: 600; line-height: 18px; text-align: center;
+  font-size: 13px; font-weight: 600; line-height: 18px; text-align: center;
 }
 
 /* Formulaires : nombres, dates, listes */
@@ -239,17 +239,17 @@ input[type="number"], input[type="date"] {
   padding: 14px 20px;
   background: rgba(14, 13, 11, 0.94);
   border-bottom: 1px solid var(--line);
-  font-size: 14px; white-space: nowrap;
+  font-size: 15px; white-space: nowrap;
 }
 .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .kpis .card { padding: 14px; text-align: center; }
 .num-big { font-family: var(--font-serif), serif; font-size: 24px; color: var(--gold-soft); }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .table th { text-align: left; font-weight: 500; color: var(--ivory-dim); padding: 10px 12px; border-bottom: 1px solid var(--line); }
 .table td { padding: 12px; border-top: 1px solid var(--line); vertical-align: top; }
 .table tr:first-child td { border-top: none; }
-.table .muted { font-size: 12px; }
+.table .muted { font-size: 13px; }
 .nowrap { white-space: nowrap; }
 .summary { cursor: pointer; color: var(--gold-soft); }
 
@@ -280,7 +280,7 @@ input[type="number"], input[type="date"] {
 
 /* Encadré d'information (formulaire d'invitation) */
 .notice {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--ivory-dim);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -299,7 +299,7 @@ a, button { -webkit-tap-highlight-color: transparent; touch-action: manipulation
   min-height: 56px;
   justify-content: center;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 13px;
   transition: color 0.1s ease, background 0.1s ease;
 }
 .bottom-nav a:active { background: rgba(201, 164, 92, 0.12); }
