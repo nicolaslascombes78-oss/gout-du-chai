@@ -7,14 +7,16 @@ import { displayStatus, euros, percent } from "@/lib/catalogue";
 
 export default async function AdminHome() {
   const { supabase } = await requireAdmin();
-  const [domains, { data: resa }, { count: members }] = await Promise.all([
+  const [domains, { data: resaToutes }, { count: members }] = await Promise.all([
     loadSelection(supabase),
-    supabase.from("reservations").select("quantity, unit_price").in("status", ACTIVE_RESERVATION),
+    supabase.from("reservations").select("quantity, unit_price, archived").in("status", ACTIVE_RESERVATION),
     supabase.from("members").select("id", { count: "exact", head: true }),
   ]);
+  // Les commandes archivées (domaine livré puis rouvert) ne font plus partie des réservations en cours
+  const resa = (resaToutes || []).filter((r) => !r.archived);
 
-  const bottles = (resa || []).reduce((s, r) => s + r.quantity, 0);
-  const amount = (resa || []).reduce((s, r) => s + r.quantity * Number(r.unit_price), 0);
+  const bottles = resa.reduce((s, r) => s + r.quantity, 0);
+  const amount = resa.reduce((s, r) => s + r.quantity * Number(r.unit_price), 0);
   const rows = domains
     .map((d) => ({ ...d, st: displayStatus(d, d.reserved), pct: percent(d.reserved, d.threshold) }))
     .sort((a, b) => b.reserved - a.reserved || b.pct - a.pct || a.name.localeCompare(b.name));

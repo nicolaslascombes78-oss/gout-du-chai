@@ -15,13 +15,15 @@ export default async function AdminAFaire() {
   const [{ data: domains }, { data: cuvees }, { data: resas }, { count: nouvellesIdees }] = await Promise.all([
     db.from("domains").select("id, slug, name, status, threshold, deadline, triggered_at, shipped_at"),
     db.from("cuvees").select("id, domain_id"),
-    db.from("reservations").select("cuvee_id, quantity").in("status", ACTIVES),
+    db.from("reservations").select("cuvee_id, quantity, archived, group_order_id").in("status", ACTIVES),
     db.from("feedbacks").select("id", { count: "exact", head: true }).eq("status", "nouveau"),
   ]);
 
   const domaineDe = Object.fromEntries((cuvees || []).map((c) => [c.id, c.domain_id]));
   const total = {};
   for (const r of resas || []) {
+    // Les bouteilles d'une commande précédente (archivée, domaine rouvert) ne comptent pas pour le tour en cours
+    if (r.archived || r.group_order_id) continue;
     const id = domaineDe[r.cuvee_id];
     if (id) total[id] = (total[id] || 0) + (r.quantity || 0);
   }
