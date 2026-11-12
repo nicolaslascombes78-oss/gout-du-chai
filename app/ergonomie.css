@@ -28,7 +28,7 @@
   cursor: pointer;
 }
 .region-name { font-family: var(--font-serif), serif; font-size: 20px; color: var(--gold-soft); }
-.region-meta { grid-column: 1; font-size: 13px; color: var(--ivory-dim); }
+.region-meta { grid-column: 1; font-size: 14px; color: var(--ivory-dim); }
 .region-meta strong { color: var(--gold-soft); font-weight: 500; }
 .region-chevron { grid-column: 2; grid-row: 1 / 3; color: var(--gold-soft); transition: transform 0.2s ease; }
 .region-group.is-open .region-chevron { transform: rotate(180deg); }
@@ -61,7 +61,7 @@
 }
 .cuvee-tabbar::-webkit-scrollbar { display: none; }
 .cuvee-tabbar .chip { flex: 0 0 auto; min-height: 40px; }
-.chip-n { margin-left: 6px; font-size: 12px; opacity: 0.7; }
+.chip-n { margin-left: 6px; font-size: 13px; opacity: 0.7; }
 .cuvee-tabs:not([data-f="tout"]) .cuvee-group { display: none; }
 .cuvee-tabs[data-f="bulles"] .cuvee-group[data-c="bulles"],
 .cuvee-tabs[data-f="blanc"] .cuvee-group[data-c="blanc"],
@@ -95,12 +95,12 @@
   animation: install-in 0.3s ease-out;
 }
 .cart-bar-t { font-size: 15px; color: var(--ivory); font-variant-numeric: tabular-nums; }
-.cart-bar-s { font-size: 12px; color: var(--ivory-dim); }
-.cart-bar-btn { width: auto; flex: 0 0 auto; padding: 11px 18px; font-size: 14px; }
+.cart-bar-s { font-size: 13px; color: var(--ivory-dim); }
+.cart-bar-btn { width: auto; flex: 0 0 auto; padding: 11px 18px; font-size: 15px; }
 .club-app:has(.cart-bar) .shell { padding-bottom: 180px; }
 
 /* Panier */
-.sous-btn { text-align: center; font-size: 13px; }
+.sous-btn { text-align: center; font-size: 14px; }
 
 /* Formulaires : champ en erreur et message juste dessous */
 input[aria-invalid="true"],
@@ -146,7 +146,7 @@ input[aria-invalid="true"]:focus { border-color: var(--error); }
 
 /* Filtres et badges actifs : trait d'or, plus de fond plein */
 .chip.on { background: rgba(201, 164, 92, 0.1); border-color: var(--gold); color: var(--gold-soft); }
-.badge { text-transform: none; letter-spacing: 0.02em; font-size: 12px; }
+.badge { text-transform: none; letter-spacing: 0.02em; font-size: 13px; }
 .badge-bientot { background: rgba(201, 164, 92, 0.1); border-color: var(--gold); color: var(--gold-soft); }
 .badge-declenche { background: transparent; border-color: var(--ivory); color: var(--ivory); }
 
@@ -200,12 +200,12 @@ input[type="email"] { border-radius: 14px; }
   pointer-events: none;
 }
 .seal-num { font-family: var(--font-serif), serif; line-height: 1; color: var(--gold-soft); }
-.seal-lbl { font-size: 11px; line-height: 1.2; color: var(--ivory-dim); margin-top: 2px; }
+.seal-lbl { font-size: 13px; line-height: 1.2; color: var(--ivory-dim); margin-top: 2px; }
 
 .gauge-row { display: flex; align-items: center; gap: 16px; }
 .gauge-lines { min-width: 0; }
 .gauge-lines .gauge-txt { margin-top: 2px; }
-.gauge-txt { font-size: 14px; }
+.gauge-txt { font-size: 15px; }
 .gauge-first { color: var(--gold-soft); }
 .dot-mine { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ivory); vertical-align: 1px; margin-right: 2px; }
 .is-urgent { color: var(--error) !important; }
@@ -236,7 +236,7 @@ input[type="email"] { border-radius: 14px; }
 .mc-num { font-family: var(--font-serif), serif; font-size: 22px; color: var(--gold-soft); }
 .order-card h3 { margin: 2px 0 6px; }
 .order-actions { display: flex; gap: 10px; margin-top: 14px; }
-.order-btn { width: auto; padding: 11px 16px; font-size: 14px; }
+.order-btn { width: auto; padding: 11px 16px; font-size: 15px; }
 .order-actions .order-btn:first-child { flex: 1; }
 .order-edit { color: var(--ivory-dim); }
 .howto { list-style: none; display: flex; flex-direction: column; gap: 18px; }
@@ -325,7 +325,7 @@ input[type="email"] { border-radius: 14px; }
 .cdot-autre { background: #d98b4a; }
 .cdots { display: inline-flex; align-items: center; gap: 3px; }
 .cdots-labels { flex-wrap: wrap; gap: 4px 10px; }
-.cdot-item { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ivory-dim); }
+.cdot-item { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--ivory-dim); }
 
 .sel-menus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
 .sel-menu {
@@ -338,7 +338,7 @@ input[type="email"] { border-radius: 14px; }
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--ink-2);
-  font-size: 14px;
+  font-size: 15px;
 }
 .sel-menu:focus-within { border-color: var(--gold); }
 .sel-menu-l { color: var(--ivory-dim); margin-right: 6px; }
@@ -351,7 +351,7 @@ input[type="email"] { border-radius: 14px; }
   border: none;
   color: var(--ivory);
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   padding: 12px 18px 12px 0;
   outline: none;
 }
@@ -370,7 +370,7 @@ input[type="email"] { border-radius: 14px; }
 
 .sel-section { margin-top: 34px; }
 .sel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.sel-head .muted { font-size: 13px; }
+.sel-head .muted { font-size: 14px; }
 .sel-head-line { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
 
 /* Nouvelles maisons : grandes cartes photo */
@@ -402,7 +402,7 @@ input[type="email"] { border-radius: 14px; }
 .ncard-badge { position: absolute; top: 12px; right: 12px; }
 .badge-new { color: var(--gold-soft); border-color: var(--gold); background: rgba(14, 13, 11, 0.78); }
 .ncard-title { position: absolute; left: 18px; right: 100px; bottom: 18px; display: flex; flex-direction: column; }
-.ncard-region { font-size: 12px; color: #d8cfbd; }
+.ncard-region { font-size: 13px; color: #d8cfbd; }
 .ncard-name { font-family: var(--font-serif), serif; font-size: 26px; line-height: 1.1; color: var(--ivory); }
 .ncard-seal { position: absolute; right: 14px; bottom: 14px; }
 .ncard-seal .seal { background: rgba(14, 13, 11, 0.82); border-radius: 50%; }
@@ -429,7 +429,7 @@ input[type="email"] { border-radius: 14px; }
 .chapter-toggle:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; border-radius: 8px; }
 .chapter-txt { display: flex; flex-direction: column; gap: 3px; }
 .chapter-name { font-family: var(--font-serif), serif; font-size: 22px; line-height: 1.1; }
-.chapter-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; color: var(--ivory-dim); }
+.chapter-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--ivory-dim); }
 .chapter .region-chevron { color: var(--gold-soft); transition: transform 0.2s ease; }
 .chapter.is-open .region-chevron { transform: rotate(180deg); }
 .chapter-body { display: flex; flex-direction: column; gap: 16px; padding: 16px 0 22px; }
@@ -456,12 +456,12 @@ input[type="email"] { border-radius: 14px; }
 .dcard-body.no-media .dcard-name,
 .dcard-body.no-media .dcard-tag { padding-right: 84px; }
 .dcard-seal-inline { position: absolute; right: 16px; top: 16px; }
-.dcard-region { font-size: 12px; color: var(--ivory-dim); letter-spacing: 0.02em; }
+.dcard-region { font-size: 13px; color: var(--ivory-dim); letter-spacing: 0.02em; }
 .dcard-name { font-size: 22px; line-height: 1.15; margin-top: 4px; }
 .dcard-tag { margin-top: 6px; font-family: var(--font-serif), serif; font-style: italic; font-size: 15px; line-height: 1.45; color: #cfc6b5; }
 .dcard-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
 .dcard-price { font-family: var(--font-serif), serif; font-size: 16px; white-space: nowrap; color: var(--ivory); }
-.dcard-meta { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ivory-dim); }
+.dcard-meta { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ivory-dim); }
 
 @media (prefers-reduced-motion: reduce) {
   .dcard { transition: none; }
@@ -474,7 +474,7 @@ input[type="email"] { border-radius: 14px; }
 .cta-commande .order-btn { width: 100%; }
 
 /* Sélection : cuvées trouvées par la recherche */
-.dcard-match { margin-top: 8px; font-size: 13px; color: var(--gold-soft); }
+.dcard-match { margin-top: 8px; font-size: 14px; color: var(--gold-soft); }
 
 /* En-tête : cloche des notifications (remplace Déconnexion) */
 .bell {
@@ -511,7 +511,7 @@ input[type="email"] { border-radius: 14px; }
   line-height: 1.45;
   color: #cfc6b5;
 }
-.legal-maj { margin-top: 8px; font-size: 13px; color: var(--ivory-dim); }
+.legal-maj { margin-top: 8px; font-size: 14px; color: var(--ivory-dim); }
 .legal-body { margin-top: 24px; }
 .legal-body section { padding: 18px 0; border-top: 1px solid var(--line); }
 .legal-body h2 { font-family: var(--font-serif), serif; font-size: 21px; margin-bottom: 8px; }
@@ -581,7 +581,7 @@ input[type="email"] { border-radius: 14px; }
 .errpage-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
 
 /* Page publique de partage d'une commande */
-.share-kicker { margin: 18px 0 10px; font-size: 13px; color: var(--gold-soft); }
+.share-kicker { margin: 18px 0 10px; font-size: 14px; color: var(--gold-soft); }
 .share-title { text-align: left; font-size: 34px; line-height: 1.1; margin-top: 6px; }
 .share-seal { margin-top: 20px; }
 .share-invite { margin-top: 26px; }
@@ -617,8 +617,8 @@ input[type="email"] { border-radius: 14px; }
 .share-opt-main { border-color: var(--gold); }
 .share-opt:disabled { opacity: 0.7; cursor: progress; }
 .share-opt-t { font-size: 15px; }
-.share-opt-s { font-size: 12px; color: var(--ivory-dim); }
-.share-menu-t { font-size: 14px; }
+.share-opt-s { font-size: 13px; color: var(--ivory-dim); }
+.share-menu-t { font-size: 15px; }
 .share-menu-t strong { color: var(--gold-soft); letter-spacing: 0.04em; }
 .share-menu-row { display: flex; gap: 8px; }
 .share-menu-row > * { flex: 1; }
@@ -685,7 +685,7 @@ input[type="email"] { border-radius: 14px; }
   padding: 1px 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   color: var(--gold-soft);
   vertical-align: 2px;
@@ -718,31 +718,31 @@ input[type="email"] { border-radius: 14px; }
 .sheet-close { width: 44px; height: 44px; margin: -10px -10px 0 0; border: 0; background: none; color: var(--ivory-dim); font-size: 28px; line-height: 1; cursor: pointer; }
 .sheet-title { text-align: left; font-size: 28px; line-height: 1.15; margin-top: 4px; }
 .sheet-labels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.sheet-label { padding: 3px 10px; border: 1px solid var(--gold); border-radius: 999px; font-size: 12px; color: var(--gold-soft); }
+.sheet-label { padding: 3px 10px; border: 1px solid var(--gold); border-radius: 999px; font-size: 13px; color: var(--gold-soft); }
 .sheet-accroche { margin-top: 14px; font-family: var(--font-serif), serif; font-style: italic; font-size: 18px; line-height: 1.4; color: #cfc6b5; }
 .sheet-rows { margin: 16px 0 0; }
 .sheet-rows > div { padding: 12px 0; border-top: 1px solid var(--line); }
 .sheet-rows dt { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ivory-dim); }
 .sheet-rows dd { margin: 4px 0 0; line-height: 1.5; }
-.sheet-source { margin-top: 14px; font-size: 12px; color: var(--ivory-dim); }
+.sheet-source { margin-top: 14px; font-size: 13px; color: var(--ivory-dim); }
 .sheet-source a { color: var(--ivory-dim); text-decoration: underline; }
 @keyframes sheet-monte { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet, .sheet-card { animation: none; } }
 
 /* Fiche cuvée : cépage et labels sous le nom quand il n'y a pas d'autres détails */
-.cuvee-cep { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ivory-dim); }
+.cuvee-cep { display: block; margin-top: 2px; font-size: 13px; font-weight: 400; line-height: 1.4; color: var(--ivory-dim); }
 
 /* Admin : fiches des cuvées */
 .fiche-edit summary { display: flex; flex-direction: column; gap: 2px; cursor: pointer; list-style: none; }
 .fiche-edit summary::-webkit-details-marker { display: none; }
 .fiche-nom { font-weight: 600; }
-.fiche-meta { font-size: 13px; }
+.fiche-meta { font-size: 14px; }
 .fiche-form { margin-top: 14px; }
-.fiche-form > label, .fiche-row > label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.fiche-form > label, .fiche-row > label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
 .fiche-form textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; resize: vertical; }
 .fiche-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .fiche-labels { display: flex; flex-wrap: wrap; gap: 16px; margin: 0; padding: 0; border: 0; }
-.fiche-labels legend { margin-bottom: 6px; font-size: 14px; }
+.fiche-labels legend { margin-bottom: 6px; font-size: 15px; }
 .fiche-check { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 
 /* Fil « Au club » */
@@ -753,11 +753,11 @@ input[type="email"] { border-radius: 14px; }
 .act-list { margin: 0; padding: 0; list-style: none; }
 .act-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
 .act-list li:first-child .act-item { border-top: 0; }
-.act-ico { flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--gold); border-radius: 50%; color: var(--gold); font-size: 13px; line-height: 1; }
+.act-ico { flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--gold); border-radius: 50%; color: var(--gold); font-size: 14px; line-height: 1; }
 .act-sceau, .act-lance, .act-livre { background: var(--gold); color: var(--ink); }
 .act-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .act-txt strong { font-weight: 600; line-height: 1.35; }
-.act-txt span { font-size: 14px; line-height: 1.4; color: var(--ivory-dim); }
+.act-txt span { font-size: 15px; line-height: 1.4; color: var(--ivory-dim); }
 .act-urgent { padding: 12px 14px; border: 1px solid var(--gold); border-radius: 14px; }
 .act-urgent .act-ico { background: var(--gold); color: var(--ink); font-weight: 700; }
 .act-list li + li .act-urgent { margin-top: 8px; }
@@ -769,17 +769,17 @@ input[type="email"] { border-radius: 14px; }
 .mdet-chiffres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
 .mdet-chiffres > div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; text-align: center; }
 .mdet-chiffres strong { font-size: 22px; color: var(--gold); }
-.mdet-chiffres span { font-size: 13px; color: var(--ivory-dim); }
+.mdet-chiffres span { font-size: 14px; color: var(--ivory-dim); }
 .mdet-commande { margin-top: 14px; }
 .mdet-domaine { margin: 0; font-size: 20px; }
 .mdet-domaine a { color: inherit; }
-.mdet-badge { padding: 3px 10px; border: 1px solid var(--gold); border-radius: 999px; color: var(--gold); font-size: 12px; white-space: nowrap; }
+.mdet-badge { padding: 3px 10px; border: 1px solid var(--gold); border-radius: 999px; color: var(--gold); font-size: 13px; white-space: nowrap; }
 .mdet-scroll { overflow-x: auto; margin-top: 10px; }
-.mdet-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mdet-table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .mdet-table th { padding: 6px 8px; border-bottom: 1px solid var(--line); color: var(--ivory-dim); font-weight: 500; text-align: left; }
 .mdet-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .mdet-table tfoot td { border-bottom: 0; font-weight: 600; }
-.mdet-date { display: block; font-size: 12px; color: var(--ivory-dim); }
+.mdet-date { display: block; font-size: 13px; color: var(--ivory-dim); }
 .mdet-annulees { margin-top: 22px; }
 .mdet-annulees ul { margin: 8px 0 0; padding-left: 18px; }
 .member-link { color: inherit; text-decoration: none; }
@@ -789,7 +789,7 @@ input[type="email"] { border-radius: 14px; }
 .fiche-section { margin: 18px 0 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
 .fiche-vente { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 .fiche-form select { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; }
-.fiche-note { font-size: 13px; line-height: 1.4; }
+.fiche-note { font-size: 14px; line-height: 1.4; }
 
 /* Admin : encadré À faire */
 .afaire { margin: 20px 0 24px; padding: 16px; border: 1px solid var(--gold); border-radius: 16px; }
@@ -798,16 +798,16 @@ input[type="email"] { border-radius: 14px; }
 .afaire-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 0 10px 12px; border-left: 3px solid var(--line); color: inherit; text-decoration: none; }
 .afaire-liste li + li .afaire-item { margin-top: 6px; }
 .afaire-item strong { font-weight: 600; }
-.afaire-item span { font-size: 14px; color: var(--ivory-dim); }
+.afaire-item span { font-size: 15px; color: var(--ivory-dim); }
 .afaire-r0, .afaire-r1 { border-left-color: var(--gold); }
 .afaire-item:hover strong { color: var(--gold); }
 
 /* Admin : annulation de réservations */
-.btn-annuler { min-height: 36px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ivory-dim); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.btn-annuler { min-height: 36px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--ivory-dim); font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer; }
 .btn-annuler:hover, .btn-annuler:focus-visible { border-color: #c0564b; color: #e07a6f; }
 .mdet-annuler-tout { margin-top: 12px; }
 .mdet-annuler-tout .btn-annuler { width: 100%; min-height: 44px; }
-.mdet-note { margin-top: 8px; font-size: 13px; }
+.mdet-note { margin-top: 8px; font-size: 14px; }
 
 /* Encadré refermable (Comment ça marche) */
 .dismissible { position: relative; }
@@ -819,49 +819,49 @@ input[type="email"] { border-radius: 14px; }
 .act-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 20px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; }
 .act-tab { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: 999px; color: var(--ivory-dim); text-decoration: none; font-weight: 500; }
 .act-tab.on { background: var(--gold); color: var(--ink); }
-.act-count { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); font-size: 12px; text-align: center; }
+.act-count { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); font-size: 13px; text-align: center; }
 .act-tab.on .act-count { background: rgba(0, 0, 0, 0.15); }
 .act-filleul { background: var(--gold); color: var(--ink); }
 
 /* Boîte à idées (membres et admin) */
 .idee-form { gap: 14px; }
 .idee-types { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; }
-.idee-legend { margin-bottom: 8px; font-size: 14px; color: var(--ivory-dim); }
+.idee-legend { margin-bottom: 8px; font-size: 15px; color: var(--ivory-dim); }
 .idee-type { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
 .idee-type input { position: absolute; opacity: 0; pointer-events: none; }
 .idee-type.on { border-color: var(--gold); background: rgba(201, 162, 39, 0.1); color: var(--ivory); }
 .idee-type:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
-.idee-label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.idee-label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
 .idee-label textarea, .idee-suivi textarea, .idee-suivi select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink-2); color: var(--ivory); font: inherit; }
 .idee-label textarea { min-height: 110px; resize: vertical; }
 .idee-merci { display: flex; flex-direction: column; gap: 8px; text-align: center; }
 .idee-merci-titre { margin: 0; font-size: 18px; font-weight: 600; color: var(--gold); }
 .idee-filtres { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-.idee-filtres a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--ivory-dim); text-decoration: none; font-size: 14px; }
+.idee-filtres a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--ivory-dim); text-decoration: none; font-size: 15px; }
 .idee-filtres a.on { border-color: var(--gold); background: var(--gold); color: var(--ink); }
 .idee-item.idee-nouveau { border-color: var(--gold); }
 .idee-message { margin: 8px 0; white-space: pre-wrap; line-height: 1.5; }
 .idee-suivi { display: grid; gap: 10px; margin-top: 10px; }
-.idee-suivi label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
-.idee-note { margin-top: 8px; font-size: 13px; }
+.idee-suivi label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.idee-note { margin-top: 8px; font-size: 14px; }
 .act-idee { background: var(--gold); color: var(--ink); }
 
 /* Fiche domaine allégée : barre fixe, coups de cœur, lien vers l'histoire */
 .sticky-progress { position: fixed; top: 0; left: 0; right: 0; z-index: 40; padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px 8px; border-bottom: 1px solid var(--line); background: rgba(14, 12, 11, 0.94); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transform: translateY(-110%); transition: transform 0.25s ease; pointer-events: none; }
 .sticky-progress.on { transform: none; pointer-events: auto; }
-.sticky-progress-txt { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; max-width: 640px; margin: 0 auto; font-size: 13px; }
+.sticky-progress-txt { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; max-width: 640px; margin: 0 auto; font-size: 14px; }
 .sticky-progress-txt strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 600; }
 .sticky-progress-txt span { flex: none; color: var(--ivory-dim); }
 .sticky-progress-bar { max-width: 640px; height: 4px; margin: 6px auto 0; overflow: hidden; border-radius: 2px; background: var(--line); }
 .sticky-progress-bar span { display: block; height: 100%; background: var(--gold); }
 @media (prefers-reduced-motion: reduce) { .sticky-progress { transition: none; } }
 .cuvee-fav { color: var(--gold); font-weight: 600; }
-.histoire-lien { align-self: center; font-size: 14px; }
+.histoire-lien { align-self: center; font-size: 15px; }
 
 /* Fiche domaine : ma réservation dans la carte de commande */
 .ma-resa { padding: 12px 14px; border: 1px solid var(--gold); border-radius: 14px; background: rgba(201, 162, 39, 0.08); }
 .ma-resa-titre { margin: 0; font-weight: 600; }
-.ma-resa-liste { margin: 6px 0 8px; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
+.ma-resa-liste { margin: 6px 0 8px; padding: 0; list-style: none; font-size: 15px; line-height: 1.5; color: var(--ivory-dim); }
 .cuvee { scroll-margin-top: 76px; }
 .cuvee:target { outline: 1px solid var(--gold); outline-offset: 6px; border-radius: 12px; }
 
@@ -871,14 +871,14 @@ input[type="email"] { border-radius: 14px; }
 /* Fiche domaine : confort tactile et lisibilité sur téléphone */
 .stepper-wrap .stepper button { width: 44px; height: 44px; font-size: 20px; }
 .stepper-wrap .stepper .qty-input { height: 44px; min-width: 36px; font-size: 16px; } /* 16 px : évite le zoom automatique d'iOS au toucher */
-.cuvee .muted { font-size: 14px; line-height: 1.45; }
-.cuvee .cuvee-cep { font-size: 13.5px; }
-.stepper-wrap .hint { font-size: 13px; }
+.cuvee .muted { font-size: 15px; line-height: 1.45; }
+.cuvee .cuvee-cep { font-size: 14px; }
+.stepper-wrap .hint { font-size: 14px; }
 
 /* Panier : récapitulatif avant de réserver */
 .recap { padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, 0.03); }
 .recap-titre { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
-.recap-etapes { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; color: var(--ivory-dim); }
+.recap-etapes { margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.5; color: var(--ivory-dim); }
 .recap-etapes li + li { margin-top: 4px; }
 .recap-etapes strong { color: var(--ivory); font-weight: 600; }
 
@@ -887,6 +887,6 @@ input[type="email"] { border-radius: 14px; }
 .interets-liste { margin: 0; padding: 0; list-style: none; }
 .interets-liste a { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 8px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
 .interets-liste li:first-child a { border-top: 0; }
-.interets-n { flex: none; font-size: 13px; font-weight: 600; color: var(--ivory-dim); }
+.interets-n { flex: none; font-size: 14px; font-weight: 600; color: var(--ivory-dim); }
 .interets-n.on { color: var(--gold); }
-.interets-note { margin-top: 10px; font-size: 13px; }
+.interets-note { margin-top: 10px; font-size: 14px; }
