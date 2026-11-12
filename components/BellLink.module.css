@@ -1,5 +1,20 @@
-/* La cloche se balance quand il y a du nouveau au club, puis marque une pause.
+/* Cloche quand il y a du nouveau au club :
+   elle devient pleine, dorée, et se balance puis marque une pause.
    Pour changer le rythme : modifier la durée de l'animation (4s = une volée toutes les 4 secondes). */
+.sonne {
+  color: var(--gold);
+}
+
+/* Le corps de la cloche est rempli d'or (au repos, seul le contour est doré) */
+.sonne svg path:first-child {
+  fill: var(--gold);
+}
+
+/* Le point doré garde un liseré sombre pour rester visible sur la cloche pleine */
+.sonne :global(.bell-dot) {
+  box-shadow: 0 0 0 2px #0e0d0b;
+}
+
 .sonne svg {
   transform-origin: 50% 8%; /* la cloche pivote depuis son attache, en haut */
   animation: cloche-volee 4s ease-in-out 0.8s infinite;
