@@ -11,7 +11,7 @@
 .seals i.half { background: linear-gradient(90deg, var(--gold) 50%, transparent 50%); }
 
 /* Résumé sous le nom de la cuvée, dans la liste */
-.avis-mini { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; font-size: 12px; color: var(--ivory-dim); }
+.avis-mini { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; font-size: 13px; color: var(--ivory-dim); }
 .avis-mini .seals i { width: 8px; height: 8px; }
 
 /* Section dans la fiche */
@@ -25,13 +25,13 @@
 .avis-item { padding: 14px 0; }
 .avis-item + .avis-item { border-top: 1px solid var(--line); }
 .avis-qui { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.avis-qui p { font-size: 14px; }
-.avis-quand { font-size: 12px; color: var(--ivory-dim); }
+.avis-qui p { font-size: 15px; }
+.avis-quand { font-size: 13px; color: var(--ivory-dim); }
 .avis-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.avis-tag { font-size: 12px; color: var(--gold-soft); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+.avis-tag { font-size: 13px; color: var(--gold-soft); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
 .avis-texte { margin-top: 8px; font-size: 15px; line-height: 1.6; color: var(--ivory); white-space: pre-line; }
-.avis-note-masque { margin-top: 6px; font-size: 12px; color: var(--error); }
-.avis-mention { margin-top: 14px; font-size: 12px; color: var(--ivory-dim); }
+.avis-note-masque { margin-top: 6px; font-size: 13px; color: var(--error); }
+.avis-mention { margin-top: 14px; font-size: 13px; color: var(--ivory-dim); }
 
 /* Formulaire */
 .avis-form { margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; padding: 18px; background: var(--ink); }
@@ -40,27 +40,27 @@
 .avis-pick button {
   width: 40px; height: 40px; border-radius: 50%;
   border: 1px solid var(--gold); background: transparent;
-  color: var(--gold-soft); font: inherit; font-size: 14px; cursor: pointer;
+  color: var(--gold-soft); font: inherit; font-size: 15px; cursor: pointer;
   transition: background 0.12s ease, transform 0.08s ease;
 }
 .avis-pick button.on { background: radial-gradient(circle at 35% 35%, var(--gold-soft) 0%, var(--gold) 70%); color: var(--ink); }
 .avis-pick button:active { transform: scale(0.94); }
 .avis-pick button:focus-visible { outline: 1px solid var(--gold-soft); outline-offset: 3px; }
-.avis-pick-label { font-size: 13px; color: var(--ivory-dim); min-height: 20px; }
+.avis-pick-label { font-size: 14px; color: var(--ivory-dim); min-height: 20px; }
 .avis-form textarea {
   width: 100%; min-height: 96px; resize: vertical;
   background: transparent; border: 1px solid var(--line); border-radius: 10px;
   color: var(--ivory); font: inherit; font-size: 16px; padding: 12px 14px; outline: none;
 }
 .avis-form textarea:focus { border-color: var(--gold); }
-.avis-compte { text-align: right; font-size: 12px; color: var(--ivory-dim); margin-top: 4px; }
+.avis-compte { text-align: right; font-size: 13px; color: var(--ivory-dim); margin-top: 4px; }
 .avis-actions { display: flex; gap: 10px; align-items: center; }
 .avis-actions .btn { flex: 1; }
-.avis-retirer { background: none; border: none; color: var(--ivory-dim); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; }
+.avis-retirer { background: none; border: none; color: var(--ivory-dim); font: inherit; font-size: 14px; cursor: pointer; text-decoration: underline; }
 
 /* Fil « Au club » : icône des nouveaux avis */
 .act-ico.act-avis { font-size: 0; }
-.act-ico.act-avis::after { content: "✎"; font-size: 14px; }
+.act-ico.act-avis::after { content: "✎"; font-size: 15px; }
 
 /* Admin */
 .avis-admin-item { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
@@ -73,7 +73,7 @@
 /* Recommandation des domaines */
 .reco-encart { border-color: var(--gold); }
 .reco-choix { display: flex; flex-wrap: wrap; gap: 8px; }
-.reco-choix .chip { padding: 10px 16px; font-size: 14px; }
+.reco-choix .chip { padding: 10px 16px; font-size: 15px; }
 .reco-texte {
   width: 100%; min-height: 72px; resize: vertical;
   background: transparent; border: 1px solid var(--line); border-radius: 10px;
@@ -82,7 +82,7 @@
 .reco-texte:focus { border-color: var(--gold); }
 .reco-encart .avis-retirer { align-self: flex-start; }
 .reco-mienne { margin-top: 14px; text-align: center; }
-.reco-ligne { display: flex; align-items: center; gap: 8px; color: var(--gold-soft); font-size: 14px; }
+.reco-ligne { display: flex; align-items: center; gap: 8px; color: var(--gold-soft); font-size: 15px; }
 .reco-ligne::before {
   content: ""; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
   background: radial-gradient(circle at 35% 35%, var(--gold-soft) 0%, var(--gold) 70%);
@@ -90,5 +90,5 @@
 .reco-mots { list-style: none; }
 .reco-mots li + li { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .reco-mots blockquote { font-family: var(--font-serif), serif; font-size: 17px; line-height: 1.55; color: var(--ivory); }
-.reco-mots cite { display: block; margin-top: 6px; font-style: normal; font-size: 12px; color: var(--ivory-dim); }
-.dcard-reco { margin-top: 6px; font-size: 13px; }
+.reco-mots cite { display: block; margin-top: 6px; font-style: normal; font-size: 13px; color: var(--ivory-dim); }
+.dcard-reco { margin-top: 6px; font-size: 14px; }
