@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import "@/app/commande-carte.css";
 import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
@@ -128,16 +129,19 @@ export default async function Domaine({ params }) {
   const editable = ["ouvert", "bientot_atteint"].includes(domain.status) && !pastDeadline;
   const closedLabel = pastDeadline ? "Réservations closes" : CLOSED[domain.status] || "Réservations closes";
 
-  const groups = COLOR_ORDER.map((c) => ({ color: c, items: (cuvees || []).filter((x) => x.color === c).sort((a, b) => Number(Boolean(b.is_favorite)) - Number(Boolean(a.is_favorite))) })).filter(
-    (g) => g.items.length
-  );
+  const groups = COLOR_ORDER.map((c) => ({
+    color: c,
+    items: (cuvees || [])
+      .filter((x) => x.color === c)
+      .sort((a, b) => Number(Boolean(b.is_favorite)) - Number(Boolean(a.is_favorite))),
+  })).filter((g) => g.items.length);
   const tabs = groups.map((g) => ({ color: g.color, label: COLOR_LABELS[g.color], count: g.items.length }));
   const favorites = (cuvees || []).filter((c) => c.is_favorite);
 
-  // Bloc commande : quand on peut encore réserver, un vrai appel à l'action + le partage.
+  // Bloc commande : quand on peut encore réserver, le partage en bouton principal
+  // (les cuvées à choisir sont juste en dessous).
   const missing = domain.threshold ? Math.max(0, domain.threshold - reserved) : 0;
   const jours = daysLeft(domain.deadline);
-  const urgent = (jours != null && jours >= 0 && jours <= 5) || (domain.threshold && missing <= 6);
   const canAct = editable && groups.length > 0 && st.key !== "a_venir" && missing > 0;
   const forBar = (cuvees || []).map((c) => ({
     id: c.id,
@@ -177,10 +181,13 @@ export default async function Domaine({ params }) {
       {domain.tagline && <p className="lead">{domain.tagline}</p>}
       <div className="ornament" />
 
-      <section className="card stack" id="commande">
-        <div className="row">
-          <p className="eyebrow">Commande groupée</p>
-          {badge && <span className={`badge badge-${badge.key}`}>{badge.label}</span>}
+      <section className="card stack carte-commande" id="commande">
+        <div className="cmd-tete">
+          <div className="cmd-tete-g">
+            <p className="eyebrow">Commande groupée</p>
+            {badge && <span className={`badge badge-${badge.key}`}>{badge.label}</span>}
+          </div>
+          <FollowButton domainId={domain.id} initial={Boolean(follow)} interet={st.key === "a_venir"} compact />
         </div>
         {st.key === "a_venir" ? (
           <p className="muted">Les réservations ouvriront prochainement.</p>
@@ -219,9 +226,6 @@ export default async function Domaine({ params }) {
         )}
         {canAct ? (
           <div className="cta-commande">
-            <a href="#cuvees" className="btn">
-              {urgent ? `Compléter la commande · plus que ${missing}` : "Choisir mes bouteilles"}
-            </a>
             <ShareOrder
               name={domain.name}
               region={domain.region}
@@ -239,12 +243,6 @@ export default async function Domaine({ params }) {
           )
         )}
         {recommandation && <p className="reco-ligne">{recommandation}</p>}
-        <FollowButton domainId={domain.id} initial={Boolean(follow)} interet={st.key === "a_venir"} />
-        {domain.story && (
-          <a href="#histoire" className="link-btn histoire-lien">
-            Pourquoi on l’aime ↓
-          </a>
-        )}
       </section>
 
       {st.key !== "a_venir" && (
@@ -296,29 +294,29 @@ export default async function Domaine({ params }) {
                 {partage(g.items).caches.length > 0 && (
                   <ShowMore count={partage(g.items).caches.length}>
                     {partage(g.items).caches.map((c) => (
-                    <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
-                      <div>
-                        <p>
-                          <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
-                        </p>
-                        <p className="muted">
-                          {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
-                          {c.vintage || "Sans millésime"}
-                          {c.description ? ` · ${c.description}` : ""}
-                        </p>
+                      <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
+                        <div>
+                          <p>
+                            <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
+                          </p>
+                          <p className="muted">
+                            {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
+                            {c.vintage || "Sans millésime"}
+                            {c.description ? ` · ${c.description}` : ""}
+                          </p>
+                        </div>
+                        <div className="cuvee-side">
+                          <p className="price">{euros(c.member_price)}</p>
+                          <CuveeStepper
+                            cuveeId={c.id}
+                            domainSlug={domain.slug}
+                            step={c.pack_size}
+                            reserved={reservedByCuvee[c.id] || 0}
+                            editable={editable}
+                            label={c.name}
+                          />
+                        </div>
                       </div>
-                      <div className="cuvee-side">
-                        <p className="price">{euros(c.member_price)}</p>
-                        <CuveeStepper
-                          cuveeId={c.id}
-                          domainSlug={domain.slug}
-                          step={c.pack_size}
-                          reserved={reservedByCuvee[c.id] || 0}
-                          editable={editable}
-                          label={c.name}
-                        />
-                      </div>
-                    </div>
                     ))}
                   </ShowMore>
                 )}

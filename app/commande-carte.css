@@ -1,0 +1,60 @@
+/* Carte « Commande groupée » de la fiche domaine : en-tête avec le bouton Suivre,
+   jauge, puis « Partager la commande » en bouton principal doré. */
+
+.carte-commande .cmd-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.carte-commande .cmd-tete-g {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.carte-commande .cmd-tete .eyebrow {
+  margin: 0;
+}
+
+/* Bouton « Suivre ce domaine » compact, en haut à droite */
+.follow.follow-compact {
+  display: block;
+  margin: 0;
+  text-align: right;
+}
+.follow-compact .follow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.follow-compact .follow-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--gold-soft);
+}
+.follow-compact .follow-erreur {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ivory-dim);
+  max-width: 220px;
+  margin-left: auto;
+}
+
+/* « Partager la commande » : bouton principal doré, pleine largeur */
+.carte-commande .cta-commande .order-btn.btn-ghost {
+  width: 100%;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+  font-weight: 600;
+}
+.carte-commande .cta-commande .order-btn.btn-ghost:hover {
+  filter: brightness(1.05);
+}
