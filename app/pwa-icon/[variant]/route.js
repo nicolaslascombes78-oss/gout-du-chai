@@ -1,7 +1,9 @@
 // Icônes de l'appli générées par le code (aucun fichier image à envoyer sur GitHub).
 // Dessin : le bouchon « marque au fer » (monogramme GC pyrogravé sur liège).
-// Adresses : /pwa-icon/192, /pwa-icon/512, /pwa-icon/maskable, /pwa-icon/apple
+// Adresses : /pwa-icon/bouchon-192, /pwa-icon/bouchon-512, /pwa-icon/bouchon-maskable,
+//            /pwa-icon/bouchon-apple (nouveaux noms : les téléphones ne gardent pas l'ancienne icône en mémoire)
 //            /pwa-icon/logo (bouchon seul, fond transparent, pour l'en-tête de l'appli)
+//            Les anciennes adresses (/pwa-icon/192, 512, maskable, apple) restent valables.
 // Elles sont fabriquées une seule fois au déploiement, puis servies comme des fichiers fixes.
 import { ImageResponse } from "next/og";
 import * as opentype from "opentype.js";
@@ -21,6 +23,10 @@ const VARIANTES = {
   apple: { size: 180, zone: 0.9, fond: true },
   logo: { size: 256, zone: 0.94, fond: false },
 };
+VARIANTES["bouchon-192"] = VARIANTES["192"];
+VARIANTES["bouchon-512"] = VARIANTES["512"];
+VARIANTES["bouchon-maskable"] = VARIANTES.maskable;
+VARIANTES["bouchon-apple"] = VARIANTES.apple;
 
 export function generateStaticParams() {
   return Object.keys(VARIANTES).map((variant) => ({ variant }));

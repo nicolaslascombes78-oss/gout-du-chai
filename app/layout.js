@@ -19,9 +19,10 @@ export const metadata = {
     title: "Goût du Chai",
     statusBarStyle: "black-translucent",
   },
+  // Icônes : le bouchon « marque au fer » (nouveaux noms pour remplacer l'ancienne icône)
   icons: {
-    icon: "/pwa-icon/192",
-    apple: "/pwa-icon/apple",
+    icon: "/pwa-icon/bouchon-192",
+    apple: "/pwa-icon/bouchon-apple",
   },
   formatDetection: { telephone: false },
   other: { "apple-mobile-web-app-capable": "yes" },
