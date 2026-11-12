@@ -1,0 +1,21 @@
+/* La cloche se balance quand il y a du nouveau au club, puis marque une pause.
+   Pour changer le rythme : modifier la durée de l'animation (4s = une volée toutes les 4 secondes). */
+.sonne svg {
+  transform-origin: 50% 8%; /* la cloche pivote depuis son attache, en haut */
+  animation: cloche-volee 4s ease-in-out 0.8s infinite;
+}
+
+@keyframes cloche-volee {
+  0%   { transform: rotate(0deg); }
+  4%   { transform: rotate(16deg); }
+  8%   { transform: rotate(-14deg); }
+  12%  { transform: rotate(10deg); }
+  16%  { transform: rotate(-7deg); }
+  20%  { transform: rotate(4deg); }
+  24%  { transform: rotate(-2deg); }
+  28%, 100% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sonne svg { animation: none; }
+}
