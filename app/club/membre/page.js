@@ -7,7 +7,8 @@ import CancelDomainButton from "@/components/CancelDomainButton";
 import InviteFriend from "@/components/InviteFriend";
 import MemberCard from "@/components/MemberCard";
 import NotificationToggle from "@/components/NotificationToggle";
-import OrderTimeline from "@/components/OrderTimeline";
+import OrderTimeline, { dateLongue } from "@/components/OrderTimeline";
+import s from "@/components/Commandes.module.css";
 import { requireMember } from "@/lib/data";
 import { euros } from "@/lib/catalogue";
 
@@ -22,6 +23,42 @@ const STATUT_SUIVI = {
   livre: "Livré",
   expire: "Clos",
 };
+
+const NIVEAU = { declenche: 1, expedie: 3, livre: 4 };
+
+// Statut lisible d'une commande en cours, en une phrase, et position sur la barre (1 à 5).
+function statutCommande(d, p, paid, bottles) {
+  const niveau = NIVEAU[d.status] || 0;
+  const reserved = p.reserved_bottles || 0;
+  const atteint = d.threshold ? reserved >= d.threshold : false;
+  const membres = p.participants || 0;
+  if (niveau === 0 && !atteint) {
+    const manque = d.threshold ? Math.max(d.threshold - reserved, 0) : 0;
+    return {
+      etape: 1,
+      texte: d.threshold ? `En attente du seuil · il manque ${manque} bt` : "Réservation enregistrée",
+      sous: d.threshold
+        ? `${reserved} / ${d.threshold} bouteilles réunies, dont ${bottles} à vous. Aucun débit avant le déclenchement.`
+        : "Aucun débit avant le déclenchement.",
+      atteint,
+    };
+  }
+  if (niveau === 0) {
+    return {
+      etape: 2,
+      texte: "Seuil atteint · déclenchement en cours",
+      sous: `${reserved} / ${d.threshold} bouteilles réunies par ${membres} membre${membres > 1 ? "s" : ""}. Votre carte sera débitée au déclenchement.`,
+      atteint,
+    };
+  }
+  if (niveau === 1 && !paid) {
+    return { etape: 3, texte: "Déclenchée · paiement en cours", sous: "Le domaine prépare la commande.", atteint: true };
+  }
+  if (niveau === 1) {
+    return { etape: 4, texte: "Payée · expédition à venir", sous: "Le domaine prépare la commande.", atteint: true };
+  }
+  return { etape: 5, texte: "En route vers vous", sous: null, atteint: true };
+}
 
 export default async function Membre({ searchParams }) {
   const { supabase, member } = await requireMember();
@@ -56,14 +93,27 @@ export default async function Membre({ searchParams }) {
     if (r.created_at && (!g.reservedAt || r.created_at < g.reservedAt)) g.reservedAt = r.created_at;
     if (r.paid_at && (!g.paidAt || r.paid_at > g.paidAt)) g.paidAt = r.paid_at;
   }
-  // Commandes en cours d’abord, commandes passées ensuite.
-  const groups = Object.values(byDomain).sort((a, b) => Number(a.archive) - Number(b.archive));
+  // Le débit a lieu au déclenchement : une date de paiement antérieure (paiement saisi à la main,
+  // donnée de test) est ramenée à la date de déclenchement pour que la frise reste dans l'ordre.
+  for (const g of Object.values(byDomain)) {
+    const t = g.domain.triggered_at;
+    if (g.paidAt && t && new Date(g.paidAt) < new Date(t)) g.paidAt = t;
+  }
+  const groups = Object.values(byDomain);
 
   const ids = groups.map((g) => g.domain.id);
   const { data: prog } = ids.length
     ? await supabase.from("domain_progress").select("domain_id, reserved_bottles, participants").in("domain_id", ids)
     : { data: [] };
   const progress = Object.fromEntries((prog || []).map((p) => [p.domain_id, p]));
+
+  // En cours d'un côté, livrées ou closes de l'autre.
+  const estPassee = (g) => g.archive || g.domain.status === "livre" || g.domain.status === "expire";
+  const enCours = groups.filter((g) => !estPassee(g));
+  const passees = groups
+    .filter(estPassee)
+    .sort((a, b) => String(b.domain.delivered_at || "").localeCompare(String(a.domain.delivered_at || "")));
+  const toutesLivrees = passees.every((g) => g.domain.status === "livre");
 
   const [{ data: invites }, { data: suivis }, { data: carte }, { data: aRegler }] = await Promise.all([
     supabase.rpc("my_invitations"),
@@ -89,6 +139,15 @@ export default async function Membre({ searchParams }) {
   const numero = String(member.member_number).padStart(3, "0");
   const since = new Date(member.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
   const today = new Date().toISOString().slice(0, 10);
+
+  // Résumé d'une commande sur une ligne : « Crémant zéro dosage 2022 · 2 bt » ou « 3 cuvées · 8 bt ».
+  const resume = (g) => {
+    if (g.lines.length === 1) {
+      const c = g.lines[0].cuvees;
+      return `${c.name}${c.vintage ? ` ${c.vintage}` : ""} · ${g.bottles} bt`;
+    }
+    return `${g.lines.length} cuvées · ${g.bottles} bt`;
+  };
 
   return (
     <main className="shell">
@@ -126,6 +185,15 @@ export default async function Membre({ searchParams }) {
 
       <section className="section stack">
         <h2>Mes commandes</h2>
+        {groups.length > 0 && (
+          <p className={s.intro}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            Aucun débit avant le déclenchement du domaine
+          </p>
+        )}
         {justReserved && (
           <div className="card stack reserve-ok" role="status">
             <p className="reserve-ok-t">C&apos;est réservé !</p>
@@ -146,70 +214,160 @@ export default async function Membre({ searchParams }) {
             </Link>
           </div>
         )}
-        {groups.map((g) => {
-          const d = g.domain;
-          const p = progress[d.id] || { reserved_bottles: 0, participants: 0 };
-          const editable =
-            ["ouvert", "bientot_atteint"].includes(d.status) && (!d.deadline || d.deadline >= today);
-          const paid = g.lines.every((r) => r.status === "payee");
-          const enAttente = ["ouvert", "bientot_atteint", "a_venir"].includes(d.status);
-          return (
-            <div className="card stack" key={g.cle}>
-              <div className="row">
-                <h3>{d.name}</h3>
-                {d.status === "expire" && <span className="badge">Close</span>}
-              </div>
-              {d.status !== "expire" && (
-                <OrderTimeline
-                  status={d.status}
-                  paid={paid}
-                  prevue={d.expected_delivery}
-                  dates={{
-                    reservee: g.reservedAt,
-                    declenchee: d.triggered_at,
-                    payee: g.paidAt,
-                    expediee: d.shipped_at,
-                    livree: d.delivered_at,
-                  }}
-                />
-              )}
-              {g.lines.map((r) => (
-                <div className="row" key={r.id}>
-                  <p className="muted">
-                    {r.quantity} × {r.cuvees.name}
-                    {r.cuvees.vintage ? ` ${r.cuvees.vintage}` : ""}
-                  </p>
-                  <p className="muted">{euros(r.quantity * Number(r.unit_price))}</p>
+
+        {enCours.length > 0 && (
+          <div className={s.groupe}>
+            <p className={s.titreGroupe}>
+              En cours <span>· {enCours.length}</span>
+            </p>
+            {enCours.map((g) => {
+              const d = g.domain;
+              const p = progress[d.id] || { reserved_bottles: 0, participants: 0 };
+              const editable =
+                ["ouvert", "bientot_atteint"].includes(d.status) && (!d.deadline || d.deadline >= today);
+              const paid = g.lines.every((r) => r.status === "payee");
+              const st = statutCommande(d, p, paid, g.bottles);
+              return (
+                <details className={s.carte} key={g.cle}>
+                  <summary>
+                    <div className={s.entete}>
+                      <div className={s.identite}>
+                        <h3 className={s.domaine}>{d.name}</h3>
+                        <span className={s.resume}>{resume(g)}</span>
+                      </div>
+                      <span className={s.prix}>{euros(g.total)}</span>
+                    </div>
+                    <div className={s.barre} aria-hidden="true">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <span
+                          key={n}
+                          className={n < st.etape ? s.segFait : n === st.etape ? s.segEnCours : s.seg}
+                        />
+                      ))}
+                    </div>
+                    <div className={s.statut}>
+                      <span className={s.statutTexte}>{st.texte}</span>
+                      <span className={s.etapeNum}>{st.etape} / 5</span>
+                    </div>
+                    {st.sous && <p className={s.sous}>{st.sous}</p>}
+                    <span className={s.voir}>
+                      <span>
+                        <span className={s.voirOuvrir}>Voir le suivi</span>
+                        <span className={s.voirFermer}>Masquer le suivi</span>
+                      </span>
+                      <svg className={s.chevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9 6l6 6-6 6" />
+                      </svg>
+                    </span>
+                  </summary>
+
+                  <div className={s.corps}>
+                    <OrderTimeline
+                      status={d.status}
+                      paid={paid}
+                      prevue={d.expected_delivery}
+                      seuil={{
+                        atteint: st.atteint,
+                        reserved: p.reserved_bottles,
+                        threshold: d.threshold,
+                        participants: p.participants,
+                      }}
+                      dates={{
+                        reservee: g.reservedAt,
+                        declenchee: d.triggered_at,
+                        payee: g.paidAt,
+                        expediee: d.shipped_at,
+                        livree: d.delivered_at,
+                      }}
+                    />
+
+                    {!st.atteint && d.threshold ? (
+                      <Gauge
+                        reserved={p.reserved_bottles}
+                        threshold={d.threshold}
+                        participants={p.participants}
+                        deadline={d.deadline}
+                        showDeadline
+                        mine={g.bottles}
+                        size={64}
+                      />
+                    ) : null}
+
+                    <div className={s.bloc}>
+                      <span className={s.etiquette}>Votre réservation</span>
+                      {g.lines.map((r) => (
+                        <div className={s.ligneCuvee} key={r.id}>
+                          <span>
+                            {r.quantity} × {r.cuvees.name}
+                            {r.cuvees.vintage ? ` ${r.cuvees.vintage}` : ""}
+                          </span>
+                          <span>{euros(r.quantity * Number(r.unit_price))}</span>
+                        </div>
+                      ))}
+                      {g.lines.length > 1 && (
+                        <div className={s.total}>
+                          <span>
+                            {g.bottles} bouteille{g.bottles > 1 ? "s" : ""}
+                          </span>
+                          <span>{euros(g.total)}</span>
+                        </div>
+                      )}
+                      {editable ? (
+                        <div className={s.actions}>
+                          <Link href={`/club/domaine/${d.slug}`}>Modifier</Link>
+                          <CancelDomainButton cuveeIds={g.lines.map((r) => r.cuvees.id)} domainName={d.name} />
+                        </div>
+                      ) : (
+                        <p className="muted">Réservations closes, le domaine prépare la commande.</p>
+                      )}
+                    </div>
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        )}
+
+        {passees.length > 0 && (
+          <div className={s.groupe}>
+            <p className={s.titreGroupePasse}>
+              {toutesLivrees ? "Livrées" : "Terminées"} <span>· {passees.length}</span>
+            </p>
+            {passees.map((g) => {
+              const d = g.domain;
+              const livree = d.status === "livre";
+              const le = dateLongue(d.delivered_at);
+              return (
+                <div className={s.passee} key={g.cle}>
+                  <div className={s.entete}>
+                    <div className={s.identite}>
+                      <h3 className={s.domaine}>{d.name}</h3>
+                      <span className={s.resume}>
+                        {resume(g)} · {euros(g.total)}
+                      </span>
+                    </div>
+                    {livree ? (
+                      <span className={s.coche} role="img" aria-label="Livrée">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 12.5l4.5 4.5L19 7.5" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <span className="badge">Close</span>
+                    )}
+                  </div>
+                  <div className={s.pied}>
+                    <span>{livree ? (le ? `Livrée le ${le}` : "Livrée") : "Commande non lancée"}</span>
+                    {livree && (
+                      <Link href={`/club/domaine/${d.slug}`} className={s.avis}>
+                        Donner mon avis
+                      </Link>
+                    )}
+                  </div>
                 </div>
-              ))}
-              <div className="row">
-                <p>
-                  {g.bottles} bouteille{g.bottles > 1 ? "s" : ""}
-                </p>
-                <p className="price">{euros(g.total)}</p>
-              </div>
-              {enAttente && d.threshold ? (
-                <Gauge
-                  reserved={p.reserved_bottles}
-                  threshold={d.threshold}
-                  participants={p.participants}
-                  deadline={d.deadline}
-                  showDeadline
-                  mine={g.bottles}
-                  size={64}
-                />
-              ) : null}
-              {editable && (
-                <div className="row" style={{ alignItems: "center" }}>
-                  <Link href={`/club/domaine/${d.slug}`}>Modifier</Link>
-                  <CancelDomainButton cuveeIds={g.lines.map((r) => r.cuvees.id)} domainName={d.name} />
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {groups.length > 0 && (
-          <p className="muted">Aucun débit tant que le seuil d&apos;un domaine n&apos;est pas atteint.</p>
+              );
+            })}
+          </div>
         )}
       </section>
 

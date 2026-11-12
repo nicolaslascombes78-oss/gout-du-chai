@@ -1,0 +1,237 @@
+/* Cartes « Mes commandes » de l'espace membre (thème nuit et or) */
+.intro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ivory-dim);
+  margin: -4px 0 6px;
+}
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.titreGroupe {
+  margin: 8px 0 0;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.titreGroupe span {
+  color: var(--ivory-dim);
+  font-weight: 500;
+}
+.titreGroupePasse {
+  composes: titreGroupe;
+  color: var(--ivory-dim);
+}
+
+/* Carte en cours : repliée = l'essentiel, dépliée = le suivi complet */
+.carte {
+  border-radius: 18px;
+  background: var(--ink-2);
+  border: 1px solid rgba(201, 164, 92, 0.24);
+  overflow: hidden;
+}
+.carte > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 18px 0;
+}
+.carte > summary::-webkit-details-marker {
+  display: none;
+}
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.identite {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.domaine {
+  margin: 0;
+  font-family: var(--font-serif), serif;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ivory);
+}
+.resume {
+  font-size: 14px;
+  color: var(--ivory-dim);
+}
+.prix {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ivory);
+  white-space: nowrap;
+  padding-top: 3px;
+}
+
+/* Barre d'avancement en 5 segments */
+.barre {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+}
+.seg {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(242, 235, 221, 0.12);
+}
+.segFait {
+  composes: seg;
+  background: var(--gold);
+}
+.segEnCours {
+  composes: seg;
+  background: linear-gradient(90deg, var(--gold) 50%, rgba(201, 164, 92, 0.25) 50%);
+}
+.statut {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: -4px;
+}
+.statutTexte {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ivory);
+}
+.etapeNum {
+  font-size: 12px;
+  color: var(--ivory-dim);
+  white-space: nowrap;
+}
+.sous {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ivory-dim);
+  margin-top: -6px;
+}
+.voir {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  margin: 0 -18px;
+  padding: 0 18px;
+  border-top: 1px solid rgba(242, 235, 221, 0.08);
+  font-size: 14px;
+  color: var(--gold);
+}
+.chevron {
+  transition: transform 0.25s ease;
+}
+.carte[open] .chevron {
+  transform: rotate(90deg);
+}
+.carte[open] .voirOuvrir {
+  display: none;
+}
+.voirFermer {
+  display: none;
+}
+.carte[open] .voirFermer {
+  display: inline;
+}
+.corps {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 4px 18px 18px;
+}
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(242, 235, 221, 0.08);
+}
+.etiquette {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--ivory-dim);
+}
+.ligneCuvee {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--ivory);
+}
+.ligneCuvee span:last-child {
+  white-space: nowrap;
+}
+.total {
+  composes: ligneCuvee;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(242, 235, 221, 0.12);
+  font-weight: 500;
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Carte livrée ou close : compacte */
+.passee {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(23, 21, 15, 0.6);
+  border: 1px solid rgba(242, 235, 221, 0.08);
+}
+.passee .domaine {
+  font-size: 19px;
+}
+.coche {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+.pied {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ivory-dim);
+}
+.avis {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(201, 164, 92, 0.45);
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}

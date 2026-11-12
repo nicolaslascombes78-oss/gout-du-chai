@@ -1,23 +1,93 @@
-/* Dates sous les étapes de la frise et livraison prévue */
+/* Frise verticale du suivi de commande (thème nuit et or) */
+.frise {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.etape {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 16px;
+}
+.etape:last-child {
+  padding-bottom: 0;
+}
+/* Trait vertical entre deux étapes */
+.etape::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 18px;
+  bottom: -2px;
+  width: 2px;
+  background: rgba(242, 235, 221, 0.12);
+}
+.etape:last-child::before {
+  display: none;
+}
+.fait::before {
+  background: var(--gold);
+}
+.point {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid rgba(242, 235, 221, 0.3);
+  background: transparent;
+}
+.fait .point {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+.enCours .point {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 164, 92, 0.18);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.texte {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.nom {
+  font-size: 15px;
+  color: var(--ivory-dim);
+}
+.fait .nom {
+  color: var(--ivory);
+}
+.enCours .nom {
+  color: var(--gold-soft);
+  font-weight: 600;
+}
 .date {
-  display: block;
-  margin-top: 2px;
   font-size: 13px;
-  line-height: 1.2;
-  opacity: .65;
-  font-variant-numeric: tabular-nums;
+  color: var(--ivory-dim);
   white-space: nowrap;
 }
-.prevue {
-  margin-top: 8px;
-  font-size: 15px;
+.aide {
+  font-size: 13px;
+  color: var(--ivory-dim);
+  line-height: 1.4;
 }
-.prevue strong {
-  color: var(--gold-soft);
-  font-weight: 500;
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(201, 164, 92, 0.18); }
+  50% { box-shadow: 0 0 0 7px rgba(201, 164, 92, 0.06); }
 }
-.attente {
-  margin-top: 8px;
-  font-size: 14px;
-  opacity: .7;
+@media (prefers-reduced-motion: reduce) {
+  .enCours .point { animation: none; }
 }
