@@ -1,0 +1,50 @@
+/* Logo horizontal de l'en-tête — thème « nuit et or » */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.bouchon {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+}
+
+.texte {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nom {
+  font-family: var(--font-serif), serif;
+  font-weight: 500;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--ivory);
+  white-space: nowrap;
+}
+
+.baseline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.filet {
+  width: 14px;
+  height: 1px;
+  background: var(--gold);
+  flex: none;
+}

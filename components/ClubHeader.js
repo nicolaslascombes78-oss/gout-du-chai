@@ -1,8 +1,10 @@
 import Link from "next/link";
 import BellLink from "@/components/BellLink";
 import ConceptButton from "@/components/ConceptButton";
+import BrandLogo from "@/components/BrandLogo";
 
 // En-tête des écrans du club. La déconnexion se trouve en bas de l'espace Membre.
+// En haut à gauche : le logo du club (ou le lien de retour sur les sous-pages).
 // En haut à droite : le bouton « ? » (concept du club, sur l'accueil seulement) et la cloche.
 export default function ClubHeader({ back }) {
   return (
@@ -12,9 +14,7 @@ export default function ClubHeader({ back }) {
           ← {back.label}
         </Link>
       ) : (
-        <Link href="/club" className="brand">
-          Le Goût du Chai
-        </Link>
+        <BrandLogo />
       )}
       <span className="head-actions">
         <ConceptButton />
