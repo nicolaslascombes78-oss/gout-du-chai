@@ -27,10 +27,8 @@ export default async function Activite({ searchParams }) {
   const { member } = await requireMember();
   const { events: tous, aVenir, latest } = await loadActivity(member?.id);
   const events = tous.filter((e) => e.onglet === onglet);
-  const nb = {
-    domaines: tous.filter((e) => e.onglet === "domaines").length,
-    membres: tous.filter((e) => e.onglet === "membres").length,
-  };
+  // Pas de chiffre sur les onglets : il ressemblait à un compteur de notifications non lues,
+  // alors qu'il donnait seulement le nombre total d'évènements des dernières semaines.
 
   const groupes = [];
   for (const e of events) {
@@ -57,14 +55,14 @@ export default async function Activite({ searchParams }) {
           className={`act-tab${onglet === "domaines" ? " on" : ""}`}
           aria-current={onglet === "domaines" ? "page" : undefined}
         >
-          Domaines <span className="act-count">{nb.domaines}</span>
+          Domaines
         </Link>
         <Link
           href="/club/activite?onglet=membres"
           className={`act-tab${onglet === "membres" ? " on" : ""}`}
           aria-current={onglet === "membres" ? "page" : undefined}
         >
-          Membres <span className="act-count">{nb.membres}</span>
+          Membres
         </Link>
       </nav>
 
@@ -95,9 +93,11 @@ export default async function Activite({ searchParams }) {
       )}
 
       {groupes.length === 0 ? (
-        <p className="muted act-vide">{onglet === "membres"
+        <p className="muted act-vide">
+          {onglet === "membres"
             ? "Pas de nouveau membre ces dernières semaines."
-            : "Rien de nouveau ces dernières semaines. Les prochaines commandes s’annonceront ici."}</p>
+            : "Rien de nouveau ces dernières semaines. Les prochaines commandes s’annonceront ici."}
+        </p>
       ) : (
         groupes.map((g) => (
           <section key={g.titre}>
