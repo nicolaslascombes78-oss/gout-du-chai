@@ -1,0 +1,64 @@
+/* Bouton « ? » à côté de la cloche et fiche « Comment fonctionne le club » */
+.head-actions {
+  display: inline-flex;
+  align-items: center;
+}
+.help-btn {
+  margin-right: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+.concept-intro {
+  margin: 10px 0 4px;
+  color: var(--ivory-dim);
+  line-height: 1.55;
+}
+.concept .concept-steps {
+  margin: 18px 0 6px;
+}
+.concept-h3 {
+  margin: 22px 0 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+.concept-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.concept-points li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--ivory-dim);
+  line-height: 1.5;
+}
+.concept-points li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.concept-points strong {
+  color: var(--ivory, inherit);
+  font-weight: 600;
+}
+.concept-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+.concept-actions .btn {
+  width: 100%;
+  text-align: center;
+}
