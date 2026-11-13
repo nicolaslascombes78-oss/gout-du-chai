@@ -71,11 +71,13 @@ export default async function Domaine({ params, searchParams }) {
   const vide = { data: [] };
   const [{ data: mine }, { data: avisLignes }, { data: recues }] = ids.length
     ? await Promise.all([
+        // Réservations du tour en cours : celles d'une commande remise à zéro (archivées) ne comptent plus
         supabase
           .from("reservations")
           .select("cuvee_id, quantity, unit_price")
           .eq("member_id", member.id)
           .eq("status", "en_attente")
+          .eq("archived", false)
           .in("cuvee_id", ids),
         supabase
           .from("cuvee_reviews")

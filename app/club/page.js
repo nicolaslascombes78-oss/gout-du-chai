@@ -33,11 +33,13 @@ export default async function Club() {
       .eq("is_favorite", true)
       .eq("active", true)
       .limit(60),
+    // Réservations du tour en cours seulement : celles d'une commande remise à zéro (archivées) n'en font plus partie
     supabase
       .from("reservations")
       .select("quantity, cuvees(domains(id))")
       .eq("member_id", member.id)
-      .eq("status", "en_attente"),
+      .eq("status", "en_attente")
+      .eq("archived", false),
   ]);
 
   // Un coup de cœur par domaine et par couleur, 6 au maximum.
