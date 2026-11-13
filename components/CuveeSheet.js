@@ -174,14 +174,6 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
                 ))}
               </dl>
             )}
-            {c.source_fiche && (
-              <p className="sheet-source">
-                Source :{" "}
-                <a href={c.source_fiche} target="_blank" rel="noopener noreferrer">
-                  fiche technique
-                </a>
-              </p>
-            )}
             {avis && <CuveeReviews cuveeId={c.id} slug={slug} avis={avis} />}
           </div>
         </div>
