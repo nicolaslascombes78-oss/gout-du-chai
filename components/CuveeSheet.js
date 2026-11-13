@@ -8,12 +8,23 @@ import { noteTexte } from "@/lib/avis";
 
 const LABELS = { bio: "Bio", biodynamie: "Biodynamie", nature: "Nature" };
 
+// Style de la carte cliquable, ajouté une seule fois à la page.
+const STYLE_ID = "cuvee-cliquable-style";
+const STYLE = `
+.cuvee.cuvee-cliquable { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
+.cuvee.cuvee-cliquable:active { background-color: rgba(255, 255, 255, 0.04); }
+@media (hover: hover) { .cuvee.cuvee-cliquable:hover { background-color: rgba(255, 255, 255, 0.025); } }
+.cuvee.cuvee-cliquable .stepper-wrap { cursor: auto; }
+`;
+
 // Nom d'une cuvée sur la fiche domaine, suivi du cépage et des labels (Bio, Biodynamie…).
-// Si la cuvée a une description, des détails (élevage, accords…) ou des avis, le nom ouvre une fiche
-// qui monte du bas de l'écran : c'est là que se lit la description ; sinon il reste un simple texte.
+// Si la cuvée a une description, des détails (élevage, accords…) ou des avis, toute sa carte ouvre
+// une fiche qui monte du bas de l'écran (sauf le choix du nombre de bouteilles) ;
+// sinon le nom reste un simple texte et la carte ne s'ouvre pas.
 export default function CuveeSheet({ c, domainName, slug, avis }) {
   const [open, setOpen] = useState(false);
   const fermer = useRef(null);
+  const declencheur = useRef(null);
 
   const rows = [
     ["Cépages", c.cepages],
@@ -28,8 +39,37 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
   // ou des avis à lire ou à donner.
   const hasDetails = Boolean(c.description) || rows.some(([k]) => k !== "Cépages");
   const aDesAvis = (avis?.nb || 0) > 0 || Boolean(avis?.mien) || Boolean(avis?.peutDonner);
+  const ouvrable = hasDetails || aDesAvis;
   // Toujours visible sous le nom : cépage et labels, sur une ligne
   const resume = [c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
+
+  // Toute la carte de la cuvée ouvre la fiche, sauf le choix du nombre de bouteilles,
+  // les autres boutons et liens, et la fiche elle-même une fois ouverte.
+  useEffect(() => {
+    if (!ouvrable) return;
+    const carte = declencheur.current?.closest(".cuvee");
+    if (!carte) return;
+    if (!document.getElementById(STYLE_ID)) {
+      const style = document.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = STYLE;
+      document.head.appendChild(style);
+    }
+    carte.classList.add("cuvee-cliquable");
+    const onClick = (e) => {
+      const cible = e.target;
+      if (!(cible instanceof Element)) return;
+      if (cible.closest(".sheet, .stepper-wrap, button, a, input, select, textarea, label")) return;
+      // On laisse sélectionner du texte sans ouvrir la fiche
+      if (window.getSelection()?.toString()) return;
+      setOpen(true);
+    };
+    carte.addEventListener("click", onClick);
+    return () => {
+      carte.removeEventListener("click", onClick);
+      carte.classList.remove("cuvee-cliquable");
+    };
+  }, [ouvrable]);
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +100,7 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
       </span>
     ) : null;
 
-  if (!hasDetails && !aDesAvis) {
+  if (!ouvrable) {
     return (
       <>
         {nom}
@@ -71,7 +111,13 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
 
   return (
     <>
-      <button type="button" className="cuvee-open" onClick={() => setOpen(true)} aria-haspopup="dialog">
+      <button
+        ref={declencheur}
+        type="button"
+        className="cuvee-open"
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+      >
         {nom}
         <span className="cuvee-open-hint">
           {hasDetails ? "Fiche" : avis?.peutDonner && !avis?.mien ? "Donner mon avis" : "Avis"}
@@ -80,11 +126,23 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
       {mini}
       {resume && <span className="cuvee-cep">{resume}</span>}
       {open && (
-        <div className="sheet" role="dialog" aria-modal="true" aria-labelledby={`fiche-${c.id}`} onClick={() => setOpen(false)}>
+        <div
+          className="sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={`fiche-${c.id}`}
+          onClick={() => setOpen(false)}
+        >
           <div className="sheet-card" onClick={(e) => e.stopPropagation()}>
             <div className="sheet-head">
               <p className="eyebrow">{domainName}</p>
-              <button ref={fermer} type="button" className="sheet-close" onClick={() => setOpen(false)} aria-label="Fermer la fiche">
+              <button
+                ref={fermer}
+                type="button"
+                className="sheet-close"
+                onClick={() => setOpen(false)}
+                aria-label="Fermer la fiche"
+              >
                 ×
               </button>
             </div>
