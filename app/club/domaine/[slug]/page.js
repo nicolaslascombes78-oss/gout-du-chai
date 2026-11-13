@@ -157,6 +157,33 @@ export default async function Domaine({ params }) {
   const recommandation = texteRecommandation(reponses.filter((r) => r.verdict === "oui").length, reponses.length);
   const motsMembres = reponses.filter((r) => r.comment).slice(0, 3);
 
+  // Une ligne de cuvée : nom (+ cépage et labels, via CuveeSheet), puis coup de cœur et millésime.
+  // La description complète se lit dans la fiche du vin.
+  const ligneCuvee = (c) => (
+    <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
+      <div>
+        <p>
+          <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
+        </p>
+        <p className="muted">
+          {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
+          {c.vintage || "Sans millésime"}
+        </p>
+      </div>
+      <div className="cuvee-side">
+        <p className="price">{euros(c.member_price)}</p>
+        <CuveeStepper
+          cuveeId={c.id}
+          domainSlug={domain.slug}
+          step={c.pack_size}
+          reserved={reservedByCuvee[c.id] || 0}
+          editable={editable}
+          label={c.name}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <main className="shell">
       <ClubHeader back={{ href: "/club/selection", label: "La Sélection" }} />
@@ -266,59 +293,9 @@ export default async function Domaine({ params }) {
             <div key={g.color} className="stack cuvee-group" data-c={g.color}>
               <p className="eyebrow">{COLOR_LABELS[g.color]}</p>
               <div className="cuvee-list">
-                {partage(g.items).visibles.map((c) => (
-                  <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
-                    <div>
-                      <p>
-                        <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
-                      </p>
-                      <p className="muted">
-                        {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
-                        {c.vintage || "Sans millésime"}
-                        {c.description ? ` · ${c.description}` : ""}
-                      </p>
-                    </div>
-                    <div className="cuvee-side">
-                      <p className="price">{euros(c.member_price)}</p>
-                      <CuveeStepper
-                        cuveeId={c.id}
-                        domainSlug={domain.slug}
-                        step={c.pack_size}
-                        reserved={reservedByCuvee[c.id] || 0}
-                        editable={editable}
-                        label={c.name}
-                      />
-                    </div>
-                  </div>
-                ))}
+                {partage(g.items).visibles.map(ligneCuvee)}
                 {partage(g.items).caches.length > 0 && (
-                  <ShowMore count={partage(g.items).caches.length}>
-                    {partage(g.items).caches.map((c) => (
-                      <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
-                        <div>
-                          <p>
-                            <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
-                          </p>
-                          <p className="muted">
-                            {c.is_favorite && <span className="cuvee-fav">♥ Coup de cœur · </span>}
-                            {c.vintage || "Sans millésime"}
-                            {c.description ? ` · ${c.description}` : ""}
-                          </p>
-                        </div>
-                        <div className="cuvee-side">
-                          <p className="price">{euros(c.member_price)}</p>
-                          <CuveeStepper
-                            cuveeId={c.id}
-                            domainSlug={domain.slug}
-                            step={c.pack_size}
-                            reserved={reservedByCuvee[c.id] || 0}
-                            editable={editable}
-                            label={c.name}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </ShowMore>
+                  <ShowMore count={partage(g.items).caches.length}>{partage(g.items).caches.map(ligneCuvee)}</ShowMore>
                 )}
               </div>
             </div>

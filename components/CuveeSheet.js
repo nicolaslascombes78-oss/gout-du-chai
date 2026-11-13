@@ -8,8 +8,9 @@ import { noteTexte } from "@/lib/avis";
 
 const LABELS = { bio: "Bio", biodynamie: "Biodynamie", nature: "Nature" };
 
-// Nom d'une cuvée sur la fiche domaine. Si la cuvée a des détails (cépages, élevage…) ou des avis,
-// le nom ouvre une fiche qui monte du bas de l'écran ; sinon il reste un simple texte.
+// Nom d'une cuvée sur la fiche domaine, suivi du cépage et des labels (Bio, Biodynamie…).
+// Si la cuvée a une description, des détails (élevage, accords…) ou des avis, le nom ouvre une fiche
+// qui monte du bas de l'écran : c'est là que se lit la description ; sinon il reste un simple texte.
 export default function CuveeSheet({ c, domainName, slug, avis }) {
   const [open, setOpen] = useState(false);
   const fermer = useRef(null);
@@ -23,10 +24,11 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
     ["Degré", c.degre ? `${String(c.degre).replace(".", ",")} %` : null],
   ].filter(([, v]) => v);
   const labels = (c.labels || []).filter(Boolean);
-  // La fiche s'ouvre s'il y a de vrais détails (élevage, accords, service, garde, degré)
-  // ou des avis à lire ou à donner ; sinon, le cépage et les labels s'affichent directement sous le nom.
-  const hasDetails = rows.some(([k]) => k !== "Cépages");
+  // La fiche s'ouvre s'il y a une description, de vrais détails (élevage, accords, service, garde, degré)
+  // ou des avis à lire ou à donner.
+  const hasDetails = Boolean(c.description) || rows.some(([k]) => k !== "Cépages");
   const aDesAvis = (avis?.nb || 0) > 0 || Boolean(avis?.mien) || Boolean(avis?.peutDonner);
+  // Toujours visible sous le nom : cépage et labels, sur une ligne
   const resume = [c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
 
   useEffect(() => {
@@ -71,10 +73,12 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
     <>
       <button type="button" className="cuvee-open" onClick={() => setOpen(true)} aria-haspopup="dialog">
         {nom}
-        <span className="cuvee-open-hint">{hasDetails ? "Fiche" : avis?.peutDonner && !avis?.mien ? "Donner mon avis" : "Avis"}</span>
+        <span className="cuvee-open-hint">
+          {hasDetails ? "Fiche" : avis?.peutDonner && !avis?.mien ? "Donner mon avis" : "Avis"}
+        </span>
       </button>
       {mini}
-      {!hasDetails && resume && <span className="cuvee-cep">{resume}</span>}
+      {resume && <span className="cuvee-cep">{resume}</span>}
       {open && (
         <div className="sheet" role="dialog" aria-modal="true" aria-labelledby={`fiche-${c.id}`} onClick={() => setOpen(false)}>
           <div className="sheet-card" onClick={(e) => e.stopPropagation()}>
