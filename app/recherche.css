@@ -1,0 +1,21 @@
+/* Fiche domaine ouverte depuis une recherche de la Sélection */
+.recherche-note {
+  font-size: 14px;
+  color: var(--gold-soft);
+}
+.cuvee.is-match {
+  position: relative;
+  border-radius: 12px;
+  background: rgba(201, 164, 92, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(201, 164, 92, 0.55);
+  padding-left: 12px;
+  padding-right: 12px;
+  animation: cuvee-trouvee 1.6s ease-out 0.5s 1;
+}
+@keyframes cuvee-trouvee {
+  0% { background: rgba(201, 164, 92, 0.28); }
+  100% { background: rgba(201, 164, 92, 0.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cuvee.is-match { animation: none; }
+}

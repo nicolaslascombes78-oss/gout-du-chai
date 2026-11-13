@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Seal from "@/components/Seal";
 import DomainImage from "@/components/DomainImage";
 import { COLOR_LABELS, COLOR_ORDER, cardBadge, closingLabel, daysLeft, displayStatus, euros } from "@/lib/catalogue";
@@ -18,6 +18,8 @@ const SORTS = [
   { key: "prix", label: "Prix croissant" },
 ];
 const NEW_DAYS = 14;
+// La recherche en cours est gardée le temps de la visite : en revenant d'une fiche, on retrouve ses résultats.
+const CLE_RECHERCHE = "gdc-selection-recherche";
 
 const norm = (s) =>
   String(s || "")
@@ -64,12 +66,14 @@ function metaLine(d) {
   );
 }
 
-function DomainCard({ d, matches = [] }) {
+function DomainCard({ d, matches = [], recherche = "" }) {
   const badge = cardBadge(d, d.st);
   const hasImage = Boolean(d.photos?.[0]);
   const showSeal = d.st.key !== "a_venir" && d.threshold;
+  // Avec une recherche, la fiche s'ouvre directement sur la ou les cuvées trouvées
+  const href = recherche ? `/club/domaine/${d.slug}?q=${encodeURIComponent(recherche)}` : `/club/domaine/${d.slug}`;
   return (
-    <Link href={`/club/domaine/${d.slug}`} className="dcard">
+    <Link href={href} className="dcard">
       {hasImage && (
         <div className="dcard-media">
           <DomainImage domain={d} variant="card" />
@@ -153,6 +157,25 @@ export default function SelectionList({ domains, initialFilter }) {
   const [sort, setSort] = useState("avancees");
   const [open, setOpen] = useState({});
 
+  // Recherche retrouvée au retour d'une fiche domaine
+  useEffect(() => {
+    try {
+      const gardee = sessionStorage.getItem(CLE_RECHERCHE);
+      if (gardee) setQ(gardee);
+    } catch {
+      // stockage indisponible : on repart d'une recherche vide
+    }
+  }, []);
+  const changerRecherche = (valeur) => {
+    setQ(valeur);
+    try {
+      if (valeur.trim()) sessionStorage.setItem(CLE_RECHERCHE, valeur);
+      else sessionStorage.removeItem(CLE_RECHERCHE);
+    } catch {
+      // stockage indisponible
+    }
+  };
+
   const regions = useMemo(
     () => [...new Set(domains.map((d) => d.region))].sort((a, b) => a.localeCompare(b, "fr")),
     [domains]
@@ -197,7 +220,7 @@ export default function SelectionList({ domains, initialFilter }) {
     .filter((g) => g.items.length);
 
   const reset = () => {
-    setQ("");
+    changerRecherche("");
     setRegion("");
     setColor("");
     setQuick("");
@@ -215,7 +238,11 @@ export default function SelectionList({ domains, initialFilter }) {
         <input
           type="search"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => changerRecherche(e.target.value)}
+          onKeyDown={(e) => {
+            // « Rechercher » sur le clavier : on ferme le clavier pour laisser voir les résultats
+            if (e.key === "Enter") e.currentTarget.blur();
+          }}
           placeholder="Domaine, cuvée, cépage, région…"
           aria-label="Rechercher un domaine, une cuvée, un cépage ou une région"
           enterKeyHint="search"
@@ -348,7 +375,7 @@ export default function SelectionList({ domains, initialFilter }) {
         ) : (
           <div className="chapter-body">
             {sorted.map((d) => (
-              <DomainCard key={d.id} d={d} matches={matchesOf(d)} />
+              <DomainCard key={d.id} d={d} matches={matchesOf(d)} recherche={q.trim()} />
             ))}
           </div>
         )}

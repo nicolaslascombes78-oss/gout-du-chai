@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import "@/app/commande-carte.css";
+import "@/app/recherche.css";
 import Celebration from "@/components/Celebration";
 import ClubHeader from "@/components/ClubHeader";
 import Gauge from "@/components/Gauge";
@@ -12,6 +13,7 @@ import DomainRecommend from "@/components/DomainRecommend";
 import FollowButton from "@/components/FollowButton";
 import ShareOrder from "@/components/ShareOrder";
 import StickyProgress from "@/components/StickyProgress";
+import ScrollToMatch from "@/components/ScrollToMatch";
 import ShowMore from "@/components/ShowMore";
 import StoryClamp from "@/components/StoryClamp";
 import { requireMember, ACTIVE_RESERVATION } from "@/lib/data";
@@ -28,8 +30,11 @@ const CLOSED = {
   expire: "Réservations closes",
 };
 
-export default async function Domaine({ params }) {
+export default async function Domaine({ params, searchParams }) {
   const { slug } = await params;
+  const sp = (await searchParams) || {};
+  // Recherche venue de la Sélection (« chenin », « pinot noir »…) : on montre directement la ou les cuvées concernées
+  const recherche = typeof sp.q === "string" ? sp.q.trim().slice(0, 80) : "";
   const { supabase, member } = await requireMember();
 
   const { data: domain } = await supabase
@@ -92,6 +97,27 @@ export default async function Domaine({ params }) {
   const myBottles = Object.values(reservedByCuvee).reduce((s, n) => s + n, 0);
   // Ma réservation chez ce domaine, résumée dans la carte de commande
   const monMontant = (mine || []).reduce((t, r) => t + (r.quantity || 0) * Number(r.unit_price || 0), 0);
+  // Cuvées qui correspondent à la recherche : chaque mot doit se trouver dans la cuvée ou dans le domaine,
+  // et au moins un mot dans la cuvée elle-même (sinon c'est le domaine seul qui correspondait).
+  const norm = (s) =>
+    String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const texte = (v) => (Array.isArray(v) ? v.join(" ") : v || "");
+  const mots = norm(recherche).split(/\s+/).filter((m) => m.length > 1);
+  const texteDomaine = norm([domain.name, domain.region, domain.appellation, domain.tagline].join(" "));
+  const trouvees = new Set(
+    mots.length
+      ? (cuvees || [])
+          .filter((c) => {
+            const t = norm([c.name, c.description, texte(c.cepages), c.appellation, texte(c.labels), c.vintage].join(" "));
+            return mots.every((m) => t.includes(m) || texteDomaine.includes(m)) && mots.some((m) => t.includes(m));
+          })
+          .map((c) => c.id)
+      : []
+  );
+
   // Listes de cuvées raccourcies : les 6 premières de chaque couleur (coups de cœur en tête),
   // plus toutes celles déjà réservées par le membre ; le reste derrière « Voir les autres ».
   const LIMITE = 6;
@@ -99,7 +125,7 @@ export default async function Domaine({ params }) {
     if (items.length <= LIMITE + 2) return { visibles: items, caches: [] };
     const visibles = [];
     const caches = [];
-    items.forEach((c, i) => (i < LIMITE || reservedByCuvee[c.id] ? visibles : caches).push(c));
+    items.forEach((c, i) => (i < LIMITE || reservedByCuvee[c.id] || trouvees.has(c.id) ? visibles : caches).push(c));
     return { visibles, caches };
   };
   const mesLignes = (cuvees || [])
@@ -160,7 +186,7 @@ export default async function Domaine({ params }) {
   // Une ligne de cuvée : nom (+ cépage et labels, via CuveeSheet), puis coup de cœur et millésime.
   // La description complète se lit dans la fiche du vin.
   const ligneCuvee = (c) => (
-    <div className="cuvee" key={c.id} id={`cuvee-${c.id}`}>
+    <div className={`cuvee${trouvees.has(c.id) ? " is-match" : ""}`} key={c.id} id={`cuvee-${c.id}`}>
       <div>
         <p>
           <CuveeSheet c={c} domainName={domain.name} slug={domain.slug} avis={avisParCuvee[c.id]} />
@@ -288,6 +314,13 @@ export default async function Domaine({ params }) {
       <section className="section stack" id="cuvees">
         <h2>Les cuvées</h2>
         {groups.length === 0 && <p className="muted">Les cuvées de ce domaine arrivent bientôt.</p>}
+        {trouvees.size > 0 && (
+          <p className="recherche-note" role="status">
+            {trouvees.size === 1 ? "1 cuvée correspond" : `${trouvees.size} cuvées correspondent`} à « {recherche} », mise
+            {trouvees.size > 1 ? "s" : ""} en évidence ci-dessous.
+          </p>
+        )}
+        {trouvees.size > 0 && <ScrollToMatch />}
         <CuveeTabs tabs={tabs}>
           {groups.map((g) => (
             <div key={g.color} className="stack cuvee-group" data-c={g.color}>
