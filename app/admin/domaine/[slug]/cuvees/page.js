@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import "@/app/ergonomie.css";
 import { requireAdmin } from "@/lib/data";
 import { COLOR_LABELS, euros } from "@/lib/catalogue";
-import { updateCuveeFiche, updateCuveeVente } from "@/app/admin/actions";
+import { updateCuveeVente } from "@/app/admin/actions";
+import { updateCuveeFicheAvecAppellation } from "./actions-appellation";
 
 export const dynamic = "force-dynamic";
 
@@ -33,14 +34,14 @@ export default async function FichesCuvees({ params, searchParams }) {
   const { data: cuvees } = await supabase
     .from("cuvees")
     .select(
-      "id, name, vintage, color, member_price, pack_size, is_favorite, active, description, cepages, elevage, accords, service, garde, degre, labels, source_fiche"
+      "id, name, vintage, color, appellation, member_price, pack_size, is_favorite, active, description, cepages, elevage, accords, service, garde, degre, labels, source_fiche"
     )
     .eq("domain_id", domain.id)
     .order("active", { ascending: false })
     .order("name");
 
   const list = cuvees || [];
-  const remplie = (c) => c.cepages || c.elevage || c.accords || c.service || c.garde || c.degre || (c.labels || []).length;
+  const remplie = (c) => c.appellation || c.cepages || c.elevage || c.accords || c.service || c.garde || c.degre || (c.labels || []).length;
   const nb = list.filter(remplie).length;
 
   return (
@@ -128,12 +129,20 @@ export default async function FichesCuvees({ params, searchParams }) {
               </button>
             </form>
             <p className="fiche-section">Fiche détaillée</p>
-            <form action={updateCuveeFiche} className="stack fiche-form">
+            <form action={updateCuveeFicheAvecAppellation} className="stack fiche-form">
               <input type="hidden" name="id" value={c.id} />
               <input type="hidden" name="slug" value={slug} />
               <label>
                 Accroche (phrase courte affichée sous le nom)
                 <textarea name="description" rows={2} defaultValue={c.description || ""} />
+              </label>
+              <label>
+                Appellation
+                <input
+                  name="appellation"
+                  defaultValue={c.appellation || ""}
+                  placeholder="ex. Saint-Joseph, Bourgogne Hautes-Côtes de Nuits, Vin de France"
+                />
               </label>
               <label>
                 Cépages

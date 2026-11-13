@@ -17,7 +17,7 @@ const STYLE = `
 .cuvee.cuvee-cliquable .stepper-wrap { cursor: auto; }
 `;
 
-// Nom d'une cuvée sur la fiche domaine, suivi du cépage et des labels (Bio, Biodynamie…).
+// Nom d'une cuvée sur la fiche domaine, suivi de l'appellation, du cépage et des labels (Bio, Biodynamie…).
 // Si la cuvée a une description, des détails (élevage, accords…) ou des avis, toute sa carte ouvre
 // une fiche qui monte du bas de l'écran (sauf le choix du nombre de bouteilles) ;
 // sinon le nom reste un simple texte et la carte ne s'ouvre pas.
@@ -40,8 +40,8 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
   const hasDetails = Boolean(c.description) || rows.some(([k]) => k !== "Cépages");
   const aDesAvis = (avis?.nb || 0) > 0 || Boolean(avis?.mien) || Boolean(avis?.peutDonner);
   const ouvrable = hasDetails || aDesAvis;
-  // Toujours visible sous le nom : cépage et labels, sur une ligne
-  const resume = [c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
+  // Toujours visible sous le nom : appellation, cépage et labels, sur une ligne
+  const resume = [c.appellation, c.cepages, ...labels.map((l) => LABELS[l] || l)].filter(Boolean).join(" · ");
 
   // Toute la carte de la cuvée ouvre la fiche, sauf le choix du nombre de bouteilles,
   // les autres boutons et liens, et la fiche elle-même une fois ouverte.
@@ -151,6 +151,7 @@ export default function CuveeSheet({ c, domainName, slug, avis }) {
             </h2>
             <p className="muted">
               {COLOR_LABELS[c.color] || ""}
+              {c.appellation ? ` · ${c.appellation}` : ""}
               {c.vintage ? ` · ${c.vintage}` : " · Sans millésime"}
             </p>
             {labels.length > 0 && (

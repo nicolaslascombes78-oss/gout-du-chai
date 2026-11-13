@@ -42,7 +42,7 @@ export default async function Domaine({ params }) {
   const [{ data: cuvees }, { data: progress }, { data: follow }, { data: recos }] = await Promise.all([
     supabase
       .from("cuvees")
-      .select("id, name, vintage, color, member_price, description, is_favorite, pack_size, cepages, elevage, accords, service, garde, degre, labels, source_fiche")
+      .select("id, name, vintage, color, appellation, member_price, description, is_favorite, pack_size, cepages, elevage, accords, service, garde, degre, labels, source_fiche")
       .eq("domain_id", domain.id)
       .eq("active", true)
       .order("member_price"),
